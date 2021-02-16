@@ -1,0 +1,144 @@
+buildscript {
+    repositories {
+        maven { url = 'https://files.minecraftforge.net/maven' }
+        jcenter()
+        mavenCentral()
+    }
+    dependencies {
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+    }
+}
+
+repositories {
+    maven {
+        name 'LDTTeam - Modding'
+        url 'https://ldtteam.jfrog.io/ldtteam/modding/'
+    }
+    maven {
+        url "https://maven.tehnut.info"
+    }
+    maven {
+        url "https://www.cursemaven.com"
+    }
+    flatDir {
+        dirs("libs")
+    }
+}
+
+apply plugin: 'net.minecraftforge.gradle'
+// Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
+apply plugin: 'eclipse'
+apply plugin: 'maven-publish'
+
+ext.configFile = file "gradle.properties"
+configFile.withReader {
+    def prop = new Properties()
+    prop.load(it)
+    ext.config = new ConfigSlurper().parse prop
+}
+
+version = "${config.mc_version}-${config.mod_version}"
+group = config.package_group
+archivesBaseName = config.mod_name
+
+sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
+
+println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
+minecraft {
+    mappings channel: 'snapshot', version: '20201028-1.16.3'
+    runs {
+        client {
+            workingDirectory project.file('run')
+
+            // Recommended logging data for a userdev environment
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+
+            // Recommended logging level for the console
+            property 'forge.logging.console.level', 'debug'
+
+            // For Serene Seasons as it uses Mixins
+            properties 'mixin.env.disableRefMap' : 'true'
+
+            mods {
+                dynamictreesplus {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        server {
+            workingDirectory project.file('run')
+
+            // Recommended logging data for a userdev environment
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+
+            // Recommended logging level for the console
+            property 'forge.logging.console.level', 'debug'
+
+            // For Serene Seasons as it uses Mixins
+            properties 'mixin.env.disableRefMap' : 'true'
+
+            mods {
+                dynamictreesplus {
+                    source sourceSets.main
+                }
+            }
+        }
+    }
+}
+
+dependencies {
+    minecraft "net.minecraftforge:forge:${config.mc_version}-${config.forge_version}"
+
+// Compile Hwyla API, but don't include in runtime.
+    compileOnly fg.deobf("mcp.mobius.waila:Hwyla:${config.hwyla_version}:api")
+    // At runtime, use the full Hwyla mod.
+    runtimeOnly fg.deobf("mcp.mobius.waila:Hwyla:${config.hwyla_version}")
+
+    // Compile JEI API, but don't include in runtime.
+    compileOnly fg.deobf("mezz.jei:jei-1.16.4:${config.jei_version}:api")
+    // At runtime, use the full JEI mod.
+    runtimeOnly fg.deobf("mezz.jei:jei-1.16.4:${config.jei_version}")
+
+    // At runtime, use Patchouli mod (for the guide book, which is Json so we don't need the API).
+    runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:${config.patchouli_version}")
+
+    // Compile full Serene Seasons mod and use in runtime.
+    implementation fg.deobf("curse.maven:SereneSeasons-291874:3179424")
+
+    //Compile Dynamic Trees, of course
+    implementation fg.deobf("blank:DynamicTrees-1.16.5:0.1.0")
+}
+
+// Example for how to get properties into the manifest for reading by the runtime..
+jar {
+    manifest {
+        attributes([
+                "Specification-Title": project.name,
+                "Specification-Vendor": "ferreusveritas",
+                "Specification-Version": "${version}",
+                "Implementation-Title": project.name,
+                "Implementation-Version": "${version}",
+                "Implementation-Vendor" :"ferreusveritas",
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
+    }
+}
+
+def reobfFile = file("$buildDir/reobfJar/output.jar")
+def reobfArtifact = artifacts.add('default', reobfFile) {
+    type 'jar'
+    builtBy 'reobfJar'
+}
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact reobfArtifact
+        }
+    }
+    repositories {
+        maven {
+            url "file:///${project.projectDir}/mcmodsrepo"
+        }
+    }
+}

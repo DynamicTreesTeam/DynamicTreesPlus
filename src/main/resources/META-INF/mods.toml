@@ -1,0 +1,37 @@
+license="MIT"
+modLoader="javafml"
+loaderVersion="[35,)"
+issueTrackerURL="https://github.com/supermassimo/DynamicTreesPlus/issues"
+
+[[mods]]
+modId="dynamictreesplus"
+version="${file.jarVersion}"
+displayName="Dynamic Trees Plus"
+#updateJSONURL="http://minecraft.curseforge.com/projects/dynamictreesplus"
+displayURL="http://minecraft.curseforge.com/projects/dynamictreesplus"
+logoFile="logo.png"
+credits=""
+authors="Ferreusveritas, Max Hyper/supermassimo, Harley O' Connor"
+description='''
+Vanilla addon for Dynamic Trees'''
+
+[[dependencies.dynamictreesplus]]
+    modId="forge"
+    mandatory=true
+    versionRange="[35,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.dynamictreesplus]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.16.4,1.16.5]"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.dynamictreesplus]]
+    modId="dynamictrees"
+    mandatory=true
+    versionRange="[0.1.0,)"
+    ordering="AFTER"
+    side="BOTH"

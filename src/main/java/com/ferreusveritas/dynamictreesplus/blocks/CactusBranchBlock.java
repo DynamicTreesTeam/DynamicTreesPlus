@@ -247,14 +247,21 @@ public class CactusBranchBlock extends BranchBlock {
 
 	protected int getSideConnectionRadius(IBlockReader blockAccess, BlockPos pos, int radius, Direction side) {
 		BlockPos deltaPos = pos.offset(side);
-		BlockState otherState = blockAccess.getBlockState(deltaPos);
-		BlockState state = blockAccess.getBlockState(pos);
 
-		if (otherState.getBlock() == this && state.getBlock() == this && (otherState.get(ORIGIN) == side.getOpposite() || state.get(ORIGIN) == side)) {
-			return (state.get(TRUNK) && otherState.get(TRUNK)) ? 5 : 4;
-		} else if (side == Direction.DOWN && state.getBlock() == this && state.get(TRUNK) && state.get(ORIGIN) == side) {
-			return 5;
+		try {
+			BlockState otherState = blockAccess.getBlockState(deltaPos);
+			BlockState state = blockAccess.getBlockState(pos);
+
+			if (otherState.getBlock() == this && state.getBlock() == this && (otherState.get(ORIGIN) == side.getOpposite() || state.get(ORIGIN) == side)) {
+				return (state.get(TRUNK) && otherState.get(TRUNK)) ? 5 : 4;
+			} else if (side == Direction.DOWN && state.getBlock() == this && state.get(TRUNK) && state.get(ORIGIN) == side) {
+				return 5;
+			}
+		} catch (Exception e){
+			DynamicTrees.getLogger().warn("Tried to get connection info for unloaded block: " + deltaPos.getX() + " " + deltaPos.getY() + " " + deltaPos.getZ());
+			return 0;
 		}
+
 
 		return 0;
 	}

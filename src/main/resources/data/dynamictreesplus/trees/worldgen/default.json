@@ -3,7 +3,7 @@
 		"__comment" : "This applies to deserts",
 		"select": { "type": "sandy", "name": "minecraft:.*" },
 		"apply": {
-			"species" : "cactus",
+			"species" : "dynamicteesplus:cactus",
 			"density" : { "math": { "add" : [ { "mul" : [ "noise", 0.6 ] }, 0.4 ] } },
 			"chance": 0.075
 		}
@@ -11,7 +11,7 @@
 	{
 		"select": { "name": "minecraft:.*badlands.*" },
 		"apply": {
-			"species" : "cactus",
+			"species" : "dynamicteesplus:cactus",
 			"density" : { "math": { "add" : [ { "mul" : [ "noise", 0.6 ] }, 0.4 ] } },
 			"chance": 0.075
 		}

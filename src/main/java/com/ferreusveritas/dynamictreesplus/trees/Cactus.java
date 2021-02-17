@@ -78,6 +78,11 @@ public class Cactus extends TreeFamily {
 		}
 
 		@Override
+		public boolean generate(World worldObj, IWorld world, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
+			return super.generate(worldObj, world, rootPos, biome, random, radius, safeBounds);
+		}
+
+		@Override
 		protected void setStandardSoils() {
 			addAcceptableSoils(DirtHelper.SAND_LIKE);
 		}
@@ -111,7 +116,7 @@ public class Cactus extends TreeFamily {
 		}
 		
 		@Override
-		protected int[] customDirectionManipulation(World world, BlockPos pos, int radius, GrowSignal signal, int probMap[]) {
+		protected int[] customDirectionManipulation(World world, BlockPos pos, int radius, GrowSignal signal, int[] probMap) {
 			Direction originDir = signal.dir.getOpposite();
 			
 			//Alter probability map for direction change

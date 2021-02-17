@@ -6,13 +6,12 @@ import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
+import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.event.SpeciesPostGenerationEvent;
+import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.DirtHelper;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFindEnds;
-import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeNetVolume;
-import com.ferreusveritas.dynamictrees.systems.substances.TransformSubstance;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
@@ -20,14 +19,15 @@ import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.ferreusveritas.dynamictreesplus.DynamicTreesPlus;
 import com.ferreusveritas.dynamictreesplus.blocks.CactusBranchBlock;
+import com.ferreusveritas.dynamictreesplus.systems.dropcreators.CactusSeedDropCreator;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.SoundType;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -38,49 +38,37 @@ import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.Biomes;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.registries.IForgeRegistry;
 
 import java.util.List;
-import java.util.Random;
+import java.util.Optional;
 
 public class Cactus extends TreeFamily {
-	
-	public class CactusSpecies extends Species {
-		
-		public CactusSpecies(TreeFamily treeFamily) {
-			super(treeFamily.getName(), treeFamily);
-			
-			setBasicGrowingParameters(0.875f, 4.0f, 4, 2, 1.0f);
-			
-			this.setSoilLongevity(1);
 
-			generateSapling();
+	public abstract class BaseCactusSpecies extends Species {
 
-			addDropCreator(new DropCreator(new ResourceLocation(DynamicTreesPlus.MOD_ID, "cactusseeds")) {
-				@Override
-				public List<ItemStack> getLogsDrop(World world, Species species, BlockPos breakPos, Random random, List<ItemStack> dropList, NodeNetVolume.Volume volume) {
-					int numLogs = (int) (volume.getVolume() / 2);
-					while(numLogs > 0) {
-						dropList.add(species.getSeedStack(Math.min(numLogs, 64)));
-						numLogs -= 64;
-					}
-					return dropList;
-				}
-			});
-			
+		public BaseCactusSpecies (String name, TreeFamily treeFamily){
+			super(new ResourceLocation(treeFamily.getName().getNamespace(), name + "_" + treeFamily.getName().getPath()), treeFamily);
+
+			addDropCreator(new CactusSeedDropCreator());
+
 			envFactor(Type.SNOWY, 0.25f);
 			envFactor(Type.COLD, 0.5f);
 			envFactor(Type.SANDY, 1.05f);
-
 		}
 
 		@Override
-		public boolean generate(World worldObj, IWorld world, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
-			return super.generate(worldObj, world, rootPos, biome, random, radius, safeBounds);
+		public boolean showSpeciesOnWaila() {
+			return true;
 		}
+
+		public abstract boolean isThickAfterGrowth(World world, BlockPos pos, GrowSignal signal, boolean isAlreadyThick);
+
+		public abstract boolean growIntoAirAsThick(World world, BlockPos pos, GrowSignal signal);
 
 		@Override
 		protected void setStandardSoils() {
@@ -88,31 +76,91 @@ public class Cactus extends TreeFamily {
 		}
 
 		@Override
-		public boolean isTransformable() {
-			return false;
-		}
+		public boolean isTransformable() { return false; }
 
 		@Override
 		public JoCode getJoCode(String joCodeString) {
 			return new JoCodeCactus(joCodeString);
-		}
-		
-		@Override
-		public float getEnergy(World world, BlockPos pos) {
-			long day = world.getGameTime() / 24000L;
-			int month = (int)day / 30; //Change the hashs every in-game month
-			
-			return super.getEnergy(world, pos) * biomeSuitability(world, pos) + (CoordUtils.coordHashCode(pos.up(month), 2) % 3);//Vary the height energy by a psuedorandom hash function
 		}
 
 		@Override
 		public boolean isBiomePerfect(RegistryKey<Biome> biome) {
 			return BiomeDictionary.hasType(biome, Type.DRY) && BiomeDictionary.hasType(biome, Type.SANDY);
 		}
-		
+
 		@Override
 		public boolean handleRot(IWorld world, List<BlockPos> ends, BlockPos rootPos, BlockPos treePos, int soilLife, SafeChunkBounds safeBounds) {
 			return false;
+		}
+
+		@Override
+		public boolean transitionToTree(World world, BlockPos pos) {
+			//Ensure planting conditions are right
+			TreeFamily tree = getFamily();
+			if(world.isAirBlock(pos.up()) && isAcceptableSoil(world, pos.down(), world.getBlockState(pos.down()))) {
+				world.setBlockState(pos, tree.getDynamicBranch().getDefaultState().with(CactusBranchBlock.TRUNK, growIntoAirAsThick(world, pos, new GrowSignal(this, pos, 0))));//set to a single branch
+				placeRootyDirtBlock(world, pos.down(), 15);//Set to fully fertilized rooty sand underneath
+				return true;
+			}
+
+			return false;
+		}
+
+		@Override
+		public boolean canBoneMealTree() {
+			return true;
+		}
+
+		@Override
+		public VoxelShape getSaplingShape() {
+			return VoxelShapes.create(new AxisAlignedBB(0.375f, 0.0f, 0.375f, 0.625f, 0.5f, 0.625f));
+		}
+
+		public SoundType getSaplingSound() {
+			return SoundType.CLOTH;
+		}
+
+	}
+
+	public class SaguaroCactusSpecies extends BaseCactusSpecies {
+		
+		public SaguaroCactusSpecies(TreeFamily treeFamily) {
+			super("saguaro", treeFamily);
+			
+			setBasicGrowingParameters(tapering, 4.0f, 4, 2, 1.0f);
+			
+			this.setSoilLongevity(1);
+
+			generateSapling();
+			generateSeed();
+		}
+
+		@Override
+		public boolean getRequiresTileEntity(IWorld world, BlockPos pos) {
+			return !isLocationForSaguaro(world, pos);
+		}
+
+		@Override
+		public Species getMegaSpecies() {
+			return megaCactus;
+		}
+
+		@Override
+		public boolean isThickAfterGrowth(World world, BlockPos pos, GrowSignal signal, boolean isAlreadyThick) {
+			return isAlreadyThick;
+		}
+
+		@Override
+		public boolean growIntoAirAsThick(World world, BlockPos pos, GrowSignal signal) {
+			return signal.isInTrunk();
+		}
+
+		@Override
+		public float getEnergy(World world, BlockPos pos) {
+			long day = world.getGameTime() / 24000L;
+			int month = (int)day / 30; //Change the hashs every in-game month
+			
+			return super.getEnergy(world, pos) * biomeSuitability(world, pos) + (CoordUtils.coordHashCode(pos.up(month), 2) % 3);//Vary the height energy by a psuedorandom hash function
 		}
 		
 		@Override
@@ -135,46 +183,167 @@ public class Cactus extends TreeFamily {
 			}
 			return newDir;
 		}
-		
-		@Override
-		public boolean applySubstance(World world, BlockPos rootPos, BlockPos hitPos, PlayerEntity player, Hand hand, ItemStack itemStack) {
-			
-			// Prevent transformation potions from being used on Cacti
-			if(!(getSubstanceEffect(itemStack) instanceof TransformSubstance)) {
-				return super.applySubstance(world, rootPos, hitPos, player, hand, itemStack);
-			}
-			
-			return false;
+	}
+
+	public class PillarCactusSpecies extends BaseCactusSpecies {
+
+		public PillarCactusSpecies(TreeFamily treeFamily) {
+			super("pillar", treeFamily);
+
+			setBasicGrowingParameters(tapering, 8.0f, upProbability, lowestBranchHeight, 1.0f);
+
+			this.setSoilLongevity(1);
+
+			generateSapling();
+			generateSeed();
 		}
-		
+
 		@Override
-		public boolean canBoneMealTree() {
-			return false;
+		public boolean getRequiresTileEntity(IWorld world, BlockPos pos) {
+			return isLocationForSaguaro(world, pos);
 		}
-		
+
 		@Override
-		public boolean transitionToTree(World world, BlockPos pos) {
-			//Ensure planting conditions are right
-			TreeFamily tree = getFamily();
-			if(world.isAirBlock(pos.up()) && isAcceptableSoil(world, pos.down(), world.getBlockState(pos.down()))) {
-				world.setBlockState(pos, tree.getDynamicBranch().getDefaultState());//set to a single branch
-				placeRootyDirtBlock(world, pos.down(), 15);//Set to fully fertilized rooty sand underneath
-				return true;
-			}
-			
+		public boolean isThickAfterGrowth(World world, BlockPos pos, GrowSignal signal, boolean isAlreadyThick) {
+			BlockState upState = world.getBlockState(pos.up());
+			BlockState downState = world.getBlockState(pos.down());
+			return upState.getBlock() instanceof CactusBranchBlock && downState.getBlock() instanceof CactusBranchBlock;
+		}
+
+		@Override
+		public boolean growIntoAirAsThick(World world, BlockPos pos, GrowSignal signal) {
 			return false;
 		}
 
 		@Override
-		public VoxelShape getSaplingShape() {
-			return VoxelShapes.create(new AxisAlignedBB(0.375f, 0.0f, 0.375f, 0.625f, 0.5f, 0.625f));
+		public float getEnergy(World world, BlockPos pos) {
+			long day = world.getGameTime() / 24000L;
+			int month = (int)day / 30; //Change the hashs every in-game month
+
+			return super.getEnergy(world, pos) * biomeSuitability(world, pos) - (CoordUtils.coordHashCode(pos.up(month), 2) % 5);//Vary the height energy by a psuedorandom hash function
 		}
-		
-		public SoundType getSaplingSound() {
-			return SoundType.CLOTH;
+
+		@Override
+		protected int[] customDirectionManipulation(World world, BlockPos pos, int radius, GrowSignal signal, int[] probMap) {
+			//All directions except up are disabled, since pillar cacti are just straight
+			return new int[]{0,1,0,0,0,0};
 		}
 	}
-	
+
+	public class PipeCactusSpecies extends BaseCactusSpecies {
+
+		public PipeCactusSpecies(TreeFamily treeFamily) {
+			super("pipe", treeFamily);
+
+			setBasicGrowingParameters(tapering, 4.0f, upProbability, lowestBranchHeight, 1.0f);
+
+			this.setSoilLongevity(1);
+
+			generateSapling();
+			generateSeed();
+
+			setRequiresTileEntity(true);
+		}
+
+		@Override
+		public boolean isThickAfterGrowth(World world, BlockPos pos, GrowSignal signal, boolean isAlreadyThick) {
+			return false;
+		}
+
+		@Override
+		public boolean growIntoAirAsThick(World world, BlockPos pos, GrowSignal signal) {
+			return false;
+		}
+
+		@Override
+		public float getEnergy(World world, BlockPos pos) {
+			long day = world.getGameTime() / 24000L;
+			int month = (int)day / 30; //Change the hashs every in-game month
+
+			return super.getEnergy(world, pos) * biomeSuitability(world, pos) + (CoordUtils.coordHashCode(pos.up(month), 2) % 3);//Vary the height energy by a psuedorandom hash function
+		}
+
+		@Override
+		protected int[] customDirectionManipulation(World world, BlockPos pos, int radius, GrowSignal signal, int[] probMap) {
+			//All directions except up are disabled, since pipe cacti are just straight
+			return new int[]{0,1,0,0,0,0};
+		}
+	}
+
+	public class MegaCactusSpecies extends BaseCactusSpecies {
+
+		private static final int stopBranchingHeight = 5;
+
+		public MegaCactusSpecies(TreeFamily treeFamily) {
+			super("mega", treeFamily);
+
+			setBasicGrowingParameters(tapering, 18.0f, 1, 3, 0.6f);
+
+			this.setSoilLongevity(8);
+
+			setRequiresTileEntity(true);
+		}
+
+		@Override
+		public boolean isThickAfterGrowth(World world, BlockPos pos, GrowSignal signal, boolean isAlreadyThick) {
+			return true;
+		}
+
+		@Override
+		public boolean growIntoAirAsThick(World world, BlockPos pos, GrowSignal signal) {
+			Block down = world.getBlockState(pos.down()).getBlock();
+			return down instanceof CactusBranchBlock || down instanceof RootyBlock;
+		}
+
+		@Override
+		public ItemStack getSeedStack(int qty) {
+			return saguaroCactus.getSeedStack(qty);
+		}
+
+		@Override
+		public Optional<Seed> getSeed() {
+			return saguaroCactus.getSeed();
+		}
+
+		@Override
+		public boolean isMega() {
+			return true;
+		}
+
+		@Override
+		public float getEnergy(World world, BlockPos pos) {
+			long day = world.getGameTime() / 24000L;
+			int month = (int)day / 30; //Change the hashs every in-game month
+
+			return super.getEnergy(world, pos) * biomeSuitability(world, pos) + (CoordUtils.coordHashCode(pos.up(month), 2) % 6);//Vary the height energy by a psuedorandom hash function
+		}
+
+		@Override
+		protected int[] customDirectionManipulation(World world, BlockPos pos, int radius, GrowSignal signal, int[] probMap) {
+			Direction originDir = signal.dir.getOpposite();
+
+			if ((pos.getY() - signal.rootPos.getY()) > stopBranchingHeight){
+				//When above a certain height, all branches should grow straight up
+				return new int[]{0,1,0,0,0,0};
+			}
+			//Alter probability map for direction change
+			probMap[0] = 0;//Down is always disallowed for cactus
+			probMap[1] = signal.delta.getX() % 2 == 0 || signal.delta.getZ() % 2 == 0 ? getUpProbability() : 0;
+			probMap[2] = probMap[3] = probMap[4] = probMap[5] = (world.getBlockState(pos.up()).getBlock() instanceof CactusBranchBlock && signal.energy > 1) ? 1 : 0;
+			if (signal.dir != Direction.UP) probMap[signal.dir.ordinal()] = 0;//Disable the current direction, unless that direction is up
+			probMap[originDir.ordinal()] = 0;//Disable the direction we came from
+
+			return probMap;
+		}
+	}
+
+	protected boolean isLocationForSaguaro(IWorld world, BlockPos trunkPos){
+		return Species.isOneOfBiomes(Species.getBiomeKey(world.getBiome(trunkPos)), Biomes.BADLANDS, Biomes.BADLANDS_PLATEAU);
+	}
+
+	Species saguaroCactus;
+	Species pipeCactus;
+	Species megaCactus;
 	public Cactus() {
 		super(new ResourceLocation(DynamicTreesPlus.MOD_ID, "cactus"));
 		
@@ -210,15 +379,32 @@ public class Cactus extends TreeFamily {
 	
 	@Override
 	public void createSpecies() {
-		setCommonSpecies(new CactusSpecies(this));
+		saguaroCactus = new SaguaroCactusSpecies(this);
+		pipeCactus = new PipeCactusSpecies(this);
+		megaCactus = new MegaCactusSpecies(this);
+		setCommonSpecies(new PillarCactusSpecies(this));
 	}
 
 	@Override
 	public void registerSpecies(IForgeRegistry<Species> speciesRegistry) {
 		super.registerSpecies(speciesRegistry);
-		getCommonSpecies().generateSeed();
+		speciesRegistry.registerAll(saguaroCactus, pipeCactus, megaCactus);
 	}
-	
+
+	@Override
+	public List<Item> getRegisterableItems(List<Item> itemList) {
+		saguaroCactus.getSeed().ifPresent(itemList::add);
+		pipeCactus.getSeed().ifPresent(itemList::add);
+		return super.getRegisterableItems(itemList);
+	}
+
+	@Override
+	public List<Block> getRegisterableBlocks(List<Block> blockList) {
+		saguaroCactus.getSapling().ifPresent(blockList::add);
+		pipeCactus.getSapling().ifPresent(blockList::add);
+		return super.getRegisterableBlocks(blockList);
+	}
+
 	protected class JoCodeCactus extends JoCode {
 		
 		public JoCodeCactus(String code) {

@@ -8,10 +8,12 @@ import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
+import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.Connections;
+import com.ferreusveritas.dynamictreesplus.trees.Cactus;
 import com.google.common.base.Predicate;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -31,10 +33,7 @@ import net.minecraft.util.math.shapes.IBooleanFunction;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.world.IBlockDisplayReader;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
+import net.minecraft.world.*;
 import net.minecraftforge.common.ToolType;
 
 import javax.annotation.Nonnull;
@@ -117,7 +116,7 @@ public class CactusBranchBlock extends BranchBlock {
 		BlockState returnState = this.getDefaultState();
 
 		BlockState adjState = context.getWorld().getBlockState(context.getPos().offset(context.getFace().getOpposite()));
-		boolean trunk = (context.getFace() == Direction.UP && (adjState.isSolid() || (adjState.getBlock() == this && adjState.get(TRUNK))));
+		boolean trunk = (context.getFace() == Direction.UP && (adjState.getBlock() != this || adjState.get(TRUNK)));
 
 		return returnState.with(TRUNK, trunk).with(ORIGIN, context.getFace() != Direction.DOWN ? context.getFace().getOpposite() : Direction.DOWN);
 	}
@@ -131,13 +130,20 @@ public class CactusBranchBlock extends BranchBlock {
 		return CellNull.NULLCELL;
 	}
 
+	protected int getCactusRadius(boolean trunk){
+		return (int)(trunk ? getFamily().getPrimaryThickness() : getFamily().getSecondaryThickness());
+	}
+
 	public int getRadius(BlockState blockState) {
-		return blockState.getBlock() == this ? (blockState.get(TRUNK) ? 5 : 4) : 0;
+		return blockState.getBlock() == this ? getCactusRadius(blockState.get(TRUNK)) : 0;
 	}
 
 	@Override
 	public int setRadius(IWorld world, BlockPos pos, int radius, Direction originDir, int flags) {
-		return radius;//Do nothing
+		destroyMode = DynamicTrees.EnumDestroyMode.SETRADIUS;
+		world.setBlockState(pos, getStateForRadius(radius).with(ORIGIN, originDir), flags);
+		destroyMode = DynamicTrees.EnumDestroyMode.SLOPPY;
+		return radius;
 	}
 
 	// Directionless probability grabber
@@ -148,7 +154,11 @@ public class CactusBranchBlock extends BranchBlock {
 
 	public GrowSignal growIntoAir(World world, BlockPos pos, GrowSignal signal, int fromRadius) {
 		Direction originDir = signal.dir.getOpposite(); // Direction this signal originated from
-		boolean trunk = signal.isInTrunk();
+
+		boolean trunk;
+		if (signal.getSpecies() instanceof Cactus.BaseCactusSpecies){
+			trunk = ((Cactus.BaseCactusSpecies) signal.getSpecies()).growIntoAirAsThick(world, pos, signal);
+		} else trunk = false;
 
 		if (originDir.getAxis() != Direction.Axis.Y && (world.getBlockState(pos.up()).getBlock() == this || world.getBlockState(pos.down()).getBlock() == this)) {
 			signal.success = false;
@@ -156,7 +166,7 @@ public class CactusBranchBlock extends BranchBlock {
 		}
 
 		signal.success = world.setBlockState(pos, this.stateContainer.getBaseState().with(TRUNK, trunk).with(ORIGIN, originDir), 2);
-		signal.radius = (int) (trunk ? signal.getSpecies().getFamily().getPrimaryThickness(): signal.getSpecies().getFamily().getSecondaryThickness());
+		signal.radius = getCactusRadius(trunk);
 		return signal;
 	}
 
@@ -181,6 +191,16 @@ public class CactusBranchBlock extends BranchBlock {
 			} else if (world.isAirBlock(deltaPos)) {
 				signal = growIntoAir(world, deltaPos, signal, (int) signal.radius);
 			}
+
+			BlockState thisState = world.getBlockState(pos);
+			if (thisState.getBlock() == this && species instanceof Cactus.BaseCactusSpecies){
+				boolean isTrunk = thisState.get(TRUNK);
+				boolean newIsTrunk = ((Cactus.BaseCactusSpecies) species).isThickAfterGrowth(world, pos, signal, isTrunk);
+				if (isTrunk != newIsTrunk){
+					setRadius(world, pos, getCactusRadius(newIsTrunk), thisState.get(ORIGIN));
+				}
+			}
+
 		}
 
 		return signal;
@@ -188,7 +208,7 @@ public class CactusBranchBlock extends BranchBlock {
 
 	@Override
 	public BlockState getStateForRadius(int radius) {
-		return getDefaultState().with(TRUNK, radius > 4);
+		return getDefaultState().with(TRUNK, radius > getCactusRadius(false));
 	}
 
 	///////////////////////////////////////////
@@ -228,7 +248,7 @@ public class CactusBranchBlock extends BranchBlock {
 			}
 		}
 		if (!state.get(TRUNK) && numConnections == 1 && state.get(ORIGIN).getAxis().isHorizontal()) {
-			double radius = MathHelper.clamp(4, 1, thisRadius) / 16.0;
+			double radius = MathHelper.clamp(getCactusRadius(false), 1, thisRadius) / 16.0;
 			double gap = 0.5 - radius;
 			AxisAlignedBB aabb = new AxisAlignedBB(0, 0, 0, 0, 0, 0).grow(radius);
 			aabb = aabb.offset(Direction.UP.getXOffset() * gap, Direction.UP.getYOffset() * gap, Direction.UP.getZOffset() * gap).offset(0.5, 0.5, 0.5);
@@ -253,9 +273,9 @@ public class CactusBranchBlock extends BranchBlock {
 			BlockState state = blockAccess.getBlockState(pos);
 
 			if (otherState.getBlock() == this && state.getBlock() == this && (otherState.get(ORIGIN) == side.getOpposite() || state.get(ORIGIN) == side)) {
-				return (state.get(TRUNK) && otherState.get(TRUNK)) ? 5 : 4;
-			} else if (side == Direction.DOWN && state.getBlock() == this && state.get(TRUNK) && state.get(ORIGIN) == side) {
-				return 5;
+				return getCactusRadius(state.get(TRUNK) && otherState.get(TRUNK));
+			} else if (side == Direction.DOWN && state.getBlock() == this && state.get(ORIGIN) == side && (otherState.getBlock() == this || otherState.getBlock() instanceof RootyBlock)) {
+				return getCactusRadius(state.get(TRUNK));
 			}
 		} catch (Exception e){
 			DynamicTrees.getLogger().warn("Tried to get connection info for unloaded block: " + deltaPos.getX() + " " + deltaPos.getY() + " " + deltaPos.getZ());

@@ -21,11 +21,11 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Direction;
+import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -43,15 +43,28 @@ import java.util.Random;
 public class CactusBranchBlock extends BranchBlock {
 
 	// The direction it grew from. Can't be up, since cacti can't grow down.
-	public static final EnumProperty<Direction> ORIGIN = EnumProperty.<Direction>create("origin", Direction.class, new Predicate<Direction>() {
-		@Override
-		public boolean apply(@Nullable Direction dir) {
-			return dir != Direction.UP;
-		}
-	});
+	public static final EnumProperty<Direction> ORIGIN = EnumProperty.<Direction>create("origin", Direction.class, (Predicate<Direction>) dir -> dir != Direction.UP);
 	 // Not sure it's technically called the 'trunk' on cacti, but whatever
-	public static final BooleanProperty TRUNK = BooleanProperty.create("trunk");
-	
+	public static final EnumProperty<CactusThickness> TRUNK_TYPE = EnumProperty.create("type", CactusThickness.class);
+
+	public enum CactusThickness implements IStringSerializable {
+		BRANCH("branch", 4),
+		TRUNK("trunk", 5),
+		CORE("core", 7);
+		String name;
+		int radius;
+		CactusThickness (String name, int radius){ this.name = name; this.radius = radius; }
+		public int getRadius() {
+			return radius;
+		}
+		@Override public String toString() {
+			return this.name;
+		}
+		@Override public String getString() {
+			return this.name;
+		}
+	}
+
 	public CactusBranchBlock(String name) {
 		super(Properties.create(Material.CACTUS)
 				.sound(SoundType.CLOTH)
@@ -59,7 +72,7 @@ public class CactusBranchBlock extends BranchBlock {
 				.harvestLevel(0)
 				.sound(SoundType.CLOTH), name);
 
-		setDefaultState(this.getStateContainer().getBaseState().with(TRUNK, true).with(ORIGIN, Direction.DOWN));
+		setDefaultState(this.getStateContainer().getBaseState().with(TRUNK_TYPE, CactusThickness.TRUNK).with(ORIGIN, Direction.DOWN));
 	}
 
 	///////////////////////////////////////////
@@ -67,7 +80,7 @@ public class CactusBranchBlock extends BranchBlock {
 	///////////////////////////////////////////
 
 	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-		builder.add(ORIGIN, TRUNK);
+		builder.add(ORIGIN, TRUNK_TYPE);
 	}
 
 	///////////////////////////////////////////
@@ -116,9 +129,9 @@ public class CactusBranchBlock extends BranchBlock {
 		BlockState returnState = this.getDefaultState();
 
 		BlockState adjState = context.getWorld().getBlockState(context.getPos().offset(context.getFace().getOpposite()));
-		boolean trunk = (context.getFace() == Direction.UP && (adjState.getBlock() != this || adjState.get(TRUNK)));
+		boolean trunk = (context.getFace() == Direction.UP && (adjState.getBlock() != this || adjState.get(TRUNK_TYPE) != CactusThickness.BRANCH));
 
-		return returnState.with(TRUNK, trunk).with(ORIGIN, context.getFace() != Direction.DOWN ? context.getFace().getOpposite() : Direction.DOWN);
+		return returnState.with(TRUNK_TYPE, trunk?CactusThickness.TRUNK:CactusThickness.BRANCH).with(ORIGIN, context.getFace() != Direction.DOWN ? context.getFace().getOpposite() : Direction.DOWN);
 	}
 
 	///////////////////////////////////////////
@@ -130,12 +143,20 @@ public class CactusBranchBlock extends BranchBlock {
 		return CellNull.NULLCELL;
 	}
 
-	protected int getCactusRadius(boolean trunk){
-		return (int)(trunk ? getFamily().getPrimaryThickness() : getFamily().getSecondaryThickness());
+	protected int getCactusRadius(CactusThickness trunk){
+		switch (trunk){
+			default:
+			case BRANCH:
+				return (int)getFamily().getSecondaryThickness();
+			case TRUNK:
+				return (int)getFamily().getPrimaryThickness();
+			case CORE:
+				return 7;
+		}
 	}
 
 	public int getRadius(BlockState blockState) {
-		return blockState.getBlock() == this ? getCactusRadius(blockState.get(TRUNK)) : 0;
+		return blockState.getBlock() == this ? getCactusRadius(blockState.get(TRUNK_TYPE)) : 0;
 	}
 
 	@Override
@@ -155,17 +176,17 @@ public class CactusBranchBlock extends BranchBlock {
 	public GrowSignal growIntoAir(World world, BlockPos pos, GrowSignal signal, int fromRadius) {
 		Direction originDir = signal.dir.getOpposite(); // Direction this signal originated from
 
-		boolean trunk;
+		CactusThickness trunk;
 		if (signal.getSpecies() instanceof Cactus.BaseCactusSpecies){
-			trunk = ((Cactus.BaseCactusSpecies) signal.getSpecies()).growIntoAirAsThick(world, pos, signal);
-		} else trunk = false;
+			trunk = ((Cactus.BaseCactusSpecies) signal.getSpecies()).thicknessAfterGrowIntoAir(world, pos, signal);
+		} else trunk = CactusThickness.BRANCH;
 
 		if (originDir.getAxis() != Direction.Axis.Y && (world.getBlockState(pos.up()).getBlock() == this || world.getBlockState(pos.down()).getBlock() == this)) {
 			signal.success = false;
 			return signal;
 		}
 
-		signal.success = world.setBlockState(pos, this.stateContainer.getBaseState().with(TRUNK, trunk).with(ORIGIN, originDir), 2);
+		signal.success = world.setBlockState(pos, this.stateContainer.getBaseState().with(TRUNK_TYPE, trunk).with(ORIGIN, originDir), 2);
 		signal.radius = getCactusRadius(trunk);
 		return signal;
 	}
@@ -194,8 +215,8 @@ public class CactusBranchBlock extends BranchBlock {
 
 			BlockState thisState = world.getBlockState(pos);
 			if (thisState.getBlock() == this && species instanceof Cactus.BaseCactusSpecies){
-				boolean isTrunk = thisState.get(TRUNK);
-				boolean newIsTrunk = ((Cactus.BaseCactusSpecies) species).isThickAfterGrowth(world, pos, signal, isTrunk);
+				CactusThickness isTrunk = thisState.get(TRUNK_TYPE);
+				CactusThickness newIsTrunk = ((Cactus.BaseCactusSpecies) species).thicknessAfterGrowthSignal(world, pos, signal, isTrunk);
 				if (isTrunk != newIsTrunk){
 					setRadius(world, pos, getCactusRadius(newIsTrunk), thisState.get(ORIGIN));
 				}
@@ -208,7 +229,10 @@ public class CactusBranchBlock extends BranchBlock {
 
 	@Override
 	public BlockState getStateForRadius(int radius) {
-		return getDefaultState().with(TRUNK, radius > getCactusRadius(false));
+		CactusThickness thickness = CactusThickness.BRANCH;
+		if (radius >= getCactusRadius(CactusThickness.CORE)) thickness = CactusThickness.CORE;
+		else if (radius >= getCactusRadius(CactusThickness.TRUNK)) thickness = CactusThickness.TRUNK;
+		return getDefaultState().with(TRUNK_TYPE, thickness);
 	}
 
 	///////////////////////////////////////////
@@ -247,8 +271,8 @@ public class CactusBranchBlock extends BranchBlock {
 				shape = VoxelShapes.combine(shape, VoxelShapes.create(aabb), IBooleanFunction.OR);
 			}
 		}
-		if (!state.get(TRUNK) && numConnections == 1 && state.get(ORIGIN).getAxis().isHorizontal()) {
-			double radius = MathHelper.clamp(getCactusRadius(false), 1, thisRadius) / 16.0;
+		if (state.get(TRUNK_TYPE) == CactusThickness.BRANCH && numConnections == 1 && state.get(ORIGIN).getAxis().isHorizontal()) {
+			double radius = MathHelper.clamp(getCactusRadius(CactusThickness.BRANCH), 1, thisRadius) / 16.0;
 			double gap = 0.5 - radius;
 			AxisAlignedBB aabb = new AxisAlignedBB(0, 0, 0, 0, 0, 0).grow(radius);
 			aabb = aabb.offset(Direction.UP.getXOffset() * gap, Direction.UP.getYOffset() * gap, Direction.UP.getZOffset() * gap).offset(0.5, 0.5, 0.5);
@@ -273,9 +297,9 @@ public class CactusBranchBlock extends BranchBlock {
 			BlockState state = blockAccess.getBlockState(pos);
 
 			if (otherState.getBlock() == this && state.getBlock() == this && (otherState.get(ORIGIN) == side.getOpposite() || state.get(ORIGIN) == side)) {
-				return getCactusRadius(state.get(TRUNK) && otherState.get(TRUNK));
+				return Math.min(getCactusRadius(state.get(TRUNK_TYPE)), getCactusRadius(otherState.get(TRUNK_TYPE)));
 			} else if (side == Direction.DOWN && state.getBlock() == this && state.get(ORIGIN) == side && (otherState.getBlock() == this || otherState.getBlock() instanceof RootyBlock)) {
-				return getCactusRadius(state.get(TRUNK));
+				return getCactusRadius(state.get(TRUNK_TYPE));
 			}
 		} catch (Exception e){
 			DynamicTrees.getLogger().warn("Tried to get connection info for unloaded block: " + deltaPos.getX() + " " + deltaPos.getY() + " " + deltaPos.getZ());

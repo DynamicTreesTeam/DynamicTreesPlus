@@ -36,11 +36,13 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
     private TextureAtlasSprite barkTexture;
 
     // Not as many baked models as normal branches, although each model has more quads. Still less quads in total, though.
-    private IBakedModel[][] sleeves = new IBakedModel[6][2];
-    private IBakedModel[][] cores = new IBakedModel[3][2]; // 2 Cores for 3 axis with the bark texture all all 6 sides rotated appropriately.
-    private IBakedModel[] rings = new IBakedModel[2]; // 2 Cores with the ring textures on all 6 sides
-    private IBakedModel[] coreSpikes = new IBakedModel[2]; // 2 cores with only the spikey edges
+    private IBakedModel[][] sleeves = new IBakedModel[6][3];
+    private IBakedModel[][] cores = new IBakedModel[3][3]; // 3 Cores for 3 axis with the bark texture all all 6 sides rotated appropriately.
+    private IBakedModel[] rings = new IBakedModel[3]; // 3 Cores with the ring textures on all 6 sides
+    private IBakedModel[] coreSpikes = new IBakedModel[3]; // 3 cores with only the spikey edges
     private IBakedModel sleeveTopSpikes;
+
+    int[] radii = {4,5,7};
 
     public CactusBranchBlockBakedModel(ResourceLocation modelResLoc, ResourceLocation barkResLoc, ResourceLocation ringsResLoc) {
         super (modelResLoc, barkResLoc, ringsResLoc);
@@ -51,8 +53,8 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
         this.barkTexture = ModelUtils.getTexture(this.barkResLoc);
         TextureAtlasSprite ringsTexture = ModelUtils.getTexture(this.ringsResLoc);
 
-        for (int i = 0; i < 2; i++) {
-            int radius = i + 4;
+        for (int i = 0; i < 3; i++) {
+            int radius = radii[i];
 
             for (Direction dir: Direction.values()) {
                 sleeves[dir.getIndex()][i] = bakeSleeve(radius, dir, barkTexture, ringsTexture);
@@ -558,6 +560,13 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
         return new Vector3d(x, y, z);
     }
 
+    private int getRadiusIndex (int radius){
+        for (int i=0; i<radii.length; i++){
+            if (radius == radii[i]) return i;
+        }
+        return 0;
+    }
+
     @Nonnull
     @Override
     public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @Nonnull Random rand, @Nonnull IModelData extraData) {
@@ -582,11 +591,11 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
                 }
 
                 if (numConnections == 0 && forceRingDir != null){
-                    quadsList.addAll(rings[coreRadius - 4].getQuads(state, forceRingDir, rand, extraData));
+                    quadsList.addAll(rings[getRadiusIndex(coreRadius)].getQuads(state, forceRingDir, rand, extraData));
                 } else {
                     boolean extraUpSleeve = false;
-                    if (coreRadius == 4 && numConnections == 1 && state.get(CactusBranchBlock.ORIGIN).getAxis().isHorizontal()) {
-                        connections[1] = 4;
+                    if (coreRadius == radii[0] && numConnections == 1 && state.get(CactusBranchBlock.ORIGIN).getAxis().isHorizontal()) {
+                        connections[1] = radii[0];
                         extraUpSleeve = true;
                     }
 
@@ -604,16 +613,16 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
                         //Get quads for core model
                         if (coreRadius != connections[face.getIndex()]) {
                             if (coreRingDir == null || coreRingDir != face) {
-                                quadsList.addAll(cores[coreDir][coreRadius - 4].getQuads(state, face, rand, extraData));
+                                quadsList.addAll(cores[coreDir][getRadiusIndex(coreRadius)].getQuads(state, face, rand, extraData));
                             } else {
-                                quadsList.addAll(rings[coreRadius - 4].getQuads(state, face, rand, extraData));
+                                quadsList.addAll(rings[getRadiusIndex(coreRadius)].getQuads(state, face, rand, extraData));
                             }
                         }
 
                         // Get quads for core spikes
                         for (Direction dir : Direction.values()) {
                             if (coreRadius > connections[dir.getIndex()]) {
-                                for (BakedQuad quad : coreSpikes[coreRadius - 4].getQuads(state, dir, rand, extraData)) {
+                                for (BakedQuad quad : coreSpikes[getRadiusIndex(coreRadius)].getQuads(state, dir, rand, extraData)) {
                                     if (coreRadius > connections[quad.getFace().getIndex()]) {
                                         quadsList.add(quad);
                                     }
@@ -626,8 +635,8 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
                             int idx = connDir.getIndex();
                             int connRadius = connections[idx];
                             // If the connection side matches the quadpull side then cull the sleeve face.  Don't cull radius 1 connections for leaves(which are partly transparent).
-                            if (connRadius >= 4 && ((connDir == Direction.UP && connRadius == 4 && extraUpSleeve) || face != connDir || connDir == Direction.DOWN)) {
-                                quadsList.addAll(sleeves[idx][connRadius - 4].getQuads(state, face, rand, extraData));
+                            if (connRadius >= radii[0] && ((connDir == Direction.UP && connRadius == radii[0] && extraUpSleeve) || face != connDir || connDir == Direction.DOWN)) {
+                                quadsList.addAll(sleeves[idx][getRadiusIndex(connRadius)].getQuads(state, face, rand, extraData));
                             }
                         }
                     }

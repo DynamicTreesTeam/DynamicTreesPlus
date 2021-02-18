@@ -3,12 +3,16 @@ package com.ferreusveritas.dynamictreesplus.systems.featuregen;
 import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
 import com.ferreusveritas.dynamictrees.api.IPostGrowFeature;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureProperty;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictreesplus.blocks.CactusBranchBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
@@ -19,28 +23,29 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-public class CactulingsGenFeature implements IPostGenFeature, IPostGrowFeature {
+public class CactulingsGenFeature extends GenFeature implements IPostGenFeature, IPostGrowFeature {
 
-    private float chanceOnGrow = 0.3f;
-    private CactusBranchBlock.CactusThickness trunkType;
+    public static final GenFeatureProperty<Float> CHANCE_ON_GROW = GenFeatureProperty.createFloatProperty("chance_on_grow");
+    public static final GenFeatureProperty<CactusBranchBlock.CactusThickness> TRUNK_TYPE = GenFeatureProperty.createProperty("trunk_type", CactusBranchBlock.CactusThickness.class);
 
-    public CactulingsGenFeature(CactusBranchBlock.CactusThickness trunkType){
-        this.trunkType = trunkType;
-    }
-
-    public void setChanceOnGrow (float chance){
-        chanceOnGrow = chance;
+    public CactulingsGenFeature(ResourceLocation registryName) {
+        super(registryName, CHANCE_ON_GROW, TRUNK_TYPE);
     }
 
     @Override
-    public boolean postGeneration(IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor) {
+    protected ConfiguredGenFeature<?> createDefaultConfiguration() {
+        return super.createDefaultConfiguration().with(CHANCE_ON_GROW, 0.3f).with(TRUNK_TYPE, CactusBranchBlock.CactusThickness.BRANCH);
+    }
+
+    @Override
+    public boolean postGeneration(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor) {
         //return tryToPlaceClones(worldFromIWorld(world), rootPos, species, true, safeBounds);
         return false;
     }
 
     @Override
-    public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, Species species, int soilLife, boolean natural) {
-        if (world.rand.nextFloat() < chanceOnGrow)
+    public boolean postGrow(ConfiguredGenFeature<?> configuredGenFeature, World world, BlockPos rootPos, BlockPos treePos, Species species, int soilLife, boolean natural) {
+        if (world.rand.nextFloat() < configuredGenFeature.get(CHANCE_ON_GROW))
             return tryToPlaceClones(world, rootPos, species, false, SafeChunkBounds.ANY);
         return false;
     }

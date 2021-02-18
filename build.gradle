@@ -90,7 +90,7 @@ minecraft {
 dependencies {
     minecraft "net.minecraftforge:forge:${config.mc_version}-${config.forge_version}"
 
-// Compile Hwyla API, but don't include in runtime.
+    // Compile Hwyla API, but don't include in runtime.
     compileOnly fg.deobf("mcp.mobius.waila:Hwyla:${config.hwyla_version}:api")
     // At runtime, use the full Hwyla mod.
     runtimeOnly fg.deobf("mcp.mobius.waila:Hwyla:${config.hwyla_version}")

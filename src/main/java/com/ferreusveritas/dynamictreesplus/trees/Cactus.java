@@ -20,7 +20,7 @@ import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.ferreusveritas.dynamictreesplus.DynamicTreesPlus;
 import com.ferreusveritas.dynamictreesplus.blocks.CactusBranchBlock;
 import com.ferreusveritas.dynamictreesplus.systems.dropcreators.CactusSeedDropCreator;
-import com.ferreusveritas.dynamictreesplus.systems.featuregen.CactulingsGenFeature;
+import com.ferreusveritas.dynamictreesplus.systems.featuregen.DTPGenFeatures;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -246,7 +246,7 @@ public class Cactus extends TreeFamily {
 
 			setRequiresTileEntity(true);
 
-			addGenFeature(new CactulingsGenFeature(CactusBranchBlock.CactusThickness.BRANCH));
+			addGenFeature(DTPGenFeatures.CACTULINGS);
 		}
 
 		@Override

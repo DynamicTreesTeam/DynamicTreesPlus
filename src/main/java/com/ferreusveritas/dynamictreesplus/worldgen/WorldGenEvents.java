@@ -27,13 +27,6 @@ public class WorldGenEvents {
 
     public static final String CACTUS_CANCELLER = "cactus";
 
-//    @SubscribeEvent
-//    public void onBiomeDataBasePopulatorRegistry(BiomeDatabasePopulatorRegistryEvent event){
-//
-//        event.register(new JsonBiomeDatabasePopulator(DynamicTreesPlus.MOD_ID,"default.json"));
-//
-//    }
-
     @SubscribeEvent
     public void onTreeFeatureCancelRegistry(TreeFeatureCancellerRegistry.TreeFeatureCancellerRegistryEvent event) {
         final TreeFeatureCancellerRegistry registry = event.getFeatureCancellerRegistry();

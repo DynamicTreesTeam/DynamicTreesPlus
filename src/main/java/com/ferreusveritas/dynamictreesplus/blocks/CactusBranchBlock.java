@@ -178,7 +178,7 @@ public class CactusBranchBlock extends BranchBlock {
 
 		CactusThickness trunk;
 		if (signal.getSpecies() instanceof Cactus.BaseCactusSpecies){
-			trunk = ((Cactus.BaseCactusSpecies) signal.getSpecies()).thicknessAfterGrowIntoAir(world, pos, signal);
+			trunk = ((Cactus.BaseCactusSpecies) signal.getSpecies()).thicknessForBranchPlaced(world, pos, true);
 		} else trunk = CactusThickness.BRANCH;
 
 		if (originDir.getAxis() != Direction.Axis.Y && (world.getBlockState(pos.up()).getBlock() == this || world.getBlockState(pos.down()).getBlock() == this)) {

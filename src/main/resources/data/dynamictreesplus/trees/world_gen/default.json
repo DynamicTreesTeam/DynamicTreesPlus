@@ -6,12 +6,12 @@
 			"apply": {
 				"species" : {
 					"random" : {
-						"dynamicteesplus:pillar_cactus" : 4,
+						"dynamicteesplus:pillar_cactus" : 6,
 						"dynamicteesplus:pipe_cactus" : 1
 					}
 				},
 				"density" : { "math": { "add" : [ { "mul" : [ "noise", 0.6 ] }, 0.4 ] } },
-				"chance": 0.075
+				"chance": 0.1
 			}
 		},
 		{
@@ -19,7 +19,7 @@
 			"apply": {
 				"species" : "dynamicteesplus:saguaro_cactus",
 				"density" : { "math": { "add" : [ { "mul" : [ "noise", 0.6 ] }, 0.4 ] } },
-				"chance": 0.075
+				"chance": 0.5
 			}
 		}
 	]

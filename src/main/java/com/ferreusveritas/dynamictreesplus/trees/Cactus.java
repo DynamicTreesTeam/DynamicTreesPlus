@@ -69,8 +69,7 @@ public class Cactus extends TreeFamily {
 
 		public abstract CactusBranchBlock.CactusThickness thicknessAfterGrowthSignal(World world, BlockPos pos, GrowSignal signal, CactusBranchBlock.CactusThickness currentThickness);
 
-		public CactusBranchBlock.CactusThickness thicknessAfterGrowIntoAir(IWorld world, BlockPos pos){ return thicknessAfterGrowIntoAir(world, pos, new GrowSignal(this, pos, 0)); }
-		public abstract CactusBranchBlock.CactusThickness thicknessAfterGrowIntoAir(IWorld world, BlockPos pos, GrowSignal signal);
+		public abstract CactusBranchBlock.CactusThickness thicknessForBranchPlaced(IWorld world, BlockPos pos, boolean isLast);
 
 		@Override
 		protected void setStandardSoils() {
@@ -100,8 +99,8 @@ public class Cactus extends TreeFamily {
 			//Ensure planting conditions are right
 			TreeFamily tree = getFamily();
 			if(world.isAirBlock(pos.up()) && isAcceptableSoil(world, pos.down(), world.getBlockState(pos.down()))) {
-				world.setBlockState(pos, tree.getDynamicBranch().getDefaultState().with(CactusBranchBlock.TRUNK_TYPE, thicknessAfterGrowIntoAir(world, pos)));//set to a single branch
 				placeRootyDirtBlock(world, pos.down(), 15);//Set to fully fertilized rooty sand underneath
+				world.setBlockState(pos, tree.getDynamicBranch().getDefaultState().with(CactusBranchBlock.TRUNK_TYPE, thicknessForBranchPlaced(world, pos, false)));//set to a single branch
 				return true;
 			}
 
@@ -153,8 +152,11 @@ public class Cactus extends TreeFamily {
 		}
 
 		@Override
-		public CactusBranchBlock.CactusThickness thicknessAfterGrowIntoAir(IWorld world, BlockPos pos, GrowSignal signal) {
-			return signal.isInTrunk() ? CactusBranchBlock.CactusThickness.TRUNK : CactusBranchBlock.CactusThickness.BRANCH;
+		public CactusBranchBlock.CactusThickness thicknessForBranchPlaced(IWorld world, BlockPos pos, boolean isLast) {
+			BlockState downState = world.getBlockState(pos.down());
+			if (TreeHelper.isRooty(downState) || (downState.getBlock() instanceof CactusBranchBlock && downState.get(CactusBranchBlock.TRUNK_TYPE) == CactusBranchBlock.CactusThickness.TRUNK && downState.get(CactusBranchBlock.ORIGIN) == Direction.DOWN))
+				return CactusBranchBlock.CactusThickness.TRUNK;
+			return CactusBranchBlock.CactusThickness.BRANCH;
 		}
 
 		@Override
@@ -213,8 +215,11 @@ public class Cactus extends TreeFamily {
 		}
 
 		@Override
-		public CactusBranchBlock.CactusThickness thicknessAfterGrowIntoAir(IWorld world, BlockPos pos, GrowSignal signal) {
-			return CactusBranchBlock.CactusThickness.BRANCH;
+		public CactusBranchBlock.CactusThickness thicknessForBranchPlaced(IWorld world, BlockPos pos, boolean isLast) {
+			BlockState downState = world.getBlockState(pos.down());
+			if (TreeHelper.isRooty(downState) || isLast)
+				return CactusBranchBlock.CactusThickness.BRANCH;
+			return CactusBranchBlock.CactusThickness.TRUNK;
 		}
 
 		@Override
@@ -255,7 +260,7 @@ public class Cactus extends TreeFamily {
 		}
 
 		@Override
-		public CactusBranchBlock.CactusThickness thicknessAfterGrowIntoAir(IWorld world, BlockPos pos, GrowSignal signal) {
+		public CactusBranchBlock.CactusThickness thicknessForBranchPlaced(IWorld world, BlockPos pos, boolean isLast) {
 			return CactusBranchBlock.CactusThickness.BRANCH;
 		}
 
@@ -300,7 +305,7 @@ public class Cactus extends TreeFamily {
 		}
 
 		@Override
-		public CactusBranchBlock.CactusThickness thicknessAfterGrowIntoAir(IWorld world, BlockPos pos, GrowSignal signal) {
+		public CactusBranchBlock.CactusThickness thicknessForBranchPlaced(IWorld world, BlockPos pos, boolean isLast) {
 			Block down = world.getBlockState(pos.down()).getBlock();
 			Block down2 = world.getBlockState(pos.down(2)).getBlock();
 			Block down3 = world.getBlockState(pos.down(3)).getBlock();
@@ -372,6 +377,8 @@ public class Cactus extends TreeFamily {
 		
 		setPrimitiveLog(Blocks.CACTUS);
 		setStick(Items.AIR);
+
+		addSpeciesLocationOverride((world, trunkPos) -> isLocationForSaguaro(world, trunkPos) ? saguaroCactus : Species.NULL_SPECIES);
 	}
 	
 	@Override
@@ -464,12 +471,12 @@ public class Cactus extends TreeFamily {
 		}
 		
 		@Override
-		public boolean setBlockForGeneration(IWorld world, Species species, BlockPos pos, Direction dir, boolean careful) {
+		public boolean setBlockForGeneration(IWorld world, Species species, BlockPos pos, Direction dir, boolean careful, boolean isLast) {
 			if (!(species instanceof BaseCactusSpecies))
 				return false;
 			BlockState defaultBranchState = species.getFamily().getDynamicBranch().getDefaultState();
-			if (world.getBlockState(pos).getMaterial().isReplaceable()) {
-				CactusBranchBlock.CactusThickness trunk = ((BaseCactusSpecies) species).thicknessAfterGrowIntoAir(world, pos);
+			if (world.getBlockState(pos).canBeReplacedByLogs(world, pos) && (!careful || isClearOfNearbyBranches(world, pos, dir.getOpposite()))) {
+				CactusBranchBlock.CactusThickness trunk = ((BaseCactusSpecies) species).thicknessForBranchPlaced(world, pos, isLast);
 				return !world.setBlockState(pos, defaultBranchState.with(CactusBranchBlock.TRUNK_TYPE, trunk).with(CactusBranchBlock.ORIGIN, dir.getOpposite()), careful ? 3 : 2);
 			}
 			return true;

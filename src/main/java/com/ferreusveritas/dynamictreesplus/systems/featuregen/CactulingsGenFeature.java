@@ -39,8 +39,7 @@ public class CactulingsGenFeature extends GenFeature implements IPostGenFeature,
 
     @Override
     public boolean postGeneration(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor) {
-        //return tryToPlaceClones(worldFromIWorld(world), rootPos, species, true, safeBounds);
-        return false;
+        return tryToPlaceClones(world, rootPos, species, true, safeBounds);
     }
 
     @Override
@@ -50,7 +49,7 @@ public class CactulingsGenFeature extends GenFeature implements IPostGenFeature,
         return false;
     }
 
-    private boolean areCactiAround (World world, BlockPos rootPos, SafeChunkBounds safeBounds){
+    private boolean areCactiAround (IWorld world, BlockPos rootPos, SafeChunkBounds safeBounds){
         for (CoordUtils.Surround dir : CoordUtils.Surround.values()){
             for (int i=-1; i <= 1; i++){
                 BlockPos offsetPos = rootPos.add(dir.getOffset()).up(i);
@@ -62,13 +61,13 @@ public class CactulingsGenFeature extends GenFeature implements IPostGenFeature,
         return false;
     }
 
-    private boolean tryToPlaceClones (World world, BlockPos rootPos, Species species, boolean worldgen, SafeChunkBounds safeBounds){
-        if (world == null || areCactiAround(world, rootPos, safeBounds)) return false;
-        int clones = 3 + world.rand.nextInt(5); //between 3 and 8 clones
+    private boolean tryToPlaceClones (IWorld world, BlockPos rootPos, Species species, boolean worldgen, SafeChunkBounds safeBounds){
+        if (world == null || areCactiAround(world, rootPos.up(), safeBounds)) return false;
+        int clones = 3 + world.getRandom().nextInt(5); //between 3 and 8 clones
         List<CoordUtils.Surround> validDirs = new LinkedList<>(Arrays.asList(CoordUtils.Surround.values()));
         boolean clonePlaced = false;
         for (int i=0; i < clones; i++){
-            CoordUtils.Surround selectedDir = validDirs.get(world.rand.nextInt(validDirs.size()));
+            CoordUtils.Surround selectedDir = validDirs.get(world.getRandom().nextInt(validDirs.size()));
             if (placeCloneAtLocation(world, rootPos.add(selectedDir.getOffset()), species, worldgen, safeBounds))
                 clonePlaced = true;
             validDirs.remove(selectedDir);
@@ -76,33 +75,17 @@ public class CactulingsGenFeature extends GenFeature implements IPostGenFeature,
         return clonePlaced;
     }
 
-    //This just fetches a World instance from an IWorld instance, since IWorld cannot be used to create bees.
-    private World worldFromIWorld (IWorld iWorld){
-        if (iWorld instanceof WorldGenRegion){
-            return  ((WorldGenRegion)iWorld).getWorld();
-        } else if (iWorld instanceof World){
-            return  (World)iWorld;
-        }
-        return null;
-    }
-
-    private boolean placeCloneAtLocation (World world, BlockPos cloneRootPos, Species species, boolean worldgen, SafeChunkBounds safeBounds){
+    private boolean placeCloneAtLocation (IWorld world, BlockPos cloneRootPos, Species species, boolean worldgen, SafeChunkBounds safeBounds){
         for (int i=1; i >= -1; i--){
             BlockPos offsetRootPos = cloneRootPos.up(i);
             if (safeBounds.inBounds(offsetRootPos, false) && species.isAcceptableSoil(world.getBlockState(offsetRootPos))){
 
                 if (worldgen) {
-                    species.generate(world, world, offsetRootPos, world.getNoiseBiome(offsetRootPos.getX(), offsetRootPos.getY(), offsetRootPos.getZ()), world.rand, 2, safeBounds);
-                } else {
-                    species.transitionToTree(world, offsetRootPos.up());
+                    if (world instanceof WorldGenRegion)
+                        species.generate(((WorldGenRegion)world).getWorld(), world, offsetRootPos, world.getNoiseBiome(offsetRootPos.getX(), offsetRootPos.getY(), offsetRootPos.getZ()), world.getRandom(), 2, safeBounds);
+                } else if (world instanceof World) {
+                    species.transitionToTree((World) world, offsetRootPos.up());
                 }
-//                    int energy = (int) species.getEnergy(world, offsetRootPos);
-//                    for (int e=0; e<energy-1; e++){
-//                        species.generate(world, world, offsetRootPos, world.getNoiseBiome(offsetRootPos.getX(), offsetRootPos.getY(), offsetRootPos.getZ()), world.rand, 2, safeBounds);
-//                        BlockPos branchOffsetPos = offsetRootPos.up(1+e);
-//                        if (safeBounds.inBounds(branchOffsetPos, false) && world.isAirBlock(branchOffsetPos))
-//                            world.setBlockState(branchOffsetPos, species.getFamily().getDynamicBranch().getDefaultState().with(CactusBranchBlock.ORIGIN, Direction.DOWN).with(CactusBranchBlock.TRUNK_TYPE, trunkType));
-//                    }
                 return true;
             }
         }

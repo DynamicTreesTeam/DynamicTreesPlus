@@ -2,8 +2,10 @@ package com.ferreusveritas.dynamictreesplus.worldgen;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
+import com.ferreusveritas.dynamictrees.api.events.BiomeDatabasePopulatorRegistryEvent;
 import com.ferreusveritas.dynamictrees.api.events.TreeCancelRegistryEvent;
-import com.ferreusveritas.dynamictrees.worldgen.BiomeDataBasePopulatorJson;
+import com.ferreusveritas.dynamictrees.util.JsonHelper;
+import com.ferreusveritas.dynamictrees.worldgen.JsonBiomeDatabasePopulator;
 import com.ferreusveritas.dynamictrees.worldgen.canceller.ITreeCanceller;
 import com.ferreusveritas.dynamictrees.worldgen.canceller.TreeFeatureCancellerRegistry;
 import com.ferreusveritas.dynamictreesplus.DynamicTreesPlus;
@@ -25,12 +27,12 @@ public class WorldGenEvents {
 
     public static final String CACTUS_CANCELLER = "cactus";
 
-    @SubscribeEvent
-    public void onBiomeDataBasePopulatorRegistry(WorldGenRegistry.BiomeDataBasePopulatorRegistryEvent event){
-
-        event.register(new BiomeDataBasePopulatorJson(new ResourceLocation(DynamicTreesPlus.MOD_ID, "worldgen/default.json")));
-
-    }
+//    @SubscribeEvent
+//    public void onBiomeDataBasePopulatorRegistry(BiomeDatabasePopulatorRegistryEvent event){
+//
+//        event.register(new JsonBiomeDatabasePopulator(DynamicTreesPlus.MOD_ID,"default.json"));
+//
+//    }
 
     @SubscribeEvent
     public void onTreeFeatureCancelRegistry(TreeFeatureCancellerRegistry.TreeFeatureCancellerRegistryEvent event) {

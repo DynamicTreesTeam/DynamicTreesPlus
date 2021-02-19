@@ -306,14 +306,14 @@ public class Cactus extends TreeFamily {
 
 			setBasicGrowingParameters(tapering, 18.0f, 1, 3, 0.6f);
 
-			this.setSoilLongevity(8);
+			this.setSoilLongevity(10);
 
 			setRequiresTileEntity(true);
 		}
 
 		@Override
 		protected float seedPerCactusLog() {
-			return 8;
+			return 0.125f;
 		}
 
 		@Override

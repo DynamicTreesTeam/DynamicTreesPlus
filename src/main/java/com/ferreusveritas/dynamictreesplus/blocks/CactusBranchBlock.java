@@ -13,6 +13,7 @@ import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.Connections;
+import com.ferreusveritas.dynamictreesplus.init.DTPConfigs;
 import com.ferreusveritas.dynamictreesplus.trees.Cactus;
 import com.google.common.base.Predicate;
 import net.minecraft.block.Block;
@@ -20,6 +21,8 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.state.StateContainer;
@@ -33,6 +36,7 @@ import net.minecraft.util.math.shapes.IBooleanFunction;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.*;
 import net.minecraftforge.common.ToolType;
 
@@ -117,10 +121,27 @@ public class CactusBranchBlock extends BranchBlock {
 	// INTERACTION
 	///////////////////////////////////////////
 
+	private static final double hurtMovementDelta = 0.003;
 
 	@Override
-	public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity entityIn) {
-		entityIn.attackEntityFrom(DamageSource.CACTUS, 1.0F);
+	public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity entity) {
+		boolean damage = false;
+		if (DTPConfigs.cactusPrickleOnMoveOnly.get() && entity instanceof LivingEntity) {
+			boolean falling = entity.getMotion().y < 0;
+			entity.setMotion(entity.getMotion().x * 0.25, entity.getMotion().y * (falling?0.5:1), entity.getMotion().z  * 0.25);
+			if (!worldIn.isRemote && (entity.lastTickPosX != entity.getPosX() || entity.lastTickPosY != entity.getPosY() || entity.lastTickPosZ != entity.getPosZ())) {
+				double xMovement = Math.abs(entity.getPosX() - entity.lastTickPosX);
+				double yMovement = Math.abs(entity.getPosY() - entity.lastTickPosY);
+				double zMovement = Math.abs(entity.getPosZ() - entity.lastTickPosZ);
+				if (xMovement >= hurtMovementDelta || yMovement >= hurtMovementDelta || zMovement >= hurtMovementDelta) {
+					damage = true;
+				}
+			}
+		} else if (!(entity instanceof ItemEntity) || DTPConfigs.cactusKillItems.get()) {
+			damage = true;
+		}
+
+		if (damage) entity.attackEntityFrom(DamageSource.CACTUS, 1.0F);
 	}
 
 	@Nullable

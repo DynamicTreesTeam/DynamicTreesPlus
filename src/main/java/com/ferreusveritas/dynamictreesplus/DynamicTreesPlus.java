@@ -2,9 +2,12 @@ package com.ferreusveritas.dynamictreesplus;
 
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictreesplus.init.DTPClient;
+import com.ferreusveritas.dynamictreesplus.init.DTPConfigs;
 import com.ferreusveritas.dynamictreesplus.worldgen.WorldGenEvents;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
@@ -14,6 +17,7 @@ public class DynamicTreesPlus {
     public static final String MOD_ID = "dynamictreesplus";
 
     public DynamicTreesPlus (){
+        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, DTPConfigs.SERVER_CONFIG);
 
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::clientSetup);
 

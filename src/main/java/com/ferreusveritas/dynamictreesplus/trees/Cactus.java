@@ -55,21 +55,23 @@ public class Cactus extends TreeFamily {
 		public BaseCactusSpecies (String name, TreeFamily treeFamily){
 			super(new ResourceLocation(treeFamily.getName().getNamespace(), name + "_" + treeFamily.getName().getPath()), treeFamily);
 
-			addDropCreator(new CactusSeedDropCreator());
+			addDropCreator(new CactusSeedDropCreator().setSeedPerLog(seedPerCactusLog()));
 
 			envFactor(Type.SNOWY, 0.25f);
 			envFactor(Type.COLD, 0.5f);
 			envFactor(Type.SANDY, 1.05f);
 		}
 
-		@Override
-		public boolean showSpeciesOnWaila() {
-			return true;
-		}
+		protected abstract float seedPerCactusLog();
 
 		public abstract CactusBranchBlock.CactusThickness thicknessAfterGrowthSignal(World world, BlockPos pos, GrowSignal signal, CactusBranchBlock.CactusThickness currentThickness);
 
 		public abstract CactusBranchBlock.CactusThickness thicknessForBranchPlaced(IWorld world, BlockPos pos, boolean isLast);
+
+		@Override
+		public boolean showSpeciesOnWaila() {
+			return true;
+		}
 
 		@Override
 		protected void setStandardSoils() {
@@ -109,7 +111,7 @@ public class Cactus extends TreeFamily {
 
 		@Override
 		public boolean canBoneMealTree() {
-			return true;
+			return false;
 		}
 
 		@Override
@@ -134,6 +136,11 @@ public class Cactus extends TreeFamily {
 
 			generateSapling();
 			generateSeed();
+		}
+
+		@Override
+		protected float seedPerCactusLog() {
+			return 0.5f;
 		}
 
 		@Override
@@ -203,6 +210,11 @@ public class Cactus extends TreeFamily {
 		}
 
 		@Override
+		protected float seedPerCactusLog() {
+			return 1;
+		}
+
+		@Override
 		public boolean getRequiresTileEntity(IWorld world, BlockPos pos) {
 			return isLocationForSaguaro(world, pos);
 		}
@@ -255,6 +267,11 @@ public class Cactus extends TreeFamily {
 		}
 
 		@Override
+		protected float seedPerCactusLog() {
+			return 1;
+		}
+
+		@Override
 		public CactusBranchBlock.CactusThickness thicknessAfterGrowthSignal(World world, BlockPos pos, GrowSignal signal, CactusBranchBlock.CactusThickness currentThickness) {
 			return CactusBranchBlock.CactusThickness.BRANCH;
 		}
@@ -292,6 +309,11 @@ public class Cactus extends TreeFamily {
 			this.setSoilLongevity(8);
 
 			setRequiresTileEntity(true);
+		}
+
+		@Override
+		protected float seedPerCactusLog() {
+			return 8;
 		}
 
 		@Override

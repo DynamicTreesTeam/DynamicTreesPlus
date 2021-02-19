@@ -26,13 +26,20 @@ import java.util.Random;
  */
 public class CactusSeedDropCreator extends DropCreator {
 
+    private float seedPerLog = 0.5f;
+
     public CactusSeedDropCreator() {
         super(new ResourceLocation(DynamicTreesPlus.MOD_ID, "cactusseeds"));
     }
 
+    public CactusSeedDropCreator setSeedPerLog(float seedPerLog) {
+        this.seedPerLog = seedPerLog;
+        return this;
+    }
+
     @Override
     public List<ItemStack> getLogsDrop(World world, Species species, BlockPos breakPos, Random random, List<ItemStack> dropList, NodeNetVolume.Volume volume) {
-        int numLogs = (int) (volume.getVolume() / 2);
+        int numLogs = (int) (volume.getVolume() * seedPerLog);
         while(numLogs > 0) {
             dropList.add(species.getSeedStack(Math.min(numLogs, 64)));
             numLogs -= 64;

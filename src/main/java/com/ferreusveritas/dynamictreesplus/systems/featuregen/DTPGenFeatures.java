@@ -9,7 +9,7 @@ import net.minecraft.util.ResourceLocation;
  */
 public final class DTPGenFeatures {
 
-    public static final GenFeature CACTULINGS = register(new CactulingsGenFeature(regName("cactulings")));
+    public static final GenFeature CACTUS_CLONES = register(new CactusClonesGenFeature(regName("cactus_clones")));
 
     private static ResourceLocation regName(String name) {
         return new ResourceLocation(DynamicTreesPlus.MOD_ID, name);

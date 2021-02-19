@@ -251,7 +251,7 @@ public class Cactus extends TreeFamily {
 
 			setRequiresTileEntity(true);
 
-			addGenFeature(DTPGenFeatures.CACTULINGS);
+			addGenFeature(DTPGenFeatures.CACTUS_CLONES);
 		}
 
 		@Override

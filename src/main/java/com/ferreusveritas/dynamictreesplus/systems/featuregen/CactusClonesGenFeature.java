@@ -23,12 +23,12 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-public class CactulingsGenFeature extends GenFeature implements IPostGenFeature, IPostGrowFeature {
+public class CactusClonesGenFeature extends GenFeature implements IPostGenFeature, IPostGrowFeature {
 
     public static final GenFeatureProperty<Float> CHANCE_ON_GROW = GenFeatureProperty.createFloatProperty("chance_on_grow");
     public static final GenFeatureProperty<CactusBranchBlock.CactusThickness> TRUNK_TYPE = GenFeatureProperty.createProperty("trunk_type", CactusBranchBlock.CactusThickness.class);
 
-    public CactulingsGenFeature(ResourceLocation registryName) {
+    public CactusClonesGenFeature(ResourceLocation registryName) {
         super(registryName, CHANCE_ON_GROW, TRUNK_TYPE);
     }
 

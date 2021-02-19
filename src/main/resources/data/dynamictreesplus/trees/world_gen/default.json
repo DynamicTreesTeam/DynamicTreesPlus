@@ -1,8 +1,8 @@
 {
 	"entries" : [
 		{
-			"__comment" : "This applies to deserts",
-			"select": { "type": "sandy", "name": "minecraft:.*" },
+			"__comment" : "This applies to deserts, desert hills and desert lakes",
+			"select": { "name": "minecraft:.*desert.*" },
 			"apply": {
 				"species" : {
 					"random" : {
@@ -15,11 +15,12 @@
 			}
 		},
 		{
-			"select": { "name": "minecraft:.*badlands.*" },
+			"__comment" : "This applies to badlands only (not the mesa)",
+			"select": { "name": "minecraft:badlands" },
 			"apply": {
 				"species" : "dynamicteesplus:saguaro_cactus",
 				"density" : { "math": { "add" : [ { "mul" : [ "noise", 0.6 ] }, 0.4 ] } },
-				"chance": 0.5
+				"chance": 0.3
 			}
 		}
 	]

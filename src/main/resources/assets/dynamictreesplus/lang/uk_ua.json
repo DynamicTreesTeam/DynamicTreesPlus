@@ -1,0 +1,15 @@
+{
+  "block.dynamictreesplus.cactus_branch": "Динамічний кактус",
+
+  "species.dynamictreesplus.saguaro_cactus": "Saguaro Кактус",
+  "species.dynamictreesplus.pillar_cactus": "Pillar Кактус",
+  "species.dynamictreesplus.pipe_cactus": "Pipe Кактус",
+  "species.dynamictreesplus.mega_cactus": "Мега Кактус",
+
+  "item.dynamictreesplus.saguaro_cactus_seed": "Saguaro Насіння кактуса",
+  "item.dynamictreesplus.pillar_cactus_seed": "Pillar Насіння кактуса",
+  "item.dynamictreesplus.pipe_cactus_seed": "Pipe Насіння кактуса",
+  "item.dynamictreesplus.brown_mushroom_seed": "Шапка коричневого гриба",
+  "item.dynamictreesplus.red_mushroom_seed": "Шапка червоного гриба",
+  "item.dynamictreesplus.chorus_seed": "Насіння хорусу"
+}

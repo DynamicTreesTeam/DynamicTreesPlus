@@ -1,18 +1,12 @@
 package com.ferreusveritas.dynamictreesplus.worldgen;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
-import com.ferreusveritas.dynamictrees.api.events.BiomeDatabasePopulatorRegistryEvent;
 import com.ferreusveritas.dynamictrees.api.events.TreeCancelRegistryEvent;
-import com.ferreusveritas.dynamictrees.util.JsonHelper;
-import com.ferreusveritas.dynamictrees.worldgen.JsonBiomeDatabasePopulator;
 import com.ferreusveritas.dynamictrees.worldgen.canceller.ITreeCanceller;
 import com.ferreusveritas.dynamictrees.worldgen.canceller.TreeFeatureCancellerRegistry;
-import com.ferreusveritas.dynamictreesplus.DynamicTreesPlus;
 import com.ferreusveritas.dynamictreesplus.worldgen.canceller.CactusFeatureCanceller;
 import net.minecraft.block.CactusBlock;
 import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.eventbus.api.SubscribeEvent;

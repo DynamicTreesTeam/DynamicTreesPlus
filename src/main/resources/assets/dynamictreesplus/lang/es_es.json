@@ -1,15 +1,15 @@
 {
-  "block.dynamictrees.cactus_branch":"Cactus",
+  "block.dynamictreesplus.cactus_branch": "Cactus",
 
   "species.dynamictreesplus.saguaro_cactus": "Cactus saguaro",
   "species.dynamictreesplus.pillar_cactus": "Cactus columnar",
   "species.dynamictreesplus.pipe_cactus": "Cactus órgano",
   "species.dynamictreesplus.mega_cactus": "Mega cactus",
 
-  "item.dynamictreesplus.saguaro_cactus_seed":"Semilla de cactus saguaro",
-  "item.dynamictreesplus.pillar_cactus_seed":"Semilla de cactus columnar",
-  "item.dynamictreesplus.pipe_cactus_seed":"Semilla de cactus órgano",
-  "item.dynamictrees.brown_mushroom_seed":"Tapa de hongo marrón",
-  "item.dynamictrees.red_mushroom_seed":"Tapa de hongo rojo",
-  "item.dynamictrees.chorus_seed":"Semilla coral"
+  "item.dynamictreesplus.saguaro_cactus_seed": "Semilla de cactus saguaro",
+  "item.dynamictreesplus.pillar_cactus_seed": "Semilla de cactus columnar",
+  "item.dynamictreesplus.pipe_cactus_seed": "Semilla de cactus órgano",
+  "item.dynamictreesplus.brown_mushroom_seed": "Tapa de hongo marrón",
+  "item.dynamictreesplus.red_mushroom_seed": "Tapa de hongo rojo",
+  "item.dynamictreesplus.chorus_seed": "Semilla coral"
 }

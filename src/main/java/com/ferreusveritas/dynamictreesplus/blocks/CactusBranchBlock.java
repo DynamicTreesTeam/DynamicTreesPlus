@@ -39,6 +39,7 @@ import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.*;
 import net.minecraftforge.common.ToolType;
+import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -323,7 +324,7 @@ public class CactusBranchBlock extends BranchBlock {
 				return getCactusRadius(state.get(TRUNK_TYPE));
 			}
 		} catch (Exception e){
-			DynamicTrees.getLogger().warn("Tried to get connection info for unloaded block: " + deltaPos.getX() + " " + deltaPos.getY() + " " + deltaPos.getZ());
+			LogManager.getLogger().warn("Tried to get connection info for unloaded block: " + deltaPos.getX() + " " + deltaPos.getY() + " " + deltaPos.getZ());
 			return 0;
 		}
 

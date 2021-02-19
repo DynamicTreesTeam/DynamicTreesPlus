@@ -20,8 +20,8 @@ repositories {
     maven {
         url "https://www.cursemaven.com"
     }
-    flatDir {
-        dirs("libs")
+    maven {
+        url "http://harleyoconnor.com/maven"
     }
 }
 
@@ -106,8 +106,8 @@ dependencies {
     // Compile full Serene Seasons mod and use in runtime.
     implementation fg.deobf("curse.maven:SereneSeasons-291874:3179424")
 
-    //Compile Dynamic Trees, of course
-    implementation fg.deobf("blank:DynamicTrees-1.16.5:0.1.0")
+    // Compile Dynamic Trees, of course
+    implementation fg.deobf("com.ferreusveritas.dynamictrees:DynamicTrees-1.16.5:0.1.1")
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..

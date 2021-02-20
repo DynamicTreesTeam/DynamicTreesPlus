@@ -1,0 +1,6 @@
+@MethodsReturnNonnullByDefault @ParametersAreNonnullByDefault
+package com.ferreusveritas.dynamictreesplus.trees;
+
+import mcp.MethodsReturnNonnullByDefault;
+
+import javax.annotation.ParametersAreNonnullByDefault;

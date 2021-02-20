@@ -11,7 +11,7 @@ import com.ferreusveritas.dynamictrees.event.SpeciesPostGenerationEvent;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.DirtHelper;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
-import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFindEnds;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.FindEndsNode;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
@@ -479,7 +479,7 @@ public class Cactus extends TreeFamily {
 			// Fix branch thicknesses and map out leaf locations
 			BranchBlock branch = TreeHelper.getBranch(world.getBlockState(treePos));
 			if(branch != null) {//If a branch exists then the growth was successful
-				NodeFindEnds endFinder = new NodeFindEnds(); // This is responsible for gathering a list of branch end points
+				FindEndsNode endFinder = new FindEndsNode(); // This is responsible for gathering a list of branch end points
 				MapSignal signal = new MapSignal(endFinder);
 				branch.analyse(world.getBlockState(treePos), world, treePos, Direction.DOWN, signal);
 				List<BlockPos> endPoints = endFinder.getEnds();

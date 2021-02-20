@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictreesplus.systems.dropcreators;
 
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
-import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeNetVolume;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.NetVolumeNode;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictreesplus.DynamicTreesPlus;
 import net.minecraft.item.ItemStack;
@@ -35,7 +35,7 @@ public class CactusSeedDropCreator extends DropCreator {
     }
 
     @Override
-    public List<ItemStack> getLogsDrop(World world, Species species, BlockPos breakPos, Random random, List<ItemStack> dropList, NodeNetVolume.Volume volume) {
+    public List<ItemStack> getLogsDrop(World world, Species species, BlockPos breakPos, Random random, List<ItemStack> dropList, NetVolumeNode.Volume volume) {
         int numLogs = (int) (volume.getVolume() * seedPerLog);
         while(numLogs > 0) {
             dropList.add(species.getSeedStack(Math.min(numLogs, 64)));

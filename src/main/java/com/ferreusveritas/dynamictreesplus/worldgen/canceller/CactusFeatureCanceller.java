@@ -53,7 +53,7 @@ public class CactusFeatureCanceller<T extends Block> implements ITreeFeatureCanc
 
         // SimpleBlockStateProvider does not use random or BlockPos in getBlockState, so giving null is safe.
         return this.cactusBlockClass.isInstance(stateProvider.getBlockState(null, null).getBlock())
-                && treeCanceller.shouldCancelFeature(biomeResLoc, featureResLoc);
+                && featureResLoc != null && treeCanceller.shouldCancelFeature(biomeResLoc, featureResLoc);
     }
 
 }

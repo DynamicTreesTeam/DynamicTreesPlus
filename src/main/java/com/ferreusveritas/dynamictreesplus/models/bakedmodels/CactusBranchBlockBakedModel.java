@@ -36,10 +36,10 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
     private TextureAtlasSprite barkTexture;
 
     // Not as many baked models as normal branches, although each model has more quads. Still less quads in total, though.
-    private IBakedModel[][] sleeves = new IBakedModel[6][3];
-    private IBakedModel[][] cores = new IBakedModel[3][3]; // 3 Cores for 3 axis with the bark texture all all 6 sides rotated appropriately.
-    private IBakedModel[] rings = new IBakedModel[3]; // 3 Cores with the ring textures on all 6 sides
-    private IBakedModel[] coreSpikes = new IBakedModel[3]; // 3 cores with only the spikey edges
+    private final IBakedModel[][] sleeves = new IBakedModel[6][3];
+    private final IBakedModel[][] cores = new IBakedModel[3][3]; // 3 Cores for 3 axis with the bark texture all all 6 sides rotated appropriately.
+    private final IBakedModel[] rings = new IBakedModel[3]; // 3 Cores with the ring textures on all 6 sides
+    private final IBakedModel[] coreSpikes = new IBakedModel[3]; // 3 cores with only the spikey edges
     private IBakedModel sleeveTopSpikes;
 
     int[] radii = {4,5,7};
@@ -556,6 +556,7 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
     private Vector3d v(Vector3f xVec, Vector3f yVec, Vector3f zVec, float xOffset, float yOffset, float zOffset){
         return v(xVec.getX() / 16f + xOffset, yVec.getY() / 16f + yOffset, zVec.getZ() / 16f + zOffset);
     }
+
     private Vector3d v(float x, float y, float z) {
         return new Vector3d(x, y, z);
     }

@@ -107,7 +107,7 @@ dependencies {
     implementation fg.deobf("curse.maven:SereneSeasons-291874:3179424")
 
     // Compile Dynamic Trees, of course
-    implementation fg.deobf("com.ferreusveritas.dynamictrees:DynamicTrees-1.16.5:0.1.2")
+    implementation fg.deobf("com.ferreusveritas.dynamictrees:DynamicTrees-1.16.5:${config.dynamic_trees_version}")
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..

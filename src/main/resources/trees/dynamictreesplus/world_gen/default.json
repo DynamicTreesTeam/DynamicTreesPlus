@@ -6,8 +6,8 @@
 			"apply": {
 				"species" : {
 					"random" : {
-						"dynamicteesplus:pillar_cactus" : 6,
-						"dynamicteesplus:pipe_cactus" : 1
+						"dynamictreesplus:pillar_cactus" : 6,
+						"dynamictreesplus:pipe_cactus" : 1
 					}
 				},
 				"density" : { "math": { "add" : [ { "mul" : [ "noise", 0.6 ] }, 0.4 ] } },
@@ -18,7 +18,7 @@
 			"__comment" : "This applies to badlands only (not the mesa)",
 			"select": { "name": "minecraft:badlands" },
 			"apply": {
-				"species" : "dynamicteesplus:saguaro_cactus",
+				"species" : "dynamictreesplus:saguaro_cactus",
 				"density" : { "math": { "add" : [ { "mul" : [ "noise", 0.6 ] }, 0.4 ] } },
 				"chance": 0.3
 			}

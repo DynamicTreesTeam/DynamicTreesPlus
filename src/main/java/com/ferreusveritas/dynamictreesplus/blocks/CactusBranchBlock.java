@@ -5,9 +5,9 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.cells.CellNull;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
-import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
+import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
@@ -15,7 +15,7 @@ import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.Connections;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictreesplus.init.DTPConfigs;
-import com.ferreusveritas.dynamictreesplus.trees.Cactus;
+import com.ferreusveritas.dynamictreesplus.trees.CactusSpecies;
 import com.google.common.base.Predicate;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -30,6 +30,7 @@ import net.minecraft.state.StateContainer;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Direction;
 import net.minecraft.util.IStringSerializable;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -59,28 +60,22 @@ public class CactusBranchBlock extends BranchBlock {
 		BRANCH("branch", 4),
 		TRUNK("trunk", 5),
 		CORE("core", 7);
-		String name;
-		int radius;
-		CactusThickness (String name, int radius){ this.name = name; this.radius = radius; }
-		public int getRadius() {
-			return radius;
-		}
-		@Override public String toString() {
-			return this.name;
-		}
-		@Override public String getString() {
-			return this.name;
-		}
+		final String name;
+		final int radius;
+		CactusThickness (String name, int radius) { this.name = name; this.radius = radius; }
+		public int getRadius() { return radius; }
+		@Override public String toString() { return this.name; }
+		@Override public String getString() { return this.name; }
 	}
 
-	public CactusBranchBlock(String name) {
+	public CactusBranchBlock(ResourceLocation registryName) {
 		super(Properties.create(Material.CACTUS)
 				.sound(SoundType.CLOTH)
 				.harvestTool(ToolType.AXE)
 				.harvestLevel(0)
-				.sound(SoundType.CLOTH), name);
+				.sound(SoundType.CLOTH), registryName);
 
-		setDefaultState(this.getStateContainer().getBaseState().with(TRUNK_TYPE, CactusThickness.TRUNK).with(ORIGIN, Direction.DOWN));
+		this.setDefaultState(this.getStateContainer().getBaseState().with(TRUNK_TYPE, CactusThickness.TRUNK).with(ORIGIN, Direction.DOWN));
 	}
 
 	///////////////////////////////////////////
@@ -97,7 +92,7 @@ public class CactusBranchBlock extends BranchBlock {
 
 	@Override
 	public int branchSupport(BlockState blockState, IBlockReader blockAccess, BranchBlock branch, BlockPos pos, Direction dir, int radius) {
-		return 0;// Cacti don't have leaves and don't rot
+		return 0; // Cacti don't have leaves and don't rot.
 	}
 
 	///////////////////////////////////////////
@@ -164,8 +159,8 @@ public class CactusBranchBlock extends BranchBlock {
 	///////////////////////////////////////////
 
 	@Override
-	public ICell getHydrationCell(IBlockReader blockAccess, BlockPos pos, BlockState blockState, Direction dir, ILeavesProperties leavesProperties) {
-		return CellNull.NULLCELL;
+	public ICell getHydrationCell(IBlockReader blockAccess, BlockPos pos, BlockState blockState, Direction dir, LeavesProperties leavesProperties) {
+		return CellNull.NULL_CELL;
 	}
 
 	protected int getCactusRadius(CactusThickness trunk){
@@ -187,7 +182,7 @@ public class CactusBranchBlock extends BranchBlock {
 
 	@Override
 	public int setRadius(IWorld world, BlockPos pos, int radius, Direction originDir, int flags) {
-		destroyMode = DynamicTrees.EnumDestroyMode.SETRADIUS;
+		destroyMode = DynamicTrees.EnumDestroyMode.SET_RADIUS;
 		world.setBlockState(pos, getStateForRadius(radius).with(ORIGIN, originDir), flags);
 		destroyMode = DynamicTrees.EnumDestroyMode.SLOPPY;
 		return radius;
@@ -203,8 +198,8 @@ public class CactusBranchBlock extends BranchBlock {
 		Direction originDir = signal.dir.getOpposite(); // Direction this signal originated from
 
 		CactusThickness trunk;
-		if (signal.getSpecies() instanceof Cactus.BaseCactusSpecies){
-			trunk = ((Cactus.BaseCactusSpecies) signal.getSpecies()).thicknessForBranchPlaced(world, pos, true);
+		if (signal.getSpecies() instanceof CactusSpecies){
+			trunk = ((CactusSpecies) signal.getSpecies()).thicknessForBranchPlaced(world, pos, true);
 		} else trunk = CactusThickness.BRANCH;
 
 		if (originDir.getAxis() != Direction.Axis.Y && (world.getBlockState(pos.up()).getBlock() == this || world.getBlockState(pos.down()).getBlock() == this)) {
@@ -240,9 +235,9 @@ public class CactusBranchBlock extends BranchBlock {
 			}
 
 			BlockState thisState = world.getBlockState(pos);
-			if (thisState.getBlock() == this && species instanceof Cactus.BaseCactusSpecies){
+			if (thisState.getBlock() == this && species instanceof CactusSpecies){
 				CactusThickness isTrunk = thisState.get(TRUNK_TYPE);
-				CactusThickness newIsTrunk = ((Cactus.BaseCactusSpecies) species).thicknessAfterGrowthSignal(world, pos, signal, isTrunk);
+				CactusThickness newIsTrunk = ((CactusSpecies) species).thicknessAfterGrowthSignal(world, pos, signal, isTrunk);
 				if (isTrunk != newIsTrunk){
 					setRadius(world, pos, getCactusRadius(newIsTrunk), thisState.get(ORIGIN));
 				}

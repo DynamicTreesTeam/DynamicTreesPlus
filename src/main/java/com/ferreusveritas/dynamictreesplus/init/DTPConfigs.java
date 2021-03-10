@@ -17,6 +17,7 @@ public class DTPConfigs {
 //    public static ForgeConfigSpec COMMON_CONFIG;
 //    public static ForgeConfigSpec CLIENT_CONFIG;
 
+    public static ForgeConfigSpec.BooleanValue canBoneMealCactus;
     public static ForgeConfigSpec.BooleanValue cactusPrickleOnMoveOnly;
     public static ForgeConfigSpec.BooleanValue cactusKillItems;
 
@@ -28,6 +29,8 @@ public class DTPConfigs {
 //        final ForgeConfigSpec.Builder CLIENT_BUILDER = new ForgeConfigSpec.Builder();
 
         SERVER_BUILDER.comment("Cactus Settings").push("cactus");
+        canBoneMealCactus = SERVER_BUILDER.comment("If enabled bone meal can be used to speed up cactus growth.").
+                define("canBoneMealCactus", false);
         cactusPrickleOnMoveOnly = SERVER_BUILDER.comment("If enabled dynamic cacti will only prickle when moving (similar to how berry bushes prickle)").
                 define("cactusPrickleOnMoveOnly", true);
         cactusKillItems = SERVER_BUILDER.comment("If enabled dynamic cacti will destroy items on contact").

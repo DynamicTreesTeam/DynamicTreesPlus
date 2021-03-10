@@ -27,21 +27,19 @@ public class WorldGenEvents {
 
         // This registers the tree feature canceller for cacti, which will cancel any BlockCluster features using the CactusBlock class.
         registry.register(CACTUS_CANCELLER, new CactusFeatureCanceller<>(CactusBlock.class));
-
     }
 
     @SubscribeEvent
     public void onTreeCancelRegistry(TreeCancelRegistryEvent event) {
         final ITreeCanceller treeCanceller = event.getTreeCanceller();
-        final List<String> namespaces = Collections.singletonList(DynamicTrees.MINECRAFT_ID);
+        final List<String> namespaces = Collections.singletonList(DynamicTrees.MINECRAFT);
         // Gets a list of all vanilla Minecraft biome registry keys.
         final List<RegistryKey<Biome>> vanillaBiomes = ForgeRegistries.BIOMES.getEntries().stream().map(Map.Entry::getKey)
-                .filter(key -> key.getLocation().getNamespace().equals(DynamicTrees.MINECRAFT_ID)).collect(Collectors.toList());
+                .filter(key -> key.getLocation().getNamespace().equals(DynamicTrees.MINECRAFT)).collect(Collectors.toList());
 
         // This registers the cancellation of all cactus features with the namespace "minecraft" from all sandy biomes with the namespace "minecraft".
         vanillaBiomes.stream().filter(key -> BiomeDictionary.hasType(key, BiomeDictionary.Type.SANDY)).forEach(key ->
                 treeCanceller.register(key.getLocation(), namespaces, Collections.singletonList(CACTUS_CANCELLER)));
-
     }
 
 }

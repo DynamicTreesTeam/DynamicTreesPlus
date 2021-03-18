@@ -10,17 +10,14 @@ import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.FindEndsNode;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.trees.SpeciesType;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
-import com.ferreusveritas.dynamictreesplus.DynamicTreesPlus;
 import com.ferreusveritas.dynamictreesplus.blocks.CactusBranchBlock;
 import com.ferreusveritas.dynamictreesplus.init.DTPConfigs;
 import com.ferreusveritas.dynamictreesplus.init.DTPRegistries;
-import com.ferreusveritas.dynamictreesplus.systems.thicknesslogic.CactusThicknessLogic;
-import com.ferreusveritas.dynamictreesplus.systems.thicknesslogic.CactusThicknessLogicKits;
 import com.ferreusveritas.dynamictreesplus.systems.dropcreators.CactusSeedDropCreator;
+import com.ferreusveritas.dynamictreesplus.systems.thicknesslogic.CactusThicknessLogic;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SoundType;
 import net.minecraft.util.Direction;
@@ -38,12 +35,7 @@ import net.minecraftforge.common.MinecraftForge;
 
 import java.util.List;
 
-/**
- * @author Harley O'Connor
- */
 public class CactusSpecies extends Species {
-
-    public static final SpeciesType<CactusSpecies> CACTUS_SPECIES = new Type();
 
     private final CactusSeedDropCreator cactusSeedDropCreator = new CactusSeedDropCreator();
     private CactusThicknessLogic thicknessLogic;
@@ -51,14 +43,14 @@ public class CactusSpecies extends Species {
     public CactusSpecies(ResourceLocation registryName, Family treeFamily) {
         super(registryName, treeFamily);
 
-        final CactusThicknessLogic thicknessLogic = CactusThicknessLogic.get(registryName);
-        this.thicknessLogic = thicknessLogic == null ? CactusThicknessLogicKits.PILLAR : thicknessLogic;
+        // Try to get the logic kit for the registry name.
+        this.thicknessLogic = CactusThicknessLogic.REGISTRY.get(registryName);
 
         this.setGrowthLogicKit(DTPRegistries.PILLAR_LOGIC);
 
-        this.envFactor(BiomeDictionary.Type.SNOWY, 0.25f);
-        this.envFactor(BiomeDictionary.Type.COLD, 0.5f);
-        this.envFactor(BiomeDictionary.Type.SANDY, 1.05f);
+        this.defaultEnvFactor(BiomeDictionary.Type.SNOWY, 0.25f)
+                .defaultEnvFactor(BiomeDictionary.Type.COLD, 0.5f)
+                .defaultEnvFactor(BiomeDictionary.Type.SANDY, 1.05f);
 
         this.addDropCreator(this.cactusSeedDropCreator);
     }
@@ -224,14 +216,10 @@ public class CactusSpecies extends Species {
                 '}';
     }
 
-    public static final class Type extends SpeciesType<CactusSpecies> {
-        private Type() {
-            super(DynamicTreesPlus.resLoc("cactus"));
-        }
-
+    public static final class Type extends Species.Type {
         @Override
-        public CactusSpecies construct(ResourceLocation resourceLocation, Family family, LeavesProperties leavesProperties) {
-            return new CactusSpecies(resourceLocation, family);
+        public Species construct(ResourceLocation registryName, Family family, LeavesProperties leavesProperties) {
+            return new CactusSpecies(registryName, family);
         }
     }
 

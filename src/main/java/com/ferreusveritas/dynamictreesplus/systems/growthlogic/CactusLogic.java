@@ -9,9 +9,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-/**
- * @author Harley O'Connor
- */
 public class CactusLogic extends GrowthLogicKit {
 
     private final int mod;

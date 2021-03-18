@@ -568,9 +568,8 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
         return 0;
     }
 
-    @Nonnull
     @Override
-    public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @Nonnull Random rand, @Nonnull IModelData extraData) {
+    public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, Random rand, IModelData extraData) {
 
         if (side == null && state != null) {
             List<BakedQuad> quadsList = new ArrayList<>(12);
@@ -657,9 +656,8 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
      * Checks all neighboring tree parts to determine the connection radius for each side of this branch block.
      *
      */
-    @Nonnull
     @Override
-    public IModelData getModelData(@Nonnull IBlockDisplayReader world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull IModelData tileData) {
+    public IModelData getModelData(IBlockDisplayReader world, BlockPos pos, BlockState state, IModelData tileData) {
         Block block = state.getBlock();
         return block instanceof BranchBlock ? new ModelConnections(((BranchBlock) block).getConnectionData(world, pos, state)) : new ModelConnections();
     }
@@ -671,6 +669,7 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
      * @param connections an array of 6 integers, one for the radius of each connecting side. DUNSWE.
      * @return
      */
+    @Nullable
     protected Direction getSourceDir(int coreRadius, int[] connections) {
         int largestConnection = 0;
         Direction sourceDir = null;
@@ -710,7 +709,7 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
     }
 
     @Override
-    public TextureAtlasSprite getParticleTexture(@Nonnull IModelData data) {
+    public TextureAtlasSprite getParticleTexture(IModelData data) {
         return getParticleTexture();
     }
     @Override

@@ -13,20 +13,14 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * A drop creator that drops apples just like Vanilla trees.
- * No longer used by any of the trees in the base mod on account of
- * the addition of the apple species.  Left for demonstration purposes
- * or in case I change my mind about something.
- * 
  * @author ferreusveritas
- *
  */
 public class CactusSeedDropCreator extends DropCreator {
 
     private float seedPerBranch = 0.5f;
 
     public CactusSeedDropCreator() {
-        super(new ResourceLocation(DynamicTreesPlus.MOD_ID, "cactusseeds"));
+        super(DynamicTreesPlus.resLoc("cactus_seeds"));
     }
 
     public CactusSeedDropCreator setSeedPerBranch(float seedPerLog) {

@@ -14,7 +14,7 @@ import net.minecraft.world.gen.feature.IFeatureConfig;
 
 /**
  * This class cancels any features that have a config that extends {@link BlockClusterFeatureConfig} and that
- * has a block set within that class that extends the cactusBlockClass given (by default {@link CactusBlock}).
+ * has a block set within that class that extends the cactus block class given (by default {@link CactusBlock}).
  *
  * @author Harley O'Connor
  */
@@ -38,15 +38,15 @@ public class CactusFeatureCanceller<T extends Block> implements ITreeFeatureCanc
         if (!(featureConfig instanceof DecoratedFeatureConfig))
             return false;
 
-        ConfiguredFeature<?, ?> currentConfiguredFeature = ((DecoratedFeatureConfig) featureConfig).feature.get();
-        ResourceLocation featureResLoc = currentConfiguredFeature.feature.getRegistryName();
+        final ConfiguredFeature<?, ?> currentConfiguredFeature = ((DecoratedFeatureConfig) featureConfig).feature.get();
+        final ResourceLocation featureResLoc = currentConfiguredFeature.feature.getRegistryName();
         featureConfig = currentConfiguredFeature.config;
 
         if (!(featureConfig instanceof BlockClusterFeatureConfig))
             return false;
 
-        BlockClusterFeatureConfig blockClusterFeatureConfig = ((BlockClusterFeatureConfig) featureConfig);
-        BlockStateProvider stateProvider = blockClusterFeatureConfig.stateProvider;
+        final BlockClusterFeatureConfig blockClusterFeatureConfig = ((BlockClusterFeatureConfig) featureConfig);
+        final BlockStateProvider stateProvider = blockClusterFeatureConfig.stateProvider;
 
         if (!(stateProvider instanceof SimpleBlockStateProvider))
             return false;

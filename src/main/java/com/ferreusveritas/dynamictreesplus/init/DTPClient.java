@@ -12,11 +12,8 @@ public class DTPClient {
     }
 
     private static void registerRenderLayers () {
-        ForgeRegistries.BLOCKS.forEach(block -> {
-            if (block instanceof CactusBranchBlock) {
-                RenderTypeLookup.setRenderLayer(block, RenderType.getCutoutMipped());
-            }
-        });
+        ForgeRegistries.BLOCKS.getValues().stream().filter(block -> block instanceof CactusBranchBlock)
+                .forEach(block -> RenderTypeLookup.setRenderLayer(block, RenderType.getCutoutMipped()));
     }
 
 }

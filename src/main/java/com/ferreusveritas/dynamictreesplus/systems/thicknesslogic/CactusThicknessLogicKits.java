@@ -8,33 +8,13 @@ import com.ferreusveritas.dynamictreesplus.blocks.CactusBranchBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 
-/**
- * @author Harley O'Connor
- */
 public final class CactusThicknessLogicKits {
 
-    public static final CactusThicknessLogic PILLAR = new PillarThicknessLogic();
-    public static final CactusThicknessLogic PIPE = new PipeThicknessLogic();
-    public static final CactusThicknessLogic SAGUARO = new SaguaroThicknessLogic();
-    public static final CactusThicknessLogic MEGA = new MegaThicknessLogic();
-
-    public static void register () {
-        register(DynamicTreesPlus.resLoc("pillar"), PILLAR);
-        register(DynamicTreesPlus.resLoc("pipe"), PIPE);
-        register(DynamicTreesPlus.resLoc("saguaro"), SAGUARO);
-        register(DynamicTreesPlus.resLoc("mega"), MEGA);
-    }
-
-    private static void register (final ResourceLocation registryName, final CactusThicknessLogic cactusThicknessLogic) {
-        CactusThicknessLogic.register(registryName, cactusThicknessLogic);
-    }
-
-    private static class PillarThicknessLogic extends CactusThicknessLogic {
+    public static final CactusThicknessLogic PILLAR = new CactusThicknessLogic(DynamicTreesPlus.resLoc("pillar")) {
         @Override
         public CactusBranchBlock.CactusThickness thicknessAfterGrowthSignal(World world, BlockPos pos, GrowSignal signal, CactusBranchBlock.CactusThickness currentThickness) {
             BlockState upState = world.getBlockState(pos.up());
@@ -49,9 +29,9 @@ public final class CactusThicknessLogicKits {
                 return CactusBranchBlock.CactusThickness.BRANCH;
             return CactusBranchBlock.CactusThickness.TRUNK;
         }
-    }
+    };
 
-    private static class PipeThicknessLogic extends CactusThicknessLogic {
+    public static final CactusThicknessLogic PIPE = new CactusThicknessLogic(DynamicTreesPlus.resLoc("pipe")) {
         @Override
         public CactusBranchBlock.CactusThickness thicknessAfterGrowthSignal(World world, BlockPos pos, GrowSignal signal, CactusBranchBlock.CactusThickness currentThickness) {
             return CactusBranchBlock.CactusThickness.BRANCH;
@@ -61,9 +41,9 @@ public final class CactusThicknessLogicKits {
         public CactusBranchBlock.CactusThickness thicknessForBranchPlaced(IWorld world, BlockPos pos, boolean isLast) {
             return CactusBranchBlock.CactusThickness.BRANCH;
         }
-    }
+    };
 
-    private static class SaguaroThicknessLogic extends CactusThicknessLogic {
+    public static final CactusThicknessLogic SAGUARO = new CactusThicknessLogic(DynamicTreesPlus.resLoc("saguaro")) {
         @Override
         public CactusBranchBlock.CactusThickness thicknessAfterGrowthSignal(World world, BlockPos pos, GrowSignal signal, CactusBranchBlock.CactusThickness currentThickness) {
             return currentThickness;
@@ -76,9 +56,9 @@ public final class CactusThicknessLogicKits {
                 return CactusBranchBlock.CactusThickness.TRUNK;
             return CactusBranchBlock.CactusThickness.BRANCH;
         }
-    }
+    };
 
-    private static class MegaThicknessLogic extends CactusThicknessLogic {
+    public static final CactusThicknessLogic MEGA = new CactusThicknessLogic(DynamicTreesPlus.resLoc("mega")) {
         @Override
         public CactusBranchBlock.CactusThickness thicknessAfterGrowthSignal(World world, BlockPos pos, GrowSignal signal, CactusBranchBlock.CactusThickness currentThickness) {
             Block down = world.getBlockState(pos.down()).getBlock();
@@ -101,6 +81,6 @@ public final class CactusThicknessLogicKits {
                 return CactusBranchBlock.CactusThickness.TRUNK;
             return CactusBranchBlock.CactusThickness.BRANCH;
         }
-    }
+    };
 
 }

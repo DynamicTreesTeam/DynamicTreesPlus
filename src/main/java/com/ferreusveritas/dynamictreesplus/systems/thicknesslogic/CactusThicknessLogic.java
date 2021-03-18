@@ -1,6 +1,9 @@
 package com.ferreusveritas.dynamictreesplus.systems.thicknesslogic;
 
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
+import com.ferreusveritas.dynamictrees.util.Registry;
+import com.ferreusveritas.dynamictrees.util.RegistryEntry;
+import com.ferreusveritas.dynamictreesplus.DynamicTreesPlus;
 import com.ferreusveritas.dynamictreesplus.blocks.CactusBranchBlock;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -10,19 +13,17 @@ import net.minecraft.world.World;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author Harley O'Connor
- */
-public abstract class CactusThicknessLogic {
+public abstract class CactusThicknessLogic extends RegistryEntry<CactusThicknessLogic> {
 
-    private static final Map<ResourceLocation, CactusThicknessLogic> REGISTRY = new HashMap<>();
+    public static final CactusThicknessLogic NULL_LOGIC = new CactusThicknessLogic(DynamicTreesPlus.resLoc("null")) {
+        @Override public CactusBranchBlock.CactusThickness thicknessAfterGrowthSignal(World world, BlockPos pos, GrowSignal signal, CactusBranchBlock.CactusThickness currentThickness) { return currentThickness; }
+        @Override public CactusBranchBlock.CactusThickness thicknessForBranchPlaced(IWorld world, BlockPos pos, boolean isLast) { return CactusBranchBlock.CactusThickness.BRANCH; }
+    };
 
-    public static void register(final ResourceLocation registryName, final CactusThicknessLogic cactusThicknessLogic) {
-        REGISTRY.put(registryName, cactusThicknessLogic);
-    }
+    public static final Registry<CactusThicknessLogic> REGISTRY = new Registry<>(CactusThicknessLogic.class, NULL_LOGIC);
 
-    public static CactusThicknessLogic get(final ResourceLocation registryName) {
-        return REGISTRY.get(registryName);
+    public CactusThicknessLogic(ResourceLocation registryName) {
+        super(registryName);
     }
 
     public abstract CactusBranchBlock.CactusThickness thicknessAfterGrowthSignal(World world, BlockPos pos, GrowSignal signal, CactusBranchBlock.CactusThickness currentThickness);

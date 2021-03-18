@@ -7,9 +7,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-/**
- * @author Harley O'Connor
- */
 public final class SaguaroCactusLogic extends CactusLogic {
 
     public SaguaroCactusLogic(final ResourceLocation registryName) {

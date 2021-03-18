@@ -30,7 +30,6 @@ import net.minecraft.state.StateContainer;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Direction;
 import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -68,12 +67,12 @@ public class CactusBranchBlock extends BranchBlock {
 		@Override public String getString() { return this.name; }
 	}
 
-	public CactusBranchBlock(ResourceLocation registryName) {
+	public CactusBranchBlock() {
 		super(Properties.create(Material.CACTUS)
 				.sound(SoundType.CLOTH)
 				.harvestTool(ToolType.AXE)
 				.harvestLevel(0)
-				.sound(SoundType.CLOTH), registryName);
+				.sound(SoundType.CLOTH));
 
 		this.setDefaultState(this.getStateContainer().getBaseState().with(TRUNK_TYPE, CactusThickness.TRUNK).with(ORIGIN, Direction.DOWN));
 	}

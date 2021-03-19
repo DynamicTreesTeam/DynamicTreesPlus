@@ -4,7 +4,6 @@ import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictreesplus.init.DTPClient;
 import com.ferreusveritas.dynamictreesplus.init.DTPConfigs;
-import com.ferreusveritas.dynamictreesplus.systems.thicknesslogic.CactusThicknessLogic;
 import com.ferreusveritas.dynamictreesplus.worldgen.WorldGenEvents;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
@@ -34,9 +33,6 @@ public class DynamicTreesPlus {
         final RegistryHandler registryHandler = new RegistryHandler(MOD_ID);
         RegistryHandler.REGISTRY.register(registryHandler);
         modBus.register(registryHandler);
-
-        CactusThicknessLogic.REGISTRY.postRegistryEvent();
-        CactusThicknessLogic.REGISTRY.lock();
     }
 
     private void clientSetup(final FMLClientSetupEvent event) {

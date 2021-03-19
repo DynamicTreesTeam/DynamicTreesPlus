@@ -11,6 +11,7 @@ import com.ferreusveritas.dynamictreesplus.systems.thicknesslogic.CactusThicknes
 import com.ferreusveritas.dynamictreesplus.trees.CactusSpecies;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * @author Harley O'Connor
@@ -23,6 +24,9 @@ public final class JsonRegistries {
         // Add to reload appliers only.
         if (!event.isReloadApplier())
             return;
+
+        CactusThicknessLogic.REGISTRY.postRegistryEvent();
+        CactusThicknessLogic.REGISTRY.lock();
 
         registerJsonGetters();
 

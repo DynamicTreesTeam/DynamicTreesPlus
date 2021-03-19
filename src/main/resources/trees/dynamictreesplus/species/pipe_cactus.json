@@ -7,7 +7,7 @@
   "growth_rate": 1,
   "soil_longevity": 1,
   "seed_per_branch": 1,
-  "cactus_thickness_logic": "dynamictreesplus:pipe_cactus",
+  "cactus_thickness_logic": "dynamictreesplus:pipe",
   "mega_species": "dynamictreesplus:mega_cactus",
   "features": [
     "dynamictreesplus:cactus_clones"

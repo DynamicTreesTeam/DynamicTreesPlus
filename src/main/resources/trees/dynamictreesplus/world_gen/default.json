@@ -1,27 +1,33 @@
-{
-	"entries" : [
-		{
-			"__comment" : "This applies to deserts, desert hills and desert lakes",
-			"select": { "name": "minecraft:.*desert.*" },
-			"apply": {
-				"species" : {
-					"random" : {
-						"dynamictreesplus:pillar_cactus" : 6,
-						"dynamictreesplus:pipe_cactus" : 1
-					}
-				},
-				"density" : { "math": { "add" : [ { "mul" : [ "noise", 0.6 ] }, 0.4 ] } },
-				"chance": 0.1
-			}
-		},
-		{
-			"__comment" : "This applies to badlands only (not the mesa)",
-			"select": { "name": "minecraft:badlands" },
-			"apply": {
-				"species" : "dynamictreesplus:saguaro_cactus",
-				"density" : { "math": { "add" : [ { "mul" : [ "noise", 0.6 ] }, 0.4 ] } },
-				"chance": 0.3
-			}
+[
+	{
+		"__comment": "Cancel standard tree features from the overworld.",
+		"select": { "name": "minecraft.*", "type": "sandy" },
+		"cancellers": {
+			"type": "dynamictreesplus:cactus",
+			"namespace": "minecraft"
 		}
-	]
-}
+	},
+	{
+		"__comment" : "This applies to deserts, desert hills and desert lakes",
+		"select": { "name": "minecraft:.*desert.*" },
+		"apply": {
+			"species" : {
+				"random" : {
+					"dynamictreesplus:pillar_cactus" : 6,
+					"dynamictreesplus:pipe_cactus" : 1
+				}
+			},
+			"density" : { "math": { "add" : [ { "mul" : [ "noise", 0.6 ] }, 0.4 ] } },
+			"chance": 0.1
+		}
+	},
+	{
+		"__comment" : "This applies to badlands only (not the mesa)",
+		"select": { "name": "minecraft:badlands" },
+		"apply": {
+			"species" : "dynamictreesplus:saguaro_cactus",
+			"density" : { "math": { "add" : [ { "mul" : [ "noise", 0.6 ] }, 0.4 ] } },
+			"chance": 0.3
+		}
+	}
+]

@@ -1,17 +1,14 @@
 package com.ferreusveritas.dynamictreesplus.systems.thicknesslogic;
 
+import com.ferreusveritas.dynamictrees.api.registry.Registry;
+import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
-import com.ferreusveritas.dynamictrees.util.Registry;
-import com.ferreusveritas.dynamictrees.util.RegistryEntry;
 import com.ferreusveritas.dynamictreesplus.DynamicTreesPlus;
 import com.ferreusveritas.dynamictreesplus.blocks.CactusBranchBlock;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public abstract class CactusThicknessLogic extends RegistryEntry<CactusThicknessLogic> {
 

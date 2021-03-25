@@ -15,23 +15,19 @@ public final class SaguaroCactusLogic extends CactusLogic {
 
     @Override
     public int[] directionManipulation(World world, BlockPos pos, Species species, int radius, GrowSignal signal, int[] probMap) {
-        Direction originDir = signal.dir.getOpposite();
+        final Direction originDir = signal.dir.getOpposite();
 
-        //Alter probability map for direction change
-        probMap[0] = 0;//Down is always disallowed for cactus
+        // Alter probability map for direction change.
+        probMap[0] = 0; // Down is always disallowed for the cacti.
         probMap[1] = signal.delta.getX() % 2 == 0 || signal.delta.getZ() % 2 == 0 ? species.getUpProbability() : 0;
         probMap[2] = probMap[3] = probMap[4] = probMap[5] = signal.isInTrunk() && (signal.energy > 1) ? 1 : 0;
-        if (signal.dir != Direction.UP) probMap[signal.dir.ordinal()] = 0;//Disable the current direction, unless that direction is up
-        probMap[originDir.ordinal()] = 0;//Disable the direction we came from
-        return probMap;
-    }
 
-    @Override
-    public Direction newDirectionSelected(Species species, Direction newDir, GrowSignal signal) {
-        if(signal.isInTrunk() && newDir != Direction.UP){ // Turned out of trunk
-            signal.energy += 0.0f;
-        }
-        return newDir;
+        if (signal.dir != Direction.UP)
+            probMap[signal.dir.ordinal()] = 0; // Disable the current direction, unless that direction is up.
+
+        probMap[originDir.ordinal()] = 0; // Disable the direction we came from.
+
+        return probMap;
     }
 
 }

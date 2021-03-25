@@ -32,7 +32,7 @@ public class CactusClonesGenFeature extends GenFeature implements IPostGenFeatur
     }
 
     @Override
-    protected ConfiguredGenFeature<?> createDefaultConfiguration() {
+    protected ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
         return super.createDefaultConfiguration().with(CHANCE_ON_GROW, 0.3f).with(TRUNK_TYPE, CactusBranchBlock.CactusThickness.BRANCH);
     }
 

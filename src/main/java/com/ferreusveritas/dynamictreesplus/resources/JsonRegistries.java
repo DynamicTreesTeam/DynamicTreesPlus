@@ -11,7 +11,6 @@ import com.ferreusveritas.dynamictreesplus.systems.thicknesslogic.CactusThicknes
 import com.ferreusveritas.dynamictreesplus.trees.CactusSpecies;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import org.apache.logging.log4j.LogManager;
 
 /**
  * @author Harley O'Connor
@@ -25,18 +24,18 @@ public final class JsonRegistries {
         if (!event.isReloadApplier())
             return;
 
-        CactusThicknessLogic.REGISTRY.postRegistryEvent();
-        CactusThicknessLogic.REGISTRY.lock();
-
-        registerJsonGetters();
-
         event.getApplierList().register("seed_per_branch", CactusSpecies.class, Float.class, CactusSpecies::setSeedPerBranch)
                 .register("cactus_thickness_logic", CactusSpecies.class, CactusThicknessLogic.class, CactusSpecies::setThicknessLogic);
     }
 
-    public static void registerJsonGetters () {
+    @SubscribeEvent
+    public static void registerJsonGetters (final JsonObjectGetters.RegistryEvent event) {
+        // Register cactus thickness logic kits and lock it.
+        CactusThicknessLogic.REGISTRY.postRegistryEvent();
+        CactusThicknessLogic.REGISTRY.lock();
+
         // Register getter for cactus thickness logic.
-        JsonObjectGetters.register(CactusThicknessLogic.class, new RegistryEntryGetter<>(CactusThicknessLogic.REGISTRY, "cactus thickness logic"));
+        JsonObjectGetters.register(CactusThicknessLogic.class, new RegistryEntryGetter<>(CactusThicknessLogic.REGISTRY));
 
         // Register getter for cactus thickness enum.
         JsonObjectGetters.register(CactusBranchBlock.CactusThickness.class, new EnumGetter<>(CactusBranchBlock.CactusThickness.class));

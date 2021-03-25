@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictreesplus.worldgen.canceller;
 
-import com.ferreusveritas.dynamictrees.api.worldgen.ITreeFeatureCanceller;
-import com.ferreusveritas.dynamictrees.worldgen.canceller.ITreeCanceller;
+import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
+import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
 import net.minecraft.block.Block;
 import net.minecraft.block.CactusBlock;
 import net.minecraft.util.ResourceLocation;
@@ -18,16 +18,17 @@ import net.minecraft.world.gen.feature.IFeatureConfig;
  *
  * @author Harley O'Connor
  */
-public class CactusFeatureCanceller<T extends Block> implements ITreeFeatureCanceller {
+public class CactusFeatureCanceller<T extends Block> extends FeatureCanceller {
 
     private final Class<T> cactusBlockClass;
 
-    public CactusFeatureCanceller(Class<T> cactusBlockClass) {
+    public CactusFeatureCanceller(final ResourceLocation registryName, Class<T> cactusBlockClass) {
+        super(registryName);
         this.cactusBlockClass = cactusBlockClass;
     }
 
     @Override
-    public boolean shouldCancel(ConfiguredFeature<?, ?> configuredFeature, ResourceLocation biomeResLoc, ITreeCanceller treeCanceller) {
+    public boolean shouldCancel(ConfiguredFeature<?, ?> configuredFeature, BiomePropertySelectors.FeatureCancellations featureCancellations) {
         IFeatureConfig featureConfig = configuredFeature.config;
 
         if (!(featureConfig instanceof DecoratedFeatureConfig))
@@ -53,7 +54,7 @@ public class CactusFeatureCanceller<T extends Block> implements ITreeFeatureCanc
 
         // SimpleBlockStateProvider does not use random or BlockPos in getBlockState, so giving null is safe.
         return this.cactusBlockClass.isInstance(stateProvider.getBlockState(null, null).getBlock())
-                && featureResLoc != null && treeCanceller.shouldCancelFeature(biomeResLoc, featureResLoc);
+                && featureResLoc != null && featureCancellations.shouldCancelNamespace(featureResLoc.getNamespace());
     }
 
 }

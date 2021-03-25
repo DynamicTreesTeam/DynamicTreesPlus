@@ -43,16 +43,23 @@ public class CactusSpecies extends Species {
     public CactusSpecies(ResourceLocation registryName, Family treeFamily) {
         super(registryName, treeFamily);
 
-        // Try to get the logic kit for the registry name.
-        this.thicknessLogic = CactusThicknessLogic.REGISTRY.get(registryName);
-
-        this.setGrowthLogicKit(DTPRegistries.PILLAR_LOGIC);
-
-        this.defaultEnvFactor(BiomeDictionary.Type.SNOWY, 0.25f)
-                .defaultEnvFactor(BiomeDictionary.Type.COLD, 0.5f)
-                .defaultEnvFactor(BiomeDictionary.Type.SANDY, 1.05f);
-
         this.addDropCreator(this.cactusSeedDropCreator);
+    }
+
+    @Override
+    public Species setPreReloadDefaults() { ;
+        this.setTransformable(false);
+        return super.setPreReloadDefaults().envFactor(BiomeDictionary.Type.SNOWY, 0.25f).envFactor(BiomeDictionary.Type.COLD, 0.5f)
+                .envFactor(BiomeDictionary.Type.SANDY, 1.05f).setGrowthLogicKit(DTPRegistries.PILLAR_LOGIC);
+    }
+
+    @Override
+    public Species setPostReloadDefaults() {
+        if (this.thicknessLogic == null)
+            // Try to get the logic kit for the registry name.
+            this.thicknessLogic = CactusThicknessLogic.REGISTRY.get(this.getRegistryName());
+
+        return super.setPostReloadDefaults();
     }
 
     public void setSeedPerBranch(float seedsPerBranch) {
@@ -79,11 +86,6 @@ public class CactusSpecies extends Species {
     @Override
     protected void setStandardSoils() {
         this.addAcceptableSoils(DirtHelper.SAND_LIKE);
-    }
-
-    @Override
-    public boolean isTransformable() {
-        return false;
     }
 
     @Override

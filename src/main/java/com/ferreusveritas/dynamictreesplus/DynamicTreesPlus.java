@@ -1,12 +1,9 @@
 package com.ferreusveritas.dynamictreesplus;
 
 import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
-import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictreesplus.init.DTPClient;
 import com.ferreusveritas.dynamictreesplus.init.DTPConfigs;
-import com.ferreusveritas.dynamictreesplus.worldgen.WorldGenEvents;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -25,10 +22,6 @@ public class DynamicTreesPlus {
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, DTPConfigs.SERVER_CONFIG);
 
         modBus.addListener(this::clientSetup);
-
-        if (DTConfigs.worldGen.get()) {
-            MinecraftForge.EVENT_BUS.register(new WorldGenEvents());
-        }
 
         final RegistryHandler registryHandler = new RegistryHandler(MOD_ID);
         RegistryHandler.REGISTRY.register(registryHandler);

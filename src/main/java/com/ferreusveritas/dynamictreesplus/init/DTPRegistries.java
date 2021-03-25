@@ -1,11 +1,12 @@
 package com.ferreusveritas.dynamictreesplus.init;
 
+import com.ferreusveritas.dynamictrees.api.registry.RegistryEvent;
+import com.ferreusveritas.dynamictrees.api.registry.TypeRegistryEvent;
+import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.util.RegistryEvent;
-import com.ferreusveritas.dynamictrees.util.TypeRegistryEvent;
 import com.ferreusveritas.dynamictreesplus.DynamicTreesPlus;
 import com.ferreusveritas.dynamictreesplus.systems.featuregen.CactusClonesGenFeature;
 import com.ferreusveritas.dynamictreesplus.systems.growthlogic.CactusLogic;
@@ -15,6 +16,9 @@ import com.ferreusveritas.dynamictreesplus.systems.thicknesslogic.CactusThicknes
 import com.ferreusveritas.dynamictreesplus.systems.thicknesslogic.CactusThicknessLogicKits;
 import com.ferreusveritas.dynamictreesplus.trees.CactusFamily;
 import com.ferreusveritas.dynamictreesplus.trees.CactusSpecies;
+import com.ferreusveritas.dynamictreesplus.worldgen.canceller.CactusFeatureCanceller;
+import net.minecraft.block.CactusBlock;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -43,14 +47,21 @@ public class DTPRegistries {
         event.getRegistry().registerAll(CACTUS_CLONES);
     }
 
+    public static final ResourceLocation CACTUS = DynamicTreesPlus.resLoc("cactus");
+
     @SubscribeEvent
     public static void registerFamilyType(final TypeRegistryEvent<Family> event) {
-        event.registerType(DynamicTreesPlus.resLoc("cactus"), new CactusFamily.Type());
+        event.registerType(CACTUS, new CactusFamily.Type());
     }
 
     @SubscribeEvent
     public static void registerSpeciesType(final TypeRegistryEvent<Species> event) {
-        event.registerType(DynamicTreesPlus.resLoc("cactus"), new CactusSpecies.Type());
+        event.registerType(CACTUS, new CactusSpecies.Type());
+    }
+
+    @SubscribeEvent
+    public static void onFeatureCancellerRegistry(final com.ferreusveritas.dynamictrees.api.registry.RegistryEvent<FeatureCanceller> event) {
+        event.getRegistry().registerAll(new CactusFeatureCanceller<>(DynamicTreesPlus.resLoc("cactus"), CactusBlock.class));
     }
 
 }

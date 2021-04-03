@@ -51,12 +51,12 @@ public class DTPRegistries {
 
     @SubscribeEvent
     public static void registerFamilyType(final TypeRegistryEvent<Family> event) {
-        event.registerType(CACTUS, new CactusFamily.Type());
+        event.registerType(CACTUS, CactusFamily.TYPE);
     }
 
     @SubscribeEvent
     public static void registerSpeciesType(final TypeRegistryEvent<Species> event) {
-        event.registerType(CACTUS, new CactusSpecies.Type());
+        event.registerType(CACTUS, CactusSpecies.TYPE);
     }
 
     @SubscribeEvent

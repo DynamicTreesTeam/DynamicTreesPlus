@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictreesplus.trees;
 
+import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.trees.Family;
@@ -10,6 +11,8 @@ import net.minecraft.util.ResourceLocation;
 import java.util.Objects;
 
 public class CactusFamily extends Family {
+
+    public static final TypedRegistry.EntryType<Family> TYPE = TypedRegistry.newType(CactusFamily::new);
 
     public CactusFamily(final ResourceLocation registryName) {
         super(registryName);
@@ -33,13 +36,6 @@ public class CactusFamily extends Family {
     @Override
     public float getSecondaryThickness() {
         return 4.0f;
-    }
-
-    public static final class Type extends Family.Type {
-        @Override
-        public CactusFamily construct(ResourceLocation resourceLocation) {
-            return new CactusFamily(resourceLocation);
-        }
     }
 
 }

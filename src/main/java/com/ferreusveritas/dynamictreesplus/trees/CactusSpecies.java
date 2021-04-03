@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictreesplus.trees;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
+import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.event.SpeciesPostGenerationEvent;
@@ -37,11 +38,13 @@ import java.util.List;
 
 public class CactusSpecies extends Species {
 
+    public static final TypedRegistry.EntryType<Species> TYPE = createDefaultType(CactusSpecies::new);
+
     private final CactusSeedDropCreator cactusSeedDropCreator = new CactusSeedDropCreator();
     private CactusThicknessLogic thicknessLogic;
 
-    public CactusSpecies(ResourceLocation registryName, Family treeFamily) {
-        super(registryName, treeFamily);
+    public CactusSpecies(ResourceLocation name, Family family, LeavesProperties leavesProperties) {
+        super(name, family, leavesProperties);
 
         this.addDropCreator(this.cactusSeedDropCreator);
     }
@@ -186,43 +189,6 @@ public class CactusSpecies extends Species {
 
         // Vary the height energy by a psuedorandom hash function
         return signalEnergy * species.biomeSuitability(world, pos) + (CoordUtils.coordHashCode(pos.up(month), 2) % mod);
-    }
-
-    @Override
-    public String getDisplayInfo() {
-        return "CactusSpecies{" +
-                "cactusSeedDropCreator=" + cactusSeedDropCreator +
-                ", thicknessLogic=" + thicknessLogic +
-                ", family=" + family +
-                ", logicKit=" + logicKit +
-                ", tapering=" + tapering +
-                ", upProbability=" + upProbability +
-                ", lowestBranchHeight=" + lowestBranchHeight +
-                ", signalEnergy=" + signalEnergy +
-                ", growthRate=" + growthRate +
-                ", soilLongevity=" + soilLongevity +
-                ", soilTypeFlags=" + soilTypeFlags +
-                ", maxBranchRadius=" + maxBranchRadius +
-                ", acceptableBlocksForGrowth=" + acceptableBlocksForGrowth +
-                ", leavesProperties=" + leavesProperties +
-                ", seed=" + seed +
-                ", saplingBlock=" + saplingBlock +
-                ", primitiveSapling=" + primitiveSapling +
-                ", dropCreatorStorage=" + dropCreatorStorage +
-                ", envFactors=" + envFactors +
-                ", perfectBiomes=" + perfectBiomes +
-                ", genFeatures=" + genFeatures +
-                ", commonOverride=" + commonOverride +
-                ", flowerSeasonHoldMin=" + flowerSeasonHoldMin +
-                ", flowerSeasonHoldMax=" + flowerSeasonHoldMax +
-                '}';
-    }
-
-    public static final class Type extends Species.Type {
-        @Override
-        public Species construct(ResourceLocation registryName, Family family, LeavesProperties leavesProperties) {
-            return new CactusSpecies(registryName, family);
-        }
     }
 
 }

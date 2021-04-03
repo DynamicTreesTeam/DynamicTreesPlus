@@ -23,9 +23,7 @@ public class DynamicTreesPlus {
 
         modBus.addListener(this::clientSetup);
 
-        final RegistryHandler registryHandler = new RegistryHandler(MOD_ID);
-        RegistryHandler.REGISTRY.register(registryHandler);
-        modBus.register(registryHandler);
+        RegistryHandler.setup(MOD_ID);
     }
 
     private void clientSetup(final FMLClientSetupEvent event) {

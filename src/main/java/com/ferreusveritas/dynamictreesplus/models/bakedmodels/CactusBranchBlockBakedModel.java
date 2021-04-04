@@ -57,7 +57,7 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
             int radius = radii[i];
 
             for (Direction dir: Direction.values()) {
-                sleeves[dir.getIndex()][i] = bakeSleeve(radius, dir, barkTexture, ringsTexture);
+                sleeves[dir.get3DDataValue()][i] = bakeSleeve(radius, dir, barkTexture, ringsTexture);
             }
 
             cores[0][i] = bakeCore(radius, Axis.Y, barkTexture); //DOWN<->UP
@@ -86,8 +86,8 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
                 case UV:
                     switch (e.getIndex()) {
                         case 0:
-                            float iu = sprite.getInterpolatedU(u);
-                            float iv = sprite.getInterpolatedV(v);
+                            float iu = sprite.getU(u);
+                            float iv = sprite.getV(v);
                             builder.put(j, iu, iv);
                             break;
                         case 2:
@@ -109,10 +109,10 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
     }
 
     private BakedQuad createQuad(Vector3d v1, float v1u, float v1v, Vector3d v2, float v2u, float v2v, Vector3d v3, float v3u, float v3v, Vector3d v4, float v4u, float v4v, TextureAtlasSprite sprite) {
-        Vector3d normal = v3.subtract(v2).crossProduct(v1.subtract(v2)).normalize();
+        Vector3d normal = v3.subtract(v2).cross(v1.subtract(v2)).normalize();
 
         BakedQuadBuilder builder = new BakedQuadBuilder(sprite);
-        builder.setQuadOrientation(Direction.getFacingFromVector(normal.x, normal.y, normal.z));
+        builder.setQuadOrientation(Direction.getNearest(normal.x, normal.y, normal.z));
         putVertex(builder, normal, v1.x, v1.y, v1.z, v1u, v1v, sprite, 1.0f, 1.0f, 1.0f);
         putVertex(builder, normal, v2.x, v2.y, v2.z, v2u, v2v, sprite, 1.0f, 1.0f, 1.0f);
         putVertex(builder, normal, v3.x, v3.y, v3.z, v3u, v3v, sprite, 1.0f, 1.0f, 1.0f);
@@ -124,13 +124,13 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
         // Work in double units(*2)
         int dradius = radius * 2;
         int halfSize = (16 - dradius) / 2;
-        int halfSizeX = dir.getXOffset() != 0 ? halfSize : dradius;
-        int halfSizeY = dir.getYOffset() != 0 ? halfSize : dradius;
-        int halfSizeZ = dir.getZOffset() != 0 ? halfSize : dradius;
+        int halfSizeX = dir.getStepX() != 0 ? halfSize : dradius;
+        int halfSizeY = dir.getStepY() != 0 ? halfSize : dradius;
+        int halfSizeZ = dir.getStepZ() != 0 ? halfSize : dradius;
         int move = 16 - halfSize;
-        int centerX = 16 + (dir.getXOffset() * move);
-        int centerY = 16 + (dir.getYOffset() * move);
-        int centerZ = 16 + (dir.getZOffset() * move);
+        int centerX = 16 + (dir.getStepX() * move);
+        int centerY = 16 + (dir.getStepY() * move);
+        int centerZ = 16 + (dir.getStepZ() * move);
 
         Vector3f posFrom = new Vector3f((centerX - halfSizeX) / 2f, (centerY - halfSizeY) / 2f, (centerZ - halfSizeZ) / 2f);
         Vector3f posTo = new Vector3f((centerX + halfSizeX) / 2f, (centerY + halfSizeY) / 2f, (centerZ + halfSizeZ) / 2f);
@@ -159,149 +159,149 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
         }
 
         BlockPart part = new BlockPart(posFrom, posTo, mapFacesIn, null, true);
-        SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(blockModel.customData, ItemOverrideList.EMPTY).setTexture(bark);
+        SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(blockModel.customData, ItemOverrideList.EMPTY).particle(bark);
 
-        for (Map.Entry<Direction, BlockPartFace> e : part.mapFaces.entrySet()) {
+        for (Map.Entry<Direction, BlockPartFace> e : part.faces.entrySet()) {
             Direction face = e.getKey();
-            builder.addFaceQuad(face, ModelUtils.makeBakedQuad(part, e.getValue(), (dir == face) ? top : bark, face, ModelRotation.X0_Y0, this.modelResLoc));
+            builder.addCulledFace(face, ModelUtils.makeBakedQuad(part, e.getValue(), (dir == face) ? top : bark, face, ModelRotation.X0_Y0, this.modelResLoc));
         }
         float minV = negative ? 16 - halfSize : 0;
         float maxV = negative ? 16 : halfSize;
         switch (dir.getAxis()) {
             case X:
 
-                builder.addFaceQuad(Direction.NORTH, this.createQuad(
-                        v(posTo.getX() / 16f, posTo.getY() / 16f + 0.0625f, posFrom.getZ() / 16f - 0.002f), 16, minV,
-                        v(posTo.getX() / 16f, posTo.getY() / 16f - 0.0625f, posFrom.getZ() / 16f - 0.002f), 14, minV,
-                        v(posFrom.getX() / 16f, posTo.getY() / 16f - 0.0625f, posFrom.getZ() / 16f - 0.002f), 14, maxV,
-                        v(posFrom.getX() / 16f, posTo.getY() / 16f + 0.0625f, posFrom.getZ() / 16f - 0.002f), 16, maxV, bark));
-                builder.addFaceQuad(Direction.NORTH, this.createQuad(
-                        v(posTo.getX() / 16f, posFrom.getY() / 16f + 0.0625f, posFrom.getZ() / 16f - 0.002f), 2, minV,
-                        v(posTo.getX() / 16f, posFrom.getY() / 16f - 0.0625f, posFrom.getZ() / 16f - 0.002f), 0, minV,
-                        v(posFrom.getX() / 16f, posFrom.getY() / 16f - 0.0625f, posFrom.getZ() / 16f - 0.002f), 0, maxV,
-                        v(posFrom.getX() / 16f, posFrom.getY() / 16f + 0.0625f, posFrom.getZ() / 16f - 0.002f), 2, maxV, bark));
-                builder.addFaceQuad(Direction.SOUTH, this.createQuad(
-                        v(posFrom.getX() / 16f, posTo.getY() / 16f + 0.0625f, posTo.getZ() / 16f + 0.002f), 16, maxV,
-                        v(posFrom.getX() / 16f, posTo.getY() / 16f - 0.0625f, posTo.getZ() / 16f + 0.002f), 14, maxV,
-                        v(posTo.getX() / 16f, posTo.getY() / 16f - 0.0625f, posTo.getZ() / 16f + 0.002f), 14, minV,
-                        v(posTo.getX() / 16f, posTo.getY() / 16f + 0.0625f, posTo.getZ() / 16f + 0.002f), 16, minV, bark));
-                builder.addFaceQuad(Direction.SOUTH, this.createQuad(
-                        v(posFrom.getX() / 16f, posFrom.getY() / 16f + 0.0625f, posTo.getZ() / 16f + 0.002f), 2, maxV,
-                        v(posFrom.getX() / 16f, posFrom.getY() / 16f - 0.0625f, posTo.getZ() / 16f + 0.002f), 0, maxV,
-                        v(posTo.getX() / 16f, posFrom.getY() / 16f - 0.0625f, posTo.getZ() / 16f + 0.002f), 0, minV,
-                        v(posTo.getX() / 16f, posFrom.getY() / 16f + 0.0625f, posTo.getZ() / 16f + 0.002f), 2, minV, bark));
+                builder.addCulledFace(Direction.NORTH, this.createQuad(
+                        v(posTo.x() / 16f, posTo.y() / 16f + 0.0625f, posFrom.z() / 16f - 0.002f), 16, minV,
+                        v(posTo.x() / 16f, posTo.y() / 16f - 0.0625f, posFrom.z() / 16f - 0.002f), 14, minV,
+                        v(posFrom.x() / 16f, posTo.y() / 16f - 0.0625f, posFrom.z() / 16f - 0.002f), 14, maxV,
+                        v(posFrom.x() / 16f, posTo.y() / 16f + 0.0625f, posFrom.z() / 16f - 0.002f), 16, maxV, bark));
+                builder.addCulledFace(Direction.NORTH, this.createQuad(
+                        v(posTo.x() / 16f, posFrom.y() / 16f + 0.0625f, posFrom.z() / 16f - 0.002f), 2, minV,
+                        v(posTo.x() / 16f, posFrom.y() / 16f - 0.0625f, posFrom.z() / 16f - 0.002f), 0, minV,
+                        v(posFrom.x() / 16f, posFrom.y() / 16f - 0.0625f, posFrom.z() / 16f - 0.002f), 0, maxV,
+                        v(posFrom.x() / 16f, posFrom.y() / 16f + 0.0625f, posFrom.z() / 16f - 0.002f), 2, maxV, bark));
+                builder.addCulledFace(Direction.SOUTH, this.createQuad(
+                        v(posFrom.x() / 16f, posTo.y() / 16f + 0.0625f, posTo.z() / 16f + 0.002f), 16, maxV,
+                        v(posFrom.x() / 16f, posTo.y() / 16f - 0.0625f, posTo.z() / 16f + 0.002f), 14, maxV,
+                        v(posTo.x() / 16f, posTo.y() / 16f - 0.0625f, posTo.z() / 16f + 0.002f), 14, minV,
+                        v(posTo.x() / 16f, posTo.y() / 16f + 0.0625f, posTo.z() / 16f + 0.002f), 16, minV, bark));
+                builder.addCulledFace(Direction.SOUTH, this.createQuad(
+                        v(posFrom.x() / 16f, posFrom.y() / 16f + 0.0625f, posTo.z() / 16f + 0.002f), 2, maxV,
+                        v(posFrom.x() / 16f, posFrom.y() / 16f - 0.0625f, posTo.z() / 16f + 0.002f), 0, maxV,
+                        v(posTo.x() / 16f, posFrom.y() / 16f - 0.0625f, posTo.z() / 16f + 0.002f), 0, minV,
+                        v(posTo.x() / 16f, posFrom.y() / 16f + 0.0625f, posTo.z() / 16f + 0.002f), 2, minV, bark));
 
-                builder.addFaceQuad(Direction.DOWN, this.createQuad(
-                        v(posTo.getX() / 16f, posFrom.getY() / 16f - 0.002f, posTo.getZ() / 16f - 0.0625f), 14, minV,
-                        v(posTo.getX() / 16f, posFrom.getY() / 16f - 0.002f, posTo.getZ() / 16f + 0.0625f), 16, minV,
-                        v(posFrom.getX() / 16f, posFrom.getY() / 16f - 0.002f, posTo.getZ() / 16f + 0.0625f), 16, maxV,
-                        v(posFrom.getX() / 16f, posFrom.getY() / 16f - 0.002f, posTo.getZ() / 16f - 0.0625f), 14, maxV, bark));
-                builder.addFaceQuad(Direction.DOWN, this.createQuad(
-                        v(posTo.getX() / 16f, posFrom.getY() / 16f - 0.002f, posFrom.getZ() / 16f - 0.0625f), 0, minV,
-                        v(posTo.getX() / 16f, posFrom.getY() / 16f - 0.002f, posFrom.getZ() / 16f + 0.0625f), 2, minV,
-                        v(posFrom.getX() / 16f, posFrom.getY() / 16f - 0.002f, posFrom.getZ() / 16f + 0.0625f), 2, maxV,
-                        v(posFrom.getX() / 16f, posFrom.getY() / 16f - 0.002f, posFrom.getZ() / 16f - 0.0625f), 0, maxV, bark));
-                builder.addFaceQuad(Direction.UP, this.createQuad(
-                        v(posFrom.getX() / 16f, posTo.getY() / 16f + 0.002f, posTo.getZ() / 16f - 0.0625f), 14, maxV,
-                        v(posFrom.getX() / 16f, posTo.getY() / 16f + 0.002f, posTo.getZ() / 16f + 0.0625f), 16, maxV,
-                        v(posTo.getX() / 16f, posTo.getY() / 16f + 0.002f, posTo.getZ() / 16f + 0.0625f), 16, minV,
-                        v(posTo.getX() / 16f, posTo.getY() / 16f + 0.002f, posTo.getZ() / 16f - 0.0625f), 14, minV, bark));
-                builder.addFaceQuad(Direction.UP, this.createQuad(
-                        v(posFrom.getX() / 16f, posTo.getY() / 16f + 0.002f, posFrom.getZ() / 16f - 0.0625f), 2, maxV,
-                        v(posFrom.getX() / 16f, posTo.getY() / 16f + 0.002f, posFrom.getZ() / 16f + 0.0625f), 0, maxV,
-                        v(posTo.getX() / 16f, posTo.getY() / 16f + 0.002f, posFrom.getZ() / 16f + 0.0625f), 0, minV,
-                        v(posTo.getX() / 16f, posTo.getY() / 16f + 0.002f, posFrom.getZ() / 16f - 0.0625f), 2, minV, bark));
+                builder.addCulledFace(Direction.DOWN, this.createQuad(
+                        v(posTo.x() / 16f, posFrom.y() / 16f - 0.002f, posTo.z() / 16f - 0.0625f), 14, minV,
+                        v(posTo.x() / 16f, posFrom.y() / 16f - 0.002f, posTo.z() / 16f + 0.0625f), 16, minV,
+                        v(posFrom.x() / 16f, posFrom.y() / 16f - 0.002f, posTo.z() / 16f + 0.0625f), 16, maxV,
+                        v(posFrom.x() / 16f, posFrom.y() / 16f - 0.002f, posTo.z() / 16f - 0.0625f), 14, maxV, bark));
+                builder.addCulledFace(Direction.DOWN, this.createQuad(
+                        v(posTo.x() / 16f, posFrom.y() / 16f - 0.002f, posFrom.z() / 16f - 0.0625f), 0, minV,
+                        v(posTo.x() / 16f, posFrom.y() / 16f - 0.002f, posFrom.z() / 16f + 0.0625f), 2, minV,
+                        v(posFrom.x() / 16f, posFrom.y() / 16f - 0.002f, posFrom.z() / 16f + 0.0625f), 2, maxV,
+                        v(posFrom.x() / 16f, posFrom.y() / 16f - 0.002f, posFrom.z() / 16f - 0.0625f), 0, maxV, bark));
+                builder.addCulledFace(Direction.UP, this.createQuad(
+                        v(posFrom.x() / 16f, posTo.y() / 16f + 0.002f, posTo.z() / 16f - 0.0625f), 14, maxV,
+                        v(posFrom.x() / 16f, posTo.y() / 16f + 0.002f, posTo.z() / 16f + 0.0625f), 16, maxV,
+                        v(posTo.x() / 16f, posTo.y() / 16f + 0.002f, posTo.z() / 16f + 0.0625f), 16, minV,
+                        v(posTo.x() / 16f, posTo.y() / 16f + 0.002f, posTo.z() / 16f - 0.0625f), 14, minV, bark));
+                builder.addCulledFace(Direction.UP, this.createQuad(
+                        v(posFrom.x() / 16f, posTo.y() / 16f + 0.002f, posFrom.z() / 16f - 0.0625f), 2, maxV,
+                        v(posFrom.x() / 16f, posTo.y() / 16f + 0.002f, posFrom.z() / 16f + 0.0625f), 0, maxV,
+                        v(posTo.x() / 16f, posTo.y() / 16f + 0.002f, posFrom.z() / 16f + 0.0625f), 0, minV,
+                        v(posTo.x() / 16f, posTo.y() / 16f + 0.002f, posFrom.z() / 16f - 0.0625f), 2, minV, bark));
 
                 break;
             case Y:
 
-                builder.addFaceQuad(Direction.WEST, this.createQuad(
-                        v(posFrom.getX() / 16f - 0.001f, posTo.getY() / 16f, posTo.getZ() / 16f + 0.0625f), 16, minV,
-                        v(posFrom.getX() / 16f - 0.001f, posTo.getY() / 16f, posTo.getZ() / 16f - 0.0625f), 14, minV,
-                        v(posFrom.getX() / 16f - 0.001f, posFrom.getY() / 16f, posTo.getZ() / 16f - 0.0625f), 14, maxV,
-                        v(posFrom.getX() / 16f - 0.001f, posFrom.getY() / 16f, posTo.getZ() / 16f + 0.0625f), 16, maxV, bark));
-                builder.addFaceQuad(Direction.WEST, this.createQuad(
-                        v(posFrom.getX() / 16f - 0.001f, posTo.getY() / 16f, posFrom.getZ() / 16f + 0.0625f), 2, minV,
-                        v(posFrom.getX() / 16f - 0.001f, posTo.getY() / 16f, posFrom.getZ() / 16f - 0.0625f), 0, minV,
-                        v(posFrom.getX() / 16f - 0.001f, posFrom.getY() / 16f, posFrom.getZ() / 16f - 0.0625f), 0, maxV,
-                        v(posFrom.getX() / 16f - 0.001f, posFrom.getY() / 16f, posFrom.getZ() / 16f + 0.0625f), 2, maxV, bark));
-                builder.addFaceQuad(Direction.EAST, this.createQuad(
-                        v(posTo.getX() / 16f + 0.001f, posFrom.getY() / 16f, posTo.getZ() / 16f + 0.0625f), 16, maxV,
-                        v(posTo.getX() / 16f + 0.001f, posFrom.getY() / 16f, posTo.getZ() / 16f - 0.0625f), 14, maxV,
-                        v(posTo.getX() / 16f + 0.001f, posTo.getY() / 16f, posTo.getZ() / 16f - 0.0625f), 14, minV,
-                        v(posTo.getX() / 16f + 0.001f, posTo.getY() / 16f, posTo.getZ() / 16f + 0.0625f), 16, minV, bark));
-                builder.addFaceQuad(Direction.EAST, this.createQuad(
-                        v(posTo.getX() / 16f + 0.001f, posFrom.getY() / 16f, posFrom.getZ() / 16f + 0.0625f), 2, maxV,
-                        v(posTo.getX() / 16f + 0.001f, posFrom.getY() / 16f, posFrom.getZ() / 16f - 0.0625f), 0, maxV,
-                        v(posTo.getX() / 16f + 0.001f, posTo.getY() / 16f, posFrom.getZ() / 16f - 0.0625f), 0, minV,
-                        v(posTo.getX() / 16f + 0.001f, posTo.getY() / 16f, posFrom.getZ() / 16f + 0.0625f), 2, minV, bark));
+                builder.addCulledFace(Direction.WEST, this.createQuad(
+                        v(posFrom.x() / 16f - 0.001f, posTo.y() / 16f, posTo.z() / 16f + 0.0625f), 16, minV,
+                        v(posFrom.x() / 16f - 0.001f, posTo.y() / 16f, posTo.z() / 16f - 0.0625f), 14, minV,
+                        v(posFrom.x() / 16f - 0.001f, posFrom.y() / 16f, posTo.z() / 16f - 0.0625f), 14, maxV,
+                        v(posFrom.x() / 16f - 0.001f, posFrom.y() / 16f, posTo.z() / 16f + 0.0625f), 16, maxV, bark));
+                builder.addCulledFace(Direction.WEST, this.createQuad(
+                        v(posFrom.x() / 16f - 0.001f, posTo.y() / 16f, posFrom.z() / 16f + 0.0625f), 2, minV,
+                        v(posFrom.x() / 16f - 0.001f, posTo.y() / 16f, posFrom.z() / 16f - 0.0625f), 0, minV,
+                        v(posFrom.x() / 16f - 0.001f, posFrom.y() / 16f, posFrom.z() / 16f - 0.0625f), 0, maxV,
+                        v(posFrom.x() / 16f - 0.001f, posFrom.y() / 16f, posFrom.z() / 16f + 0.0625f), 2, maxV, bark));
+                builder.addCulledFace(Direction.EAST, this.createQuad(
+                        v(posTo.x() / 16f + 0.001f, posFrom.y() / 16f, posTo.z() / 16f + 0.0625f), 16, maxV,
+                        v(posTo.x() / 16f + 0.001f, posFrom.y() / 16f, posTo.z() / 16f - 0.0625f), 14, maxV,
+                        v(posTo.x() / 16f + 0.001f, posTo.y() / 16f, posTo.z() / 16f - 0.0625f), 14, minV,
+                        v(posTo.x() / 16f + 0.001f, posTo.y() / 16f, posTo.z() / 16f + 0.0625f), 16, minV, bark));
+                builder.addCulledFace(Direction.EAST, this.createQuad(
+                        v(posTo.x() / 16f + 0.001f, posFrom.y() / 16f, posFrom.z() / 16f + 0.0625f), 2, maxV,
+                        v(posTo.x() / 16f + 0.001f, posFrom.y() / 16f, posFrom.z() / 16f - 0.0625f), 0, maxV,
+                        v(posTo.x() / 16f + 0.001f, posTo.y() / 16f, posFrom.z() / 16f - 0.0625f), 0, minV,
+                        v(posTo.x() / 16f + 0.001f, posTo.y() / 16f, posFrom.z() / 16f + 0.0625f), 2, minV, bark));
 
-                builder.addFaceQuad(Direction.NORTH, this.createQuad(
-                        v(posTo.getX() / 16f + 0.0625f, posFrom.getY() / 16f, posFrom.getZ() / 16f - 0.001f), 16, maxV,
-                        v(posTo.getX() / 16f - 0.0625f, posFrom.getY() / 16f, posFrom.getZ() / 16f - 0.001f), 14, maxV,
-                        v(posTo.getX() / 16f - 0.0625f, posTo.getY() / 16f, posFrom.getZ() / 16f - 0.001f), 14, minV,
-                        v(posTo.getX() / 16f + 0.0625f, posTo.getY() / 16f, posFrom.getZ() / 16f - 0.001f), 16, minV, bark));
-                builder.addFaceQuad(Direction.NORTH, this.createQuad(
-                        v(posFrom.getX() / 16f + 0.0625f, posFrom.getY() / 16f, posFrom.getZ() / 16f - 0.001f), 2, maxV,
-                        v(posFrom.getX() / 16f - 0.0625f, posFrom.getY() / 16f, posFrom.getZ() / 16f - 0.001f), 0, maxV,
-                        v(posFrom.getX() / 16f - 0.0625f, posTo.getY() / 16f, posFrom.getZ() / 16f - 0.001f), 0, minV,
-                        v(posFrom.getX() / 16f + 0.0625f, posTo.getY() / 16f, posFrom.getZ() / 16f - 0.001f), 2, minV, bark));
-                builder.addFaceQuad(Direction.SOUTH, this.createQuad(
-                        v(posTo.getX() / 16f + 0.0625f, posTo.getY() / 16f, posTo.getZ() / 16f + 0.001f), 16, minV,
-                        v(posTo.getX() / 16f - 0.0625f, posTo.getY() / 16f, posTo.getZ() / 16f + 0.001f), 14, minV,
-                        v(posTo.getX() / 16f - 0.0625f, posFrom.getY() / 16f, posTo.getZ() / 16f + 0.001f), 14, maxV,
-                        v(posTo.getX() / 16f + 0.0625f, posFrom.getY() / 16f, posTo.getZ() / 16f + 0.001f), 16, maxV, bark));
-                builder.addFaceQuad(Direction.SOUTH, this.createQuad(
-                        v(posFrom.getX() / 16f + 0.0625f, posTo.getY() / 16f, posTo.getZ() / 16f + 0.001f), 2, minV,
-                        v(posFrom.getX() / 16f - 0.0625f, posTo.getY() / 16f, posTo.getZ() / 16f + 0.001f), 0, minV,
-                        v(posFrom.getX() / 16f - 0.0625f, posFrom.getY() / 16f, posTo.getZ() / 16f + 0.001f), 0, maxV,
-                        v(posFrom.getX() / 16f + 0.0625f, posFrom.getY() / 16f, posTo.getZ() / 16f + 0.001f), 2, maxV, bark));
+                builder.addCulledFace(Direction.NORTH, this.createQuad(
+                        v(posTo.x() / 16f + 0.0625f, posFrom.y() / 16f, posFrom.z() / 16f - 0.001f), 16, maxV,
+                        v(posTo.x() / 16f - 0.0625f, posFrom.y() / 16f, posFrom.z() / 16f - 0.001f), 14, maxV,
+                        v(posTo.x() / 16f - 0.0625f, posTo.y() / 16f, posFrom.z() / 16f - 0.001f), 14, minV,
+                        v(posTo.x() / 16f + 0.0625f, posTo.y() / 16f, posFrom.z() / 16f - 0.001f), 16, minV, bark));
+                builder.addCulledFace(Direction.NORTH, this.createQuad(
+                        v(posFrom.x() / 16f + 0.0625f, posFrom.y() / 16f, posFrom.z() / 16f - 0.001f), 2, maxV,
+                        v(posFrom.x() / 16f - 0.0625f, posFrom.y() / 16f, posFrom.z() / 16f - 0.001f), 0, maxV,
+                        v(posFrom.x() / 16f - 0.0625f, posTo.y() / 16f, posFrom.z() / 16f - 0.001f), 0, minV,
+                        v(posFrom.x() / 16f + 0.0625f, posTo.y() / 16f, posFrom.z() / 16f - 0.001f), 2, minV, bark));
+                builder.addCulledFace(Direction.SOUTH, this.createQuad(
+                        v(posTo.x() / 16f + 0.0625f, posTo.y() / 16f, posTo.z() / 16f + 0.001f), 16, minV,
+                        v(posTo.x() / 16f - 0.0625f, posTo.y() / 16f, posTo.z() / 16f + 0.001f), 14, minV,
+                        v(posTo.x() / 16f - 0.0625f, posFrom.y() / 16f, posTo.z() / 16f + 0.001f), 14, maxV,
+                        v(posTo.x() / 16f + 0.0625f, posFrom.y() / 16f, posTo.z() / 16f + 0.001f), 16, maxV, bark));
+                builder.addCulledFace(Direction.SOUTH, this.createQuad(
+                        v(posFrom.x() / 16f + 0.0625f, posTo.y() / 16f, posTo.z() / 16f + 0.001f), 2, minV,
+                        v(posFrom.x() / 16f - 0.0625f, posTo.y() / 16f, posTo.z() / 16f + 0.001f), 0, minV,
+                        v(posFrom.x() / 16f - 0.0625f, posFrom.y() / 16f, posTo.z() / 16f + 0.001f), 0, maxV,
+                        v(posFrom.x() / 16f + 0.0625f, posFrom.y() / 16f, posTo.z() / 16f + 0.001f), 2, maxV, bark));
 
 
                 break;
             case Z:
 
-                builder.addFaceQuad(Direction.WEST, this.createQuad(
-                        v(posFrom.getX() / 16f - 0.002f, posTo.getY() / 16f + 0.0625f, posFrom.getZ() / 16f), 16, minV,
-                        v(posFrom.getX() / 16f - 0.002f, posTo.getY() / 16f - 0.0625f, posFrom.getZ() / 16f), 14, minV,
-                        v(posFrom.getX() / 16f - 0.002f, posTo.getY() / 16f - 0.0625f, posTo.getZ() / 16f), 14, maxV,
-                        v(posFrom.getX() / 16f - 0.002f, posTo.getY() / 16f + 0.0625f, posTo.getZ() / 16f), 16, maxV, bark));
-                builder.addFaceQuad(Direction.WEST, this.createQuad(
-                        v(posFrom.getX() / 16f - 0.002f, posFrom.getY() / 16f + 0.0625f, posFrom.getZ() / 16f), 2, minV,
-                        v(posFrom.getX() / 16f - 0.002f, posFrom.getY() / 16f - 0.0625f, posFrom.getZ() / 16f), 0, minV,
-                        v(posFrom.getX() / 16f - 0.002f, posFrom.getY() / 16f - 0.0625f, posTo.getZ() / 16f), 0, maxV,
-                        v(posFrom.getX() / 16f - 0.002f, posFrom.getY() / 16f + 0.0625f, posTo.getZ() / 16f), 2, maxV, bark));
-                builder.addFaceQuad(Direction.EAST, this.createQuad(
-                        v(posTo.getX() / 16f + 0.002f, posTo.getY() / 16f + 0.0625f, posTo.getZ() / 16f), 16, maxV,
-                        v(posTo.getX() / 16f + 0.002f, posTo.getY() / 16f - 0.0625f, posTo.getZ() / 16f), 14, maxV,
-                        v(posTo.getX() / 16f + 0.002f, posTo.getY() / 16f - 0.0625f, posFrom.getZ() / 16f), 14, minV,
-                        v(posTo.getX() / 16f + 0.002f, posTo.getY() / 16f + 0.0625f, posFrom.getZ() / 16f), 16, minV, bark));
-                builder.addFaceQuad(Direction.EAST, this.createQuad(
-                        v(posTo.getX() / 16f + 0.002f, posFrom.getY() / 16f + 0.0625f, posTo.getZ() / 16f), 2, maxV,
-                        v(posTo.getX() / 16f + 0.002f, posFrom.getY() / 16f - 0.0625f, posTo.getZ() / 16f), 0, maxV,
-                        v(posTo.getX() / 16f + 0.002f, posFrom.getY() / 16f - 0.0625f, posFrom.getZ() / 16f), 0, minV,
-                        v(posTo.getX() / 16f + 0.002f, posFrom.getY() / 16f + 0.0625f, posFrom.getZ() / 16f), 2, minV, bark));
+                builder.addCulledFace(Direction.WEST, this.createQuad(
+                        v(posFrom.x() / 16f - 0.002f, posTo.y() / 16f + 0.0625f, posFrom.z() / 16f), 16, minV,
+                        v(posFrom.x() / 16f - 0.002f, posTo.y() / 16f - 0.0625f, posFrom.z() / 16f), 14, minV,
+                        v(posFrom.x() / 16f - 0.002f, posTo.y() / 16f - 0.0625f, posTo.z() / 16f), 14, maxV,
+                        v(posFrom.x() / 16f - 0.002f, posTo.y() / 16f + 0.0625f, posTo.z() / 16f), 16, maxV, bark));
+                builder.addCulledFace(Direction.WEST, this.createQuad(
+                        v(posFrom.x() / 16f - 0.002f, posFrom.y() / 16f + 0.0625f, posFrom.z() / 16f), 2, minV,
+                        v(posFrom.x() / 16f - 0.002f, posFrom.y() / 16f - 0.0625f, posFrom.z() / 16f), 0, minV,
+                        v(posFrom.x() / 16f - 0.002f, posFrom.y() / 16f - 0.0625f, posTo.z() / 16f), 0, maxV,
+                        v(posFrom.x() / 16f - 0.002f, posFrom.y() / 16f + 0.0625f, posTo.z() / 16f), 2, maxV, bark));
+                builder.addCulledFace(Direction.EAST, this.createQuad(
+                        v(posTo.x() / 16f + 0.002f, posTo.y() / 16f + 0.0625f, posTo.z() / 16f), 16, maxV,
+                        v(posTo.x() / 16f + 0.002f, posTo.y() / 16f - 0.0625f, posTo.z() / 16f), 14, maxV,
+                        v(posTo.x() / 16f + 0.002f, posTo.y() / 16f - 0.0625f, posFrom.z() / 16f), 14, minV,
+                        v(posTo.x() / 16f + 0.002f, posTo.y() / 16f + 0.0625f, posFrom.z() / 16f), 16, minV, bark));
+                builder.addCulledFace(Direction.EAST, this.createQuad(
+                        v(posTo.x() / 16f + 0.002f, posFrom.y() / 16f + 0.0625f, posTo.z() / 16f), 2, maxV,
+                        v(posTo.x() / 16f + 0.002f, posFrom.y() / 16f - 0.0625f, posTo.z() / 16f), 0, maxV,
+                        v(posTo.x() / 16f + 0.002f, posFrom.y() / 16f - 0.0625f, posFrom.z() / 16f), 0, minV,
+                        v(posTo.x() / 16f + 0.002f, posFrom.y() / 16f + 0.0625f, posFrom.z() / 16f), 2, minV, bark));
 
-                builder.addFaceQuad(Direction.DOWN, this.createQuad(
-                        v(posTo.getX() / 16f + 0.0625f, posFrom.getY() / 16f - 0.001f, posTo.getZ() / 16f), 16, maxV,
-                        v(posTo.getX() / 16f - 0.0625f, posFrom.getY() / 16f - 0.001f, posTo.getZ() / 16f), 14, maxV,
-                        v(posTo.getX() / 16f - 0.0625f, posFrom.getY() / 16f - 0.001f, posFrom.getZ() / 16f), 14, minV,
-                        v(posTo.getX() / 16f + 0.0625f, posFrom.getY() / 16f - 0.001f, posFrom.getZ() / 16f), 16, minV, bark));
-                builder.addFaceQuad(Direction.DOWN, this.createQuad(
-                        v(posFrom.getX() / 16f + 0.0625f, posFrom.getY() / 16f - 0.001f, posTo.getZ() / 16f), 2, maxV,
-                        v(posFrom.getX() / 16f - 0.0625f, posFrom.getY() / 16f - 0.001f, posTo.getZ() / 16f), 0, maxV,
-                        v(posFrom.getX() / 16f - 0.0625f, posFrom.getY() / 16f - 0.001f, posFrom.getZ() / 16f), 0, minV,
-                        v(posFrom.getX() / 16f + 0.0625f, posFrom.getY() / 16f - 0.001f, posFrom.getZ() / 16f), 2, minV, bark));
-                builder.addFaceQuad(Direction.UP, this.createQuad(
-                        v(posTo.getX() / 16f + 0.0625f, posTo.getY() / 16f + 0.001f, posFrom.getZ() / 16f), 16, minV,
-                        v(posTo.getX() / 16f - 0.0625f, posTo.getY() / 16f + 0.001f, posFrom.getZ() / 16f), 14, minV,
-                        v(posTo.getX() / 16f - 0.0625f, posTo.getY() / 16f + 0.001f, posTo.getZ() / 16f), 14, maxV,
-                        v(posTo.getX() / 16f + 0.0625f, posTo.getY() / 16f + 0.001f, posTo.getZ() / 16f), 16, maxV, bark));
-                builder.addFaceQuad(Direction.UP, this.createQuad(
-                        v(posFrom.getX() / 16f + 0.0625f, posTo.getY() / 16f + 0.001f, posFrom.getZ() / 16f), 2, minV,
-                        v(posFrom.getX() / 16f - 0.0625f, posTo.getY() / 16f + 0.001f, posFrom.getZ() / 16f), 0, minV,
-                        v(posFrom.getX() / 16f - 0.0625f, posTo.getY() / 16f + 0.001f, posTo.getZ() / 16f), 0, maxV,
-                        v(posFrom.getX() / 16f + 0.0625f, posTo.getY() / 16f + 0.001f, posTo.getZ() / 16f), 2, maxV, bark));
+                builder.addCulledFace(Direction.DOWN, this.createQuad(
+                        v(posTo.x() / 16f + 0.0625f, posFrom.y() / 16f - 0.001f, posTo.z() / 16f), 16, maxV,
+                        v(posTo.x() / 16f - 0.0625f, posFrom.y() / 16f - 0.001f, posTo.z() / 16f), 14, maxV,
+                        v(posTo.x() / 16f - 0.0625f, posFrom.y() / 16f - 0.001f, posFrom.z() / 16f), 14, minV,
+                        v(posTo.x() / 16f + 0.0625f, posFrom.y() / 16f - 0.001f, posFrom.z() / 16f), 16, minV, bark));
+                builder.addCulledFace(Direction.DOWN, this.createQuad(
+                        v(posFrom.x() / 16f + 0.0625f, posFrom.y() / 16f - 0.001f, posTo.z() / 16f), 2, maxV,
+                        v(posFrom.x() / 16f - 0.0625f, posFrom.y() / 16f - 0.001f, posTo.z() / 16f), 0, maxV,
+                        v(posFrom.x() / 16f - 0.0625f, posFrom.y() / 16f - 0.001f, posFrom.z() / 16f), 0, minV,
+                        v(posFrom.x() / 16f + 0.0625f, posFrom.y() / 16f - 0.001f, posFrom.z() / 16f), 2, minV, bark));
+                builder.addCulledFace(Direction.UP, this.createQuad(
+                        v(posTo.x() / 16f + 0.0625f, posTo.y() / 16f + 0.001f, posFrom.z() / 16f), 16, minV,
+                        v(posTo.x() / 16f - 0.0625f, posTo.y() / 16f + 0.001f, posFrom.z() / 16f), 14, minV,
+                        v(posTo.x() / 16f - 0.0625f, posTo.y() / 16f + 0.001f, posTo.z() / 16f), 14, maxV,
+                        v(posTo.x() / 16f + 0.0625f, posTo.y() / 16f + 0.001f, posTo.z() / 16f), 16, maxV, bark));
+                builder.addCulledFace(Direction.UP, this.createQuad(
+                        v(posFrom.x() / 16f + 0.0625f, posTo.y() / 16f + 0.001f, posFrom.z() / 16f), 2, minV,
+                        v(posFrom.x() / 16f - 0.0625f, posTo.y() / 16f + 0.001f, posFrom.z() / 16f), 0, minV,
+                        v(posFrom.x() / 16f - 0.0625f, posTo.y() / 16f + 0.001f, posTo.z() / 16f), 0, maxV,
+                        v(posFrom.x() / 16f + 0.0625f, posTo.y() / 16f + 0.001f, posTo.z() / 16f), 2, maxV, bark));
 
                 break;
         }
@@ -322,11 +322,11 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
         }
 
         BlockPart part = new BlockPart(posFrom, posTo, mapFacesIn, null, true);
-        SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(blockModel.customData, ItemOverrideList.EMPTY).setTexture(icon);
+        SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(blockModel.customData, ItemOverrideList.EMPTY).particle(icon);
 
-        for(Map.Entry<Direction, BlockPartFace> e : part.mapFaces.entrySet()) {
+        for(Map.Entry<Direction, BlockPartFace> e : part.faces.entrySet()) {
             Direction face = e.getKey();
-            builder.addFaceQuad(face, ModelUtils.makeBakedQuad(part, e.getValue(), icon, face, ModelRotation.X0_Y0, this.modelResLoc));
+            builder.addCulledFace(face, ModelUtils.makeBakedQuad(part, e.getValue(), icon, face, ModelRotation.X0_Y0, this.modelResLoc));
         }
 
         return builder.build();
@@ -339,136 +339,136 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
         Vector3f posFrom = new Vector3f(8 - radius, 8 - radius, 8 - radius);
         Vector3f posTo = new Vector3f(8 + radius, 8 + radius, 8 + radius);
 
-        SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(blockModel.customData, ItemOverrideList.EMPTY).setTexture(bark);
+        SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(blockModel.customData, ItemOverrideList.EMPTY).particle(bark);
 
         // X
-        builder.addFaceQuad(Direction.UP, this.createQuad(
-                v(posTo.getX() / 16f, posTo.getY() / 16f + 0.0625f, posFrom.getZ() / 16f - 0.002f), 16, minV,
-                v(posTo.getX() / 16f, posTo.getY() / 16f - 0.0625f, posFrom.getZ() / 16f - 0.002f), 14, minV,
-                v(posFrom.getX() / 16f, posTo.getY() / 16f - 0.0625f, posFrom.getZ() / 16f - 0.002f), 14, maxV,
-                v(posFrom.getX() / 16f, posTo.getY() / 16f + 0.0625f, posFrom.getZ() / 16f - 0.002f), 16, maxV, bark));
-        builder.addFaceQuad(Direction.DOWN, this.createQuad(
-                v(posTo.getX() / 16f, posFrom.getY() / 16f + 0.0625f, posFrom.getZ() / 16f - 0.002f), 2, minV,
-                v(posTo.getX() / 16f, posFrom.getY() / 16f - 0.0625f, posFrom.getZ() / 16f - 0.002f), 0, minV,
-                v(posFrom.getX() / 16f, posFrom.getY() / 16f - 0.0625f, posFrom.getZ() / 16f - 0.002f), 0, maxV,
-                v(posFrom.getX() / 16f, posFrom.getY() / 16f + 0.0625f, posFrom.getZ() / 16f - 0.002f),  2, maxV, bark));
-        builder.addFaceQuad(Direction.UP, this.createQuad(
-                v(posFrom.getX() / 16f, posTo.getY() / 16f + 0.0625f, posTo.getZ() / 16f + 0.002f), 16, maxV,
-                v(posFrom.getX() / 16f, posTo.getY() / 16f - 0.0625f, posTo.getZ() / 16f + 0.002f), 14, maxV,
-                v(posTo.getX() / 16f, posTo.getY() / 16f - 0.0625f, posTo.getZ() / 16f + 0.002f), 14, minV,
-                v(posTo.getX() / 16f, posTo.getY() / 16f + 0.0625f, posTo.getZ() / 16f + 0.002f), 16, minV, bark));
-        builder.addFaceQuad(Direction.DOWN, this.createQuad(
-                v(posFrom.getX() / 16f, posFrom.getY() / 16f + 0.0625f, posTo.getZ() / 16f + 0.002f), 2, maxV,
-                v(posFrom.getX() / 16f, posFrom.getY() / 16f - 0.0625f, posTo.getZ() / 16f + 0.002f), 0, maxV,
-                v(posTo.getX() / 16f, posFrom.getY() / 16f - 0.0625f, posTo.getZ() / 16f + 0.002f), 0, minV,
-                v(posTo.getX() / 16f, posFrom.getY() / 16f + 0.0625f, posTo.getZ() / 16f + 0.002f), 2, minV, bark));
+        builder.addCulledFace(Direction.UP, this.createQuad(
+                v(posTo.x() / 16f, posTo.y() / 16f + 0.0625f, posFrom.z() / 16f - 0.002f), 16, minV,
+                v(posTo.x() / 16f, posTo.y() / 16f - 0.0625f, posFrom.z() / 16f - 0.002f), 14, minV,
+                v(posFrom.x() / 16f, posTo.y() / 16f - 0.0625f, posFrom.z() / 16f - 0.002f), 14, maxV,
+                v(posFrom.x() / 16f, posTo.y() / 16f + 0.0625f, posFrom.z() / 16f - 0.002f), 16, maxV, bark));
+        builder.addCulledFace(Direction.DOWN, this.createQuad(
+                v(posTo.x() / 16f, posFrom.y() / 16f + 0.0625f, posFrom.z() / 16f - 0.002f), 2, minV,
+                v(posTo.x() / 16f, posFrom.y() / 16f - 0.0625f, posFrom.z() / 16f - 0.002f), 0, minV,
+                v(posFrom.x() / 16f, posFrom.y() / 16f - 0.0625f, posFrom.z() / 16f - 0.002f), 0, maxV,
+                v(posFrom.x() / 16f, posFrom.y() / 16f + 0.0625f, posFrom.z() / 16f - 0.002f),  2, maxV, bark));
+        builder.addCulledFace(Direction.UP, this.createQuad(
+                v(posFrom.x() / 16f, posTo.y() / 16f + 0.0625f, posTo.z() / 16f + 0.002f), 16, maxV,
+                v(posFrom.x() / 16f, posTo.y() / 16f - 0.0625f, posTo.z() / 16f + 0.002f), 14, maxV,
+                v(posTo.x() / 16f, posTo.y() / 16f - 0.0625f, posTo.z() / 16f + 0.002f), 14, minV,
+                v(posTo.x() / 16f, posTo.y() / 16f + 0.0625f, posTo.z() / 16f + 0.002f), 16, minV, bark));
+        builder.addCulledFace(Direction.DOWN, this.createQuad(
+                v(posFrom.x() / 16f, posFrom.y() / 16f + 0.0625f, posTo.z() / 16f + 0.002f), 2, maxV,
+                v(posFrom.x() / 16f, posFrom.y() / 16f - 0.0625f, posTo.z() / 16f + 0.002f), 0, maxV,
+                v(posTo.x() / 16f, posFrom.y() / 16f - 0.0625f, posTo.z() / 16f + 0.002f), 0, minV,
+                v(posTo.x() / 16f, posFrom.y() / 16f + 0.0625f, posTo.z() / 16f + 0.002f), 2, minV, bark));
 
-        builder.addFaceQuad(Direction.SOUTH, this.createQuad(
-                v(posTo.getX() / 16f, posFrom.getY() / 16f - 0.002f, posTo.getZ() / 16f - 0.0625f), 14, minV,
-                v(posTo.getX() / 16f, posFrom.getY() / 16f - 0.002f, posTo.getZ() / 16f + 0.0625f), 16, minV,
-                v(posFrom.getX() / 16f, posFrom.getY() / 16f - 0.002f, posTo.getZ() / 16f + 0.0625f), 16, maxV,
-                v(posFrom.getX() / 16f, posFrom.getY() / 16f - 0.002f, posTo.getZ() / 16f - 0.0625f), 14, maxV, bark));
-        builder.addFaceQuad(Direction.NORTH, this.createQuad(
-                v(posTo.getX() / 16f, posFrom.getY() / 16f - 0.002f, posFrom.getZ() / 16f - 0.0625f), 0, minV,
-                v(posTo.getX() / 16f, posFrom.getY() / 16f - 0.002f, posFrom.getZ() / 16f + 0.0625f), 2, minV,
-                v(posFrom.getX() / 16f, posFrom.getY() / 16f - 0.002f, posFrom.getZ() / 16f + 0.0625f), 2, maxV,
-                v(posFrom.getX() / 16f, posFrom.getY() / 16f - 0.002f, posFrom.getZ() / 16f - 0.0625f), 0, maxV, bark));
-        builder.addFaceQuad(Direction.SOUTH, this.createQuad(
-                v(posFrom.getX() / 16f, posTo.getY() / 16f + 0.002f, posTo.getZ() / 16f - 0.0625f), 14, maxV,
-                v(posFrom.getX() / 16f, posTo.getY() / 16f + 0.002f, posTo.getZ() / 16f + 0.0625f), 16, maxV,
-                v(posTo.getX() / 16f, posTo.getY() / 16f + 0.002f, posTo.getZ() / 16f + 0.0625f), 16, minV,
-                v(posTo.getX() / 16f, posTo.getY() / 16f + 0.002f, posTo.getZ() / 16f - 0.0625f), 14, minV, bark));
-        builder.addFaceQuad(Direction.NORTH, this.createQuad(
-                v(posFrom.getX() / 16f, posTo.getY() / 16f + 0.002f, posFrom.getZ() / 16f - 0.0625f), 0, maxV,
-                v(posFrom.getX() / 16f, posTo.getY() / 16f + 0.002f, posFrom.getZ() / 16f + 0.0625f), 2, maxV,
-                v(posTo.getX() / 16f, posTo.getY() / 16f + 0.002f, posFrom.getZ() / 16f + 0.0625f), 2, minV,
-                v(posTo.getX() / 16f, posTo.getY() / 16f + 0.002f, posFrom.getZ() / 16f - 0.0625f),  0, minV, bark));
+        builder.addCulledFace(Direction.SOUTH, this.createQuad(
+                v(posTo.x() / 16f, posFrom.y() / 16f - 0.002f, posTo.z() / 16f - 0.0625f), 14, minV,
+                v(posTo.x() / 16f, posFrom.y() / 16f - 0.002f, posTo.z() / 16f + 0.0625f), 16, minV,
+                v(posFrom.x() / 16f, posFrom.y() / 16f - 0.002f, posTo.z() / 16f + 0.0625f), 16, maxV,
+                v(posFrom.x() / 16f, posFrom.y() / 16f - 0.002f, posTo.z() / 16f - 0.0625f), 14, maxV, bark));
+        builder.addCulledFace(Direction.NORTH, this.createQuad(
+                v(posTo.x() / 16f, posFrom.y() / 16f - 0.002f, posFrom.z() / 16f - 0.0625f), 0, minV,
+                v(posTo.x() / 16f, posFrom.y() / 16f - 0.002f, posFrom.z() / 16f + 0.0625f), 2, minV,
+                v(posFrom.x() / 16f, posFrom.y() / 16f - 0.002f, posFrom.z() / 16f + 0.0625f), 2, maxV,
+                v(posFrom.x() / 16f, posFrom.y() / 16f - 0.002f, posFrom.z() / 16f - 0.0625f), 0, maxV, bark));
+        builder.addCulledFace(Direction.SOUTH, this.createQuad(
+                v(posFrom.x() / 16f, posTo.y() / 16f + 0.002f, posTo.z() / 16f - 0.0625f), 14, maxV,
+                v(posFrom.x() / 16f, posTo.y() / 16f + 0.002f, posTo.z() / 16f + 0.0625f), 16, maxV,
+                v(posTo.x() / 16f, posTo.y() / 16f + 0.002f, posTo.z() / 16f + 0.0625f), 16, minV,
+                v(posTo.x() / 16f, posTo.y() / 16f + 0.002f, posTo.z() / 16f - 0.0625f), 14, minV, bark));
+        builder.addCulledFace(Direction.NORTH, this.createQuad(
+                v(posFrom.x() / 16f, posTo.y() / 16f + 0.002f, posFrom.z() / 16f - 0.0625f), 0, maxV,
+                v(posFrom.x() / 16f, posTo.y() / 16f + 0.002f, posFrom.z() / 16f + 0.0625f), 2, maxV,
+                v(posTo.x() / 16f, posTo.y() / 16f + 0.002f, posFrom.z() / 16f + 0.0625f), 2, minV,
+                v(posTo.x() / 16f, posTo.y() / 16f + 0.002f, posFrom.z() / 16f - 0.0625f),  0, minV, bark));
 
         // Y
-        builder.addFaceQuad(Direction.SOUTH, this.createQuad(
-                v(posFrom.getX() / 16f - 0.001f, posTo.getY() / 16f, posTo.getZ() / 16f + 0.0625f), 16, minV,
-                v(posFrom.getX() / 16f - 0.001f, posTo.getY() / 16f, posTo.getZ() / 16f - 0.0625f), 14, minV,
-                v(posFrom.getX() / 16f - 0.001f, posFrom.getY() / 16f, posTo.getZ() / 16f - 0.0625f), 14, maxV,
-                v(posFrom.getX() / 16f - 0.001f, posFrom.getY() / 16f, posTo.getZ() / 16f + 0.0625f), 16, maxV, bark));
-        builder.addFaceQuad(Direction.NORTH, this.createQuad(
-                v(posFrom.getX() / 16f - 0.001f, posTo.getY() / 16f, posFrom.getZ() / 16f + 0.0625f), 2, minV,
-                v(posFrom.getX() / 16f - 0.001f, posTo.getY() / 16f, posFrom.getZ() / 16f - 0.0625f), 0, minV,
-                v(posFrom.getX() / 16f - 0.001f, posFrom.getY() / 16f, posFrom.getZ() / 16f - 0.0625f), 0, maxV,
-                v(posFrom.getX() / 16f - 0.001f, posFrom.getY() / 16f, posFrom.getZ() / 16f + 0.0625f), 2, maxV, bark));
-        builder.addFaceQuad(Direction.SOUTH, this.createQuad(
-                v(posTo.getX() / 16f + 0.001f, posFrom.getY() / 16f, posTo.getZ() / 16f + 0.0625f), 16, maxV,
-                v(posTo.getX() / 16f + 0.001f, posFrom.getY() / 16f, posTo.getZ() / 16f - 0.0625f), 14, maxV,
-                v(posTo.getX() / 16f + 0.001f, posTo.getY() / 16f, posTo.getZ() / 16f - 0.0625f), 14, minV,
-                v(posTo.getX() / 16f + 0.001f, posTo.getY() / 16f, posTo.getZ() / 16f + 0.0625f), 16, minV, bark));
-        builder.addFaceQuad(Direction.NORTH, this.createQuad(
-                v(posTo.getX() / 16f + 0.001f, posFrom.getY() / 16f, posFrom.getZ() / 16f + 0.0625f), 2, maxV,
-                v(posTo.getX() / 16f + 0.001f, posFrom.getY() / 16f, posFrom.getZ() / 16f - 0.0625f), 0, maxV,
-                v(posTo.getX() / 16f + 0.001f, posTo.getY() / 16f, posFrom.getZ() / 16f - 0.0625f), 0, minV,
-                v(posTo.getX() / 16f + 0.001f, posTo.getY() / 16f, posFrom.getZ() / 16f + 0.0625f), 2, minV, bark));
+        builder.addCulledFace(Direction.SOUTH, this.createQuad(
+                v(posFrom.x() / 16f - 0.001f, posTo.y() / 16f, posTo.z() / 16f + 0.0625f), 16, minV,
+                v(posFrom.x() / 16f - 0.001f, posTo.y() / 16f, posTo.z() / 16f - 0.0625f), 14, minV,
+                v(posFrom.x() / 16f - 0.001f, posFrom.y() / 16f, posTo.z() / 16f - 0.0625f), 14, maxV,
+                v(posFrom.x() / 16f - 0.001f, posFrom.y() / 16f, posTo.z() / 16f + 0.0625f), 16, maxV, bark));
+        builder.addCulledFace(Direction.NORTH, this.createQuad(
+                v(posFrom.x() / 16f - 0.001f, posTo.y() / 16f, posFrom.z() / 16f + 0.0625f), 2, minV,
+                v(posFrom.x() / 16f - 0.001f, posTo.y() / 16f, posFrom.z() / 16f - 0.0625f), 0, minV,
+                v(posFrom.x() / 16f - 0.001f, posFrom.y() / 16f, posFrom.z() / 16f - 0.0625f), 0, maxV,
+                v(posFrom.x() / 16f - 0.001f, posFrom.y() / 16f, posFrom.z() / 16f + 0.0625f), 2, maxV, bark));
+        builder.addCulledFace(Direction.SOUTH, this.createQuad(
+                v(posTo.x() / 16f + 0.001f, posFrom.y() / 16f, posTo.z() / 16f + 0.0625f), 16, maxV,
+                v(posTo.x() / 16f + 0.001f, posFrom.y() / 16f, posTo.z() / 16f - 0.0625f), 14, maxV,
+                v(posTo.x() / 16f + 0.001f, posTo.y() / 16f, posTo.z() / 16f - 0.0625f), 14, minV,
+                v(posTo.x() / 16f + 0.001f, posTo.y() / 16f, posTo.z() / 16f + 0.0625f), 16, minV, bark));
+        builder.addCulledFace(Direction.NORTH, this.createQuad(
+                v(posTo.x() / 16f + 0.001f, posFrom.y() / 16f, posFrom.z() / 16f + 0.0625f), 2, maxV,
+                v(posTo.x() / 16f + 0.001f, posFrom.y() / 16f, posFrom.z() / 16f - 0.0625f), 0, maxV,
+                v(posTo.x() / 16f + 0.001f, posTo.y() / 16f, posFrom.z() / 16f - 0.0625f), 0, minV,
+                v(posTo.x() / 16f + 0.001f, posTo.y() / 16f, posFrom.z() / 16f + 0.0625f), 2, minV, bark));
 
-        builder.addFaceQuad(Direction.EAST, this.createQuad(
-                v(posTo.getX() / 16f + 0.0625f, posFrom.getY() / 16f, posFrom.getZ() / 16f - 0.001f), 16, maxV,
-                v(posTo.getX() / 16f - 0.0625f, posFrom.getY() / 16f, posFrom.getZ() / 16f - 0.001f), 14, maxV,
-                v(posTo.getX() / 16f - 0.0625f, posTo.getY() / 16f, posFrom.getZ() / 16f - 0.001f), 14, minV,
-                v(posTo.getX() / 16f + 0.0625f, posTo.getY() / 16f, posFrom.getZ() / 16f - 0.001f), 16, minV, bark));
-        builder.addFaceQuad(Direction.WEST, this.createQuad(
-                v(posFrom.getX() / 16f + 0.0625f, posFrom.getY() / 16f, posFrom.getZ() / 16f - 0.001f), 2, maxV,
-                v(posFrom.getX() / 16f - 0.0625f, posFrom.getY() / 16f, posFrom.getZ() / 16f - 0.001f), 0, maxV,
-                v(posFrom.getX() / 16f - 0.0625f, posTo.getY() / 16f, posFrom.getZ() / 16f - 0.001f), 0, minV,
-                v(posFrom.getX() / 16f + 0.0625f, posTo.getY() / 16f, posFrom.getZ() / 16f - 0.001f), 2, minV, bark));
-        builder.addFaceQuad(Direction.EAST, this.createQuad(
-                v(posTo.getX() / 16f + 0.0625f, posTo.getY() / 16f, posTo.getZ() / 16f + 0.001f), 16, minV,
-                v(posTo.getX() / 16f - 0.0625f, posTo.getY() / 16f, posTo.getZ() / 16f + 0.001f), 14, minV,
-                v(posTo.getX() / 16f - 0.0625f, posFrom.getY() / 16f, posTo.getZ() / 16f + 0.001f), 14, maxV,
-                v(posTo.getX() / 16f + 0.0625f, posFrom.getY() / 16f, posTo.getZ() / 16f + 0.001f), 16, maxV, bark));
-        builder.addFaceQuad(Direction.WEST, this.createQuad(
-                v(posFrom.getX() / 16f + 0.0625f, posTo.getY() / 16f, posTo.getZ() / 16f + 0.001f), 2, minV,
-                v(posFrom.getX() / 16f - 0.0625f, posTo.getY() / 16f, posTo.getZ() / 16f + 0.001f), 0, minV,
-                v(posFrom.getX() / 16f - 0.0625f, posFrom.getY() / 16f, posTo.getZ() / 16f + 0.001f), 0, maxV,
-                v(posFrom.getX() / 16f + 0.0625f, posFrom.getY() / 16f, posTo.getZ() / 16f + 0.001f), 2, maxV, bark));
+        builder.addCulledFace(Direction.EAST, this.createQuad(
+                v(posTo.x() / 16f + 0.0625f, posFrom.y() / 16f, posFrom.z() / 16f - 0.001f), 16, maxV,
+                v(posTo.x() / 16f - 0.0625f, posFrom.y() / 16f, posFrom.z() / 16f - 0.001f), 14, maxV,
+                v(posTo.x() / 16f - 0.0625f, posTo.y() / 16f, posFrom.z() / 16f - 0.001f), 14, minV,
+                v(posTo.x() / 16f + 0.0625f, posTo.y() / 16f, posFrom.z() / 16f - 0.001f), 16, minV, bark));
+        builder.addCulledFace(Direction.WEST, this.createQuad(
+                v(posFrom.x() / 16f + 0.0625f, posFrom.y() / 16f, posFrom.z() / 16f - 0.001f), 2, maxV,
+                v(posFrom.x() / 16f - 0.0625f, posFrom.y() / 16f, posFrom.z() / 16f - 0.001f), 0, maxV,
+                v(posFrom.x() / 16f - 0.0625f, posTo.y() / 16f, posFrom.z() / 16f - 0.001f), 0, minV,
+                v(posFrom.x() / 16f + 0.0625f, posTo.y() / 16f, posFrom.z() / 16f - 0.001f), 2, minV, bark));
+        builder.addCulledFace(Direction.EAST, this.createQuad(
+                v(posTo.x() / 16f + 0.0625f, posTo.y() / 16f, posTo.z() / 16f + 0.001f), 16, minV,
+                v(posTo.x() / 16f - 0.0625f, posTo.y() / 16f, posTo.z() / 16f + 0.001f), 14, minV,
+                v(posTo.x() / 16f - 0.0625f, posFrom.y() / 16f, posTo.z() / 16f + 0.001f), 14, maxV,
+                v(posTo.x() / 16f + 0.0625f, posFrom.y() / 16f, posTo.z() / 16f + 0.001f), 16, maxV, bark));
+        builder.addCulledFace(Direction.WEST, this.createQuad(
+                v(posFrom.x() / 16f + 0.0625f, posTo.y() / 16f, posTo.z() / 16f + 0.001f), 2, minV,
+                v(posFrom.x() / 16f - 0.0625f, posTo.y() / 16f, posTo.z() / 16f + 0.001f), 0, minV,
+                v(posFrom.x() / 16f - 0.0625f, posFrom.y() / 16f, posTo.z() / 16f + 0.001f), 0, maxV,
+                v(posFrom.x() / 16f + 0.0625f, posFrom.y() / 16f, posTo.z() / 16f + 0.001f), 2, maxV, bark));
 
         // Z
-        builder.addFaceQuad(Direction.UP, this.createQuad(
-                v(posFrom.getX() / 16f - 0.002f, posTo.getY() / 16f + 0.0625f, posFrom.getZ() / 16f), 16, minV,
-                v(posFrom.getX() / 16f - 0.002f, posTo.getY() / 16f - 0.0625f, posFrom.getZ() / 16f), 14, minV,
-                v(posFrom.getX() / 16f - 0.002f, posTo.getY() / 16f - 0.0625f, posTo.getZ() / 16f), 14, maxV,
-                v(posFrom.getX() / 16f - 0.002f, posTo.getY() / 16f + 0.0625f, posTo.getZ() / 16f), 16, maxV, bark));
-        builder.addFaceQuad(Direction.DOWN, this.createQuad(
-                v(posFrom.getX() / 16f - 0.002f, posFrom.getY() / 16f + 0.0625f, posFrom.getZ() / 16f), 2, minV,
-                v(posFrom.getX() / 16f - 0.002f, posFrom.getY() / 16f - 0.0625f, posFrom.getZ() / 16f), 0, minV,
-                v(posFrom.getX() / 16f - 0.002f, posFrom.getY() / 16f - 0.0625f, posTo.getZ() / 16f), 0, maxV,
-                v(posFrom.getX() / 16f - 0.002f, posFrom.getY() / 16f + 0.0625f, posTo.getZ() / 16f), 2, maxV, bark));
-        builder.addFaceQuad(Direction.UP, this.createQuad(
-                v(posTo.getX() / 16f + 0.002f, posTo.getY() / 16f + 0.0625f, posTo.getZ() / 16f), 16, maxV,
-                v(posTo.getX() / 16f + 0.002f, posTo.getY() / 16f - 0.0625f, posTo.getZ() / 16f), 14, maxV,
-                v(posTo.getX() / 16f + 0.002f, posTo.getY() / 16f - 0.0625f, posFrom.getZ() / 16f), 14, minV,
-                v(posTo.getX() / 16f + 0.002f, posTo.getY() / 16f + 0.0625f, posFrom.getZ() / 16f), 16, minV, bark));
-        builder.addFaceQuad(Direction.DOWN, this.createQuad(
-                v(posTo.getX() / 16f + 0.002f, posFrom.getY() / 16f + 0.0625f, posTo.getZ() / 16f), 2, maxV,
-                v(posTo.getX() / 16f + 0.002f, posFrom.getY() / 16f - 0.0625f, posTo.getZ() / 16f), 0, maxV,
-                v(posTo.getX() / 16f + 0.002f, posFrom.getY() / 16f - 0.0625f, posFrom.getZ() / 16f), 0, minV,
-                v(posTo.getX() / 16f + 0.002f, posFrom.getY() / 16f + 0.0625f, posFrom.getZ() / 16f), 2, minV, bark));
+        builder.addCulledFace(Direction.UP, this.createQuad(
+                v(posFrom.x() / 16f - 0.002f, posTo.y() / 16f + 0.0625f, posFrom.z() / 16f), 16, minV,
+                v(posFrom.x() / 16f - 0.002f, posTo.y() / 16f - 0.0625f, posFrom.z() / 16f), 14, minV,
+                v(posFrom.x() / 16f - 0.002f, posTo.y() / 16f - 0.0625f, posTo.z() / 16f), 14, maxV,
+                v(posFrom.x() / 16f - 0.002f, posTo.y() / 16f + 0.0625f, posTo.z() / 16f), 16, maxV, bark));
+        builder.addCulledFace(Direction.DOWN, this.createQuad(
+                v(posFrom.x() / 16f - 0.002f, posFrom.y() / 16f + 0.0625f, posFrom.z() / 16f), 2, minV,
+                v(posFrom.x() / 16f - 0.002f, posFrom.y() / 16f - 0.0625f, posFrom.z() / 16f), 0, minV,
+                v(posFrom.x() / 16f - 0.002f, posFrom.y() / 16f - 0.0625f, posTo.z() / 16f), 0, maxV,
+                v(posFrom.x() / 16f - 0.002f, posFrom.y() / 16f + 0.0625f, posTo.z() / 16f), 2, maxV, bark));
+        builder.addCulledFace(Direction.UP, this.createQuad(
+                v(posTo.x() / 16f + 0.002f, posTo.y() / 16f + 0.0625f, posTo.z() / 16f), 16, maxV,
+                v(posTo.x() / 16f + 0.002f, posTo.y() / 16f - 0.0625f, posTo.z() / 16f), 14, maxV,
+                v(posTo.x() / 16f + 0.002f, posTo.y() / 16f - 0.0625f, posFrom.z() / 16f), 14, minV,
+                v(posTo.x() / 16f + 0.002f, posTo.y() / 16f + 0.0625f, posFrom.z() / 16f), 16, minV, bark));
+        builder.addCulledFace(Direction.DOWN, this.createQuad(
+                v(posTo.x() / 16f + 0.002f, posFrom.y() / 16f + 0.0625f, posTo.z() / 16f), 2, maxV,
+                v(posTo.x() / 16f + 0.002f, posFrom.y() / 16f - 0.0625f, posTo.z() / 16f), 0, maxV,
+                v(posTo.x() / 16f + 0.002f, posFrom.y() / 16f - 0.0625f, posFrom.z() / 16f), 0, minV,
+                v(posTo.x() / 16f + 0.002f, posFrom.y() / 16f + 0.0625f, posFrom.z() / 16f), 2, minV, bark));
 
-        builder.addFaceQuad(Direction.EAST, this.createQuad(
-                v(posTo.getX() / 16f + 0.0625f, posFrom.getY() / 16f - 0.001f, posTo.getZ() / 16f), 16, maxV,
-                v(posTo.getX() / 16f - 0.0625f, posFrom.getY() / 16f - 0.001f, posTo.getZ() / 16f), 14, maxV,
-                v(posTo.getX() / 16f - 0.0625f, posFrom.getY() / 16f - 0.001f, posFrom.getZ() / 16f), 14, minV,
-                v(posTo.getX() / 16f + 0.0625f, posFrom.getY() / 16f - 0.001f, posFrom.getZ() / 16f), 16, minV, bark));
-        builder.addFaceQuad(Direction.WEST, this.createQuad(
-                v(posFrom.getX() / 16f + 0.0625f, posFrom.getY() / 16f - 0.001f, posTo.getZ() / 16f), 2, maxV,
-                v(posFrom.getX() / 16f - 0.0625f, posFrom.getY() / 16f - 0.001f, posTo.getZ() / 16f), 0, maxV,
-                v(posFrom.getX() / 16f - 0.0625f, posFrom.getY() / 16f - 0.001f, posFrom.getZ() / 16f), 0, minV,
-                v(posFrom.getX() / 16f + 0.0625f, posFrom.getY() / 16f - 0.001f, posFrom.getZ() / 16f), 2, minV, bark));
-        builder.addFaceQuad(Direction.EAST, this.createQuad(
-                v(posTo.getX() / 16f + 0.0625f, posTo.getY() / 16f + 0.001f, posFrom.getZ() / 16f), 16, minV,
-                v(posTo.getX() / 16f - 0.0625f, posTo.getY() / 16f + 0.001f, posFrom.getZ() / 16f), 14, minV,
-                v(posTo.getX() / 16f - 0.0625f, posTo.getY() / 16f + 0.001f, posTo.getZ() / 16f), 14, maxV,
-                v(posTo.getX() / 16f + 0.0625f, posTo.getY() / 16f + 0.001f, posTo.getZ() / 16f), 16, maxV, bark));
-        builder.addFaceQuad(Direction.WEST, this.createQuad(
-                v(posFrom.getX() / 16f + 0.0625f, posTo.getY() / 16f + 0.001f, posFrom.getZ() / 16f), 2, minV,
-                v(posFrom.getX() / 16f - 0.0625f, posTo.getY() / 16f + 0.001f, posFrom.getZ() / 16f), 0, minV,
-                v(posFrom.getX() / 16f - 0.0625f, posTo.getY() / 16f + 0.001f, posTo.getZ() / 16f), 0, maxV,
-                v(posFrom.getX() / 16f + 0.0625f, posTo.getY() / 16f + 0.001f, posTo.getZ() / 16f), 2, maxV, bark));
+        builder.addCulledFace(Direction.EAST, this.createQuad(
+                v(posTo.x() / 16f + 0.0625f, posFrom.y() / 16f - 0.001f, posTo.z() / 16f), 16, maxV,
+                v(posTo.x() / 16f - 0.0625f, posFrom.y() / 16f - 0.001f, posTo.z() / 16f), 14, maxV,
+                v(posTo.x() / 16f - 0.0625f, posFrom.y() / 16f - 0.001f, posFrom.z() / 16f), 14, minV,
+                v(posTo.x() / 16f + 0.0625f, posFrom.y() / 16f - 0.001f, posFrom.z() / 16f), 16, minV, bark));
+        builder.addCulledFace(Direction.WEST, this.createQuad(
+                v(posFrom.x() / 16f + 0.0625f, posFrom.y() / 16f - 0.001f, posTo.z() / 16f), 2, maxV,
+                v(posFrom.x() / 16f - 0.0625f, posFrom.y() / 16f - 0.001f, posTo.z() / 16f), 0, maxV,
+                v(posFrom.x() / 16f - 0.0625f, posFrom.y() / 16f - 0.001f, posFrom.z() / 16f), 0, minV,
+                v(posFrom.x() / 16f + 0.0625f, posFrom.y() / 16f - 0.001f, posFrom.z() / 16f), 2, minV, bark));
+        builder.addCulledFace(Direction.EAST, this.createQuad(
+                v(posTo.x() / 16f + 0.0625f, posTo.y() / 16f + 0.001f, posFrom.z() / 16f), 16, minV,
+                v(posTo.x() / 16f - 0.0625f, posTo.y() / 16f + 0.001f, posFrom.z() / 16f), 14, minV,
+                v(posTo.x() / 16f - 0.0625f, posTo.y() / 16f + 0.001f, posTo.z() / 16f), 14, maxV,
+                v(posTo.x() / 16f + 0.0625f, posTo.y() / 16f + 0.001f, posTo.z() / 16f), 16, maxV, bark));
+        builder.addCulledFace(Direction.WEST, this.createQuad(
+                v(posFrom.x() / 16f + 0.0625f, posTo.y() / 16f + 0.001f, posFrom.z() / 16f), 2, minV,
+                v(posFrom.x() / 16f - 0.0625f, posTo.y() / 16f + 0.001f, posFrom.z() / 16f), 0, minV,
+                v(posFrom.x() / 16f - 0.0625f, posTo.y() / 16f + 0.001f, posTo.z() / 16f), 0, maxV,
+                v(posFrom.x() / 16f + 0.0625f, posTo.y() / 16f + 0.001f, posTo.z() / 16f), 2, maxV, bark));
 
 
         return builder.build();
@@ -481,50 +481,50 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
         Vector3f posFrom = new Vector3f(4, 16, 4);
         Vector3f posTo = new Vector3f(12, 16, 12);
 
-        SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(blockModel.customData, ItemOverrideList.EMPTY).setTexture(bark);
+        SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(blockModel.customData, ItemOverrideList.EMPTY).particle(bark);
 
 
-        builder.addFaceQuad(Direction.UP, this.createQuad(
+        builder.addCulledFace(Direction.UP, this.createQuad(
                 v(posTo, posTo, posFrom, 0, + 0.0625f, - 0.002f), 16, minV,
                 v(posTo, posTo, posFrom, 0, - 0.0625f, - 0.002f), 14, minV,
                 v(posFrom, posTo, posFrom, 0, - 0.0625f, - 0.002f), 14, maxV,
                 v(posFrom, posTo, posFrom, 0, + 0.0625f, - 0.002f), 16, maxV, bark));
-        builder.addFaceQuad(Direction.UP, this.createQuad(
+        builder.addCulledFace(Direction.UP, this.createQuad(
                 v(posFrom, posTo, posTo, 0, + 0.0625f, + 0.002f), 16, maxV,
                 v(posFrom, posTo, posTo, 0, - 0.0625f, + 0.002f), 14, maxV,
                 v(posTo, posTo, posTo, 0, - 0.0625f, + 0.002f), 14, minV,
                 v(posTo, posTo, posTo, 0, + 0.0625f, + 0.002f), 16, minV, bark));
-        builder.addFaceQuad(Direction.UP, this.createQuad(
+        builder.addCulledFace(Direction.UP, this.createQuad(
                 v(posFrom, posTo, posTo, 0, + 0.002f, - 0.0625f), 14, maxV,
                 v(posFrom, posTo, posTo, 0, + 0.002f, + 0.0625f), 16, maxV,
                 v(posTo, posTo, posTo, 0, + 0.002f, + 0.0625f), 16, minV,
                 v(posTo, posTo, posTo, 0, + 0.002f, - 0.0625f), 14, minV, bark));
-        builder.addFaceQuad(Direction.UP, this.createQuad(
+        builder.addCulledFace(Direction.UP, this.createQuad(
                 v(posFrom, posTo, posFrom, 0, + 0.002f, - 0.0625f), 0, maxV,
                 v(posFrom, posTo, posFrom, 0, + 0.002f, + 0.0625f), 2, maxV,
                 v(posTo, posTo, posFrom, 0, + 0.002f, + 0.0625f), 2, minV,
                 v(posTo, posTo, posFrom, 0, + 0.002f, - 0.0625f), 0, minV, bark));
 
-        builder.addFaceQuad(Direction.UP, this.createQuad(
-                v(posFrom.getX() / 16f - 0.002f, posTo.getY() / 16f + 0.0625f, posFrom.getZ() / 16f), 16, minV,
-                v(posFrom.getX() / 16f - 0.002f, posTo.getY() / 16f - 0.0625f, posFrom.getZ() / 16f), 14, minV,
-                v(posFrom.getX() / 16f - 0.002f, posTo.getY() / 16f - 0.0625f, posTo.getZ() / 16f), 14, maxV,
-                v(posFrom.getX() / 16f - 0.002f, posTo.getY() / 16f + 0.0625f, posTo.getZ() / 16f), 16, maxV, bark));
-        builder.addFaceQuad(Direction.UP, this.createQuad(
-                v(posTo.getX() / 16f + 0.002f, posTo.getY() / 16f + 0.0625f, posTo.getZ() / 16f), 16, maxV,
-                v(posTo.getX() / 16f + 0.002f, posTo.getY() / 16f - 0.0625f, posTo.getZ() / 16f), 14, maxV,
-                v(posTo.getX() / 16f + 0.002f, posTo.getY() / 16f - 0.0625f, posFrom.getZ() / 16f), 14, minV,
-                v(posTo.getX() / 16f + 0.002f, posTo.getY() / 16f + 0.0625f, posFrom.getZ() / 16f), 16, minV, bark));
-        builder.addFaceQuad(Direction.UP, this.createQuad(
-                v(posTo.getX() / 16f + 0.0625f, posTo.getY() / 16f + 0.001f, posFrom.getZ() / 16f), 16, minV,
-                v(posTo.getX() / 16f - 0.0625f, posTo.getY() / 16f + 0.001f, posFrom.getZ() / 16f), 14, minV,
-                v(posTo.getX() / 16f - 0.0625f, posTo.getY() / 16f + 0.001f, posTo.getZ() / 16f), 14, maxV,
-                v(posTo.getX() / 16f + 0.0625f, posTo.getY() / 16f + 0.001f, posTo.getZ() / 16f), 16, maxV, bark));
-        builder.addFaceQuad(Direction.UP, this.createQuad(
-                v(posFrom.getX() / 16f + 0.0625f, posTo.getY() / 16f + 0.001f, posFrom.getZ() / 16f), 2, minV,
-                v(posFrom.getX() / 16f - 0.0625f, posTo.getY() / 16f + 0.001f, posFrom.getZ() / 16f), 0, minV,
-                v(posFrom.getX() / 16f - 0.0625f, posTo.getY() / 16f + 0.001f, posTo.getZ() / 16f), 0, maxV,
-                v(posFrom.getX() / 16f + 0.0625f, posTo.getY() / 16f + 0.001f, posTo.getZ() / 16f), 2, maxV, bark));
+        builder.addCulledFace(Direction.UP, this.createQuad(
+                v(posFrom.x() / 16f - 0.002f, posTo.y() / 16f + 0.0625f, posFrom.z() / 16f), 16, minV,
+                v(posFrom.x() / 16f - 0.002f, posTo.y() / 16f - 0.0625f, posFrom.z() / 16f), 14, minV,
+                v(posFrom.x() / 16f - 0.002f, posTo.y() / 16f - 0.0625f, posTo.z() / 16f), 14, maxV,
+                v(posFrom.x() / 16f - 0.002f, posTo.y() / 16f + 0.0625f, posTo.z() / 16f), 16, maxV, bark));
+        builder.addCulledFace(Direction.UP, this.createQuad(
+                v(posTo.x() / 16f + 0.002f, posTo.y() / 16f + 0.0625f, posTo.z() / 16f), 16, maxV,
+                v(posTo.x() / 16f + 0.002f, posTo.y() / 16f - 0.0625f, posTo.z() / 16f), 14, maxV,
+                v(posTo.x() / 16f + 0.002f, posTo.y() / 16f - 0.0625f, posFrom.z() / 16f), 14, minV,
+                v(posTo.x() / 16f + 0.002f, posTo.y() / 16f + 0.0625f, posFrom.z() / 16f), 16, minV, bark));
+        builder.addCulledFace(Direction.UP, this.createQuad(
+                v(posTo.x() / 16f + 0.0625f, posTo.y() / 16f + 0.001f, posFrom.z() / 16f), 16, minV,
+                v(posTo.x() / 16f - 0.0625f, posTo.y() / 16f + 0.001f, posFrom.z() / 16f), 14, minV,
+                v(posTo.x() / 16f - 0.0625f, posTo.y() / 16f + 0.001f, posTo.z() / 16f), 14, maxV,
+                v(posTo.x() / 16f + 0.0625f, posTo.y() / 16f + 0.001f, posTo.z() / 16f), 16, maxV, bark));
+        builder.addCulledFace(Direction.UP, this.createQuad(
+                v(posFrom.x() / 16f + 0.0625f, posTo.y() / 16f + 0.001f, posFrom.z() / 16f), 2, minV,
+                v(posFrom.x() / 16f - 0.0625f, posTo.y() / 16f + 0.001f, posFrom.z() / 16f), 0, minV,
+                v(posFrom.x() / 16f - 0.0625f, posTo.y() / 16f + 0.001f, posTo.z() / 16f), 0, maxV,
+                v(posFrom.x() / 16f + 0.0625f, posTo.y() / 16f + 0.001f, posTo.z() / 16f), 2, maxV, bark));
 
 
         return builder.build();
@@ -554,7 +554,7 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
     }
 
     private Vector3d v(Vector3f xVec, Vector3f yVec, Vector3f zVec, float xOffset, float yOffset, float zOffset){
-        return v(xVec.getX() / 16f + xOffset, yVec.getY() / 16f + yOffset, zVec.getZ() / 16f + zOffset);
+        return v(xVec.x() / 16f + xOffset, yVec.y() / 16f + yOffset, zVec.z() / 16f + zOffset);
     }
 
     private Vector3d v(float x, float y, float z) {
@@ -594,7 +594,7 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
                     quadsList.addAll(rings[getRadiusIndex(coreRadius)].getQuads(state, forceRingDir, rand, extraData));
                 } else {
                     boolean extraUpSleeve = false;
-                    if (coreRadius == radii[0] && numConnections == 1 && state.get(CactusBranchBlock.ORIGIN).getAxis().isHorizontal()) {
+                    if (coreRadius == radii[0] && numConnections == 1 && state.getValue(CactusBranchBlock.ORIGIN).getAxis().isHorizontal()) {
                         connections[1] = radii[0];
                         extraUpSleeve = true;
                     }
@@ -611,7 +611,7 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
 
                     for (Direction face : Direction.values()) {
                         //Get quads for core model
-                        if (coreRadius != connections[face.getIndex()]) {
+                        if (coreRadius != connections[face.get3DDataValue()]) {
                             if (coreRingDir == null || coreRingDir != face) {
                                 quadsList.addAll(cores[coreDir][getRadiusIndex(coreRadius)].getQuads(state, face, rand, extraData));
                             } else {
@@ -621,9 +621,9 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
 
                         // Get quads for core spikes
                         for (Direction dir : Direction.values()) {
-                            if (coreRadius > connections[dir.getIndex()]) {
+                            if (coreRadius > connections[dir.get3DDataValue()]) {
                                 for (BakedQuad quad : coreSpikes[getRadiusIndex(coreRadius)].getQuads(state, dir, rand, extraData)) {
-                                    if (coreRadius > connections[quad.getFace().getIndex()]) {
+                                    if (coreRadius > connections[quad.getDirection().get3DDataValue()]) {
                                         quadsList.add(quad);
                                     }
                                 }
@@ -632,7 +632,7 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
 
                         // Get quads for sleeves models
                         for (Direction connDir : Direction.values()) {
-                            int idx = connDir.getIndex();
+                            int idx = connDir.get3DDataValue();
                             int connRadius = connections[idx];
                             // If the connection side matches the quadpull side then cull the sleeve face.  Don't cull radius 1 connections for leaves(which are partly transparent).
                             if (connRadius >= radii[0] && ((connDir == Direction.UP && connRadius == radii[0] && extraUpSleeve) || face != connDir || connDir == Direction.DOWN)) {
@@ -675,7 +675,7 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
         Direction sourceDir = null;
 
         for(Direction dir: Direction.values()){
-            int connRadius = connections[dir.getIndex()];
+            int connRadius = connections[dir.get3DDataValue()];
             if(connRadius > largestConnection){
                 largestConnection = connRadius;
                 sourceDir = dir;
@@ -695,7 +695,7 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
      * @return
      */
     protected int resolveCoreDir(Direction dir) {
-        return dir.getIndex() >> 1;
+        return dir.get3DDataValue() >> 1;
     }
 
     protected int getRadius(BlockState blockState) {
@@ -704,16 +704,16 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
     }
 
     @Override
-    public boolean isAmbientOcclusion() {
+    public boolean useAmbientOcclusion() {
         return true;
     }
 
     @Override
     public TextureAtlasSprite getParticleTexture(IModelData data) {
-        return getParticleTexture();
+        return getParticleIcon();
     }
     @Override
-    public TextureAtlasSprite getParticleTexture() {
+    public TextureAtlasSprite getParticleIcon() {
         return barkTexture;
     }
 
@@ -723,7 +723,7 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
     }
 
     @Override
-    public boolean isBuiltInRenderer() {
+    public boolean isCustomRenderer() {
         return false;
     }
 
@@ -739,7 +739,7 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
     }
 
     @Override
-    public boolean isSideLit() {
+    public boolean usesBlockLight() {
         return false;
     }
 

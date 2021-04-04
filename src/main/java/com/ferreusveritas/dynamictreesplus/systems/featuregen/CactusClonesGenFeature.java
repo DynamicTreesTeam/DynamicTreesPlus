@@ -43,7 +43,7 @@ public class CactusClonesGenFeature extends GenFeature implements IPostGenFeatur
 
     @Override
     public boolean postGrow(ConfiguredGenFeature<?> configuredGenFeature, World world, BlockPos rootPos, BlockPos treePos, Species species, int soilLife, boolean natural) {
-        if (world.rand.nextFloat() < configuredGenFeature.get(CHANCE_ON_GROW))
+        if (world.random.nextFloat() < configuredGenFeature.get(CHANCE_ON_GROW))
             return tryToPlaceClones(world, rootPos, species, false, SafeChunkBounds.ANY);
         return false;
     }
@@ -51,7 +51,7 @@ public class CactusClonesGenFeature extends GenFeature implements IPostGenFeatur
     private boolean areCactiAround (IWorld world, BlockPos rootPos, SafeChunkBounds safeBounds){
         for (CoordUtils.Surround dir : CoordUtils.Surround.values()){
             for (int i=-1; i <= 1; i++){
-                BlockPos offsetPos = rootPos.add(dir.getOffset()).up(i);
+                BlockPos offsetPos = rootPos.offset(dir.getOffset()).above(i);
                 if (safeBounds.inBounds(offsetPos, false) && world.getBlockState(offsetPos).getBlock() instanceof BranchBlock){
                     return true;
                 }
@@ -61,13 +61,13 @@ public class CactusClonesGenFeature extends GenFeature implements IPostGenFeatur
     }
 
     private boolean tryToPlaceClones (IWorld world, BlockPos rootPos, Species species, boolean worldgen, SafeChunkBounds safeBounds){
-        if (world == null || areCactiAround(world, rootPos.up(), safeBounds)) return false;
+        if (world == null || areCactiAround(world, rootPos.above(), safeBounds)) return false;
         int clones = 3 + world.getRandom().nextInt(5); //between 3 and 8 clones
         List<CoordUtils.Surround> validDirs = new LinkedList<>(Arrays.asList(CoordUtils.Surround.values()));
         boolean clonePlaced = false;
         for (int i=0; i < clones; i++){
             CoordUtils.Surround selectedDir = validDirs.get(world.getRandom().nextInt(validDirs.size()));
-            if (placeCloneAtLocation(world, rootPos.add(selectedDir.getOffset()), species, worldgen, safeBounds))
+            if (placeCloneAtLocation(world, rootPos.offset(selectedDir.getOffset()), species, worldgen, safeBounds))
                 clonePlaced = true;
             validDirs.remove(selectedDir);
         }
@@ -76,14 +76,14 @@ public class CactusClonesGenFeature extends GenFeature implements IPostGenFeatur
 
     private boolean placeCloneAtLocation (IWorld world, BlockPos cloneRootPos, Species species, boolean worldgen, SafeChunkBounds safeBounds){
         for (int i=1; i >= -1; i--){
-            BlockPos offsetRootPos = cloneRootPos.up(i);
+            BlockPos offsetRootPos = cloneRootPos.above(i);
             if (safeBounds.inBounds(offsetRootPos, false) && species.isAcceptableSoil(world.getBlockState(offsetRootPos))){
 
                 if (worldgen) {
                     if (world instanceof WorldGenRegion)
-                        species.generate(((WorldGenRegion)world).getWorld(), world, offsetRootPos, world.getNoiseBiome(offsetRootPos.getX(), offsetRootPos.getY(), offsetRootPos.getZ()), world.getRandom(), 2, safeBounds);
+                        species.generate(((WorldGenRegion)world).getLevel(), world, offsetRootPos, world.getNoiseBiome(offsetRootPos.getX(), offsetRootPos.getY(), offsetRootPos.getZ()), world.getRandom(), 2, safeBounds);
                 } else if (world instanceof World) {
-                    species.transitionToTree((World) world, offsetRootPos.up());
+                    species.transitionToTree((World) world, offsetRootPos.above());
                 }
                 return true;
             }

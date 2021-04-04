@@ -111,9 +111,9 @@ public class CactusSpecies extends Species {
     public boolean transitionToTree(World world, BlockPos pos) {
         // Ensure planting conditions are right.
         final Family family = getFamily();
-        if (world.isAirBlock(pos.up()) && this.isAcceptableSoil(world, pos.down(), world.getBlockState(pos.down()))) {
-            this.placeRootyDirtBlock(world, pos.down(), 15); // Set to fully fertilized rooty sand underneath.
-            world.setBlockState(pos, family.getDynamicBranch().getDefaultState().with(CactusBranchBlock.TRUNK_TYPE, this.thicknessForBranchPlaced(world, pos, false)));// Set to a single branch
+        if (world.isEmptyBlock(pos.above()) && this.isAcceptableSoil(world, pos.below(), world.getBlockState(pos.below()))) {
+            this.placeRootyDirtBlock(world, pos.below(), 15); // Set to fully fertilized rooty sand underneath.
+            world.setBlockAndUpdate(pos, family.getDynamicBranch().defaultBlockState().setValue(CactusBranchBlock.TRUNK_TYPE, this.thicknessForBranchPlaced(world, pos, false)));// Set to a single branch
             return true;
         }
 
@@ -131,7 +131,7 @@ public class CactusSpecies extends Species {
     }
 
     public SoundType getSaplingSound() {
-        return SoundType.CLOTH;
+        return SoundType.WOOL;
     }
 
     private static class JoCodeCactus extends JoCode {
@@ -147,7 +147,7 @@ public class CactusSpecies extends Species {
 
             // A Tree generation boundary radius is at least 2 and at most 8
             radius = MathHelper.clamp(radius, 2, 8);
-            BlockPos treePos = rootPos.up();
+            BlockPos treePos = rootPos.above();
 
             // Create tree
             setFacing(facing);
@@ -165,7 +165,7 @@ public class CactusSpecies extends Species {
                 species.postGeneration(worldObj, world, rootPos, biome, radius, endPoints, safeBounds, initialDirtState);
                 MinecraftForge.EVENT_BUS.post(new SpeciesPostGenerationEvent(world, species, rootPos, endPoints, safeBounds, initialDirtState));
             } else { // The growth failed.. turn the soil back to what it was
-                world.setBlockState(rootPos, initialDirtState, careful ? 3 : 2);
+                world.setBlock(rootPos, initialDirtState, careful ? 3 : 2);
             }
         }
 
@@ -173,10 +173,10 @@ public class CactusSpecies extends Species {
         public boolean setBlockForGeneration(IWorld world, Species species, BlockPos pos, Direction dir, boolean careful, boolean isLast) {
             if (!(species instanceof CactusSpecies))
                 return false;
-            BlockState defaultBranchState = species.getFamily().getDynamicBranch().getDefaultState();
+            BlockState defaultBranchState = species.getFamily().getDynamicBranch().defaultBlockState();
             if (world.getBlockState(pos).canBeReplacedByLogs(world, pos) && (!careful || isClearOfNearbyBranches(world, pos, dir.getOpposite()))) {
                 CactusBranchBlock.CactusThickness trunk = ((CactusSpecies) species).thicknessForBranchPlaced(world, pos, isLast);
-                return !world.setBlockState(pos, defaultBranchState.with(CactusBranchBlock.TRUNK_TYPE, trunk).with(CactusBranchBlock.ORIGIN, dir.getOpposite()), careful ? 3 : 2);
+                return !world.setBlock(pos, defaultBranchState.setValue(CactusBranchBlock.TRUNK_TYPE, trunk).setValue(CactusBranchBlock.ORIGIN, dir.getOpposite()), careful ? 3 : 2);
             }
             return true;
         }
@@ -188,7 +188,7 @@ public class CactusSpecies extends Species {
         int month = (int)day / 30; //Change the hashs every in-game month
 
         // Vary the height energy by a psuedorandom hash function
-        return signalEnergy * species.biomeSuitability(world, pos) + (CoordUtils.coordHashCode(pos.up(month), 2) % mod);
+        return signalEnergy * species.biomeSuitability(world, pos) + (CoordUtils.coordHashCode(pos.above(month), 2) % mod);
     }
 
 }

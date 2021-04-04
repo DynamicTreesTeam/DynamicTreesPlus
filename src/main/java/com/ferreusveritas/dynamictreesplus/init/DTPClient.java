@@ -13,7 +13,7 @@ public class DTPClient {
 
     private static void registerRenderLayers () {
         ForgeRegistries.BLOCKS.getValues().stream().filter(block -> block instanceof CactusBranchBlock)
-                .forEach(block -> RenderTypeLookup.setRenderLayer(block, RenderType.getCutoutMipped()));
+                .forEach(block -> RenderTypeLookup.setRenderLayer(block, RenderType.cutoutMipped()));
     }
 
 }

@@ -23,7 +23,7 @@ public final class MegaCactusLogic extends CactusLogic {
 
         int height = pos.getY() - signal.rootPos.getY();
 
-        if (height >= MAX_HEIGHT && world.rand.nextFloat() < 0.8f){
+        if (height >= MAX_HEIGHT && world.random.nextFloat() < 0.8f){
             signal.energy = 0;
             return new int[]{0,0,0,0,0,0};
         }
@@ -35,8 +35,8 @@ public final class MegaCactusLogic extends CactusLogic {
 
         //Alter probability map for direction change
         probMap[0] = 0; //Down is always disallowed for cactus
-        probMap[1] = (int) (species.getUpProbability() + signal.rootPos.distanceSq(pos.getX(), signal.rootPos.getY(), pos.getZ(), true) * 0.8);
-        probMap[2] = probMap[3] = probMap[4] = probMap[5] = world.getBlockState(pos.up()).getBlock() instanceof CactusBranchBlock && signal.energy > 1 ? 3 : 0;
+        probMap[1] = (int) (species.getUpProbability() + signal.rootPos.distSqr(pos.getX(), signal.rootPos.getY(), pos.getZ(), true) * 0.8);
+        probMap[2] = probMap[3] = probMap[4] = probMap[5] = world.getBlockState(pos.above()).getBlock() instanceof CactusBranchBlock && signal.energy > 1 ? 3 : 0;
         if (signal.dir != Direction.UP) probMap[signal.dir.ordinal()] = 0; //Disable the current direction, unless that direction is up
         probMap[originDir.ordinal()] = 0; //Disable the direction we came from
 

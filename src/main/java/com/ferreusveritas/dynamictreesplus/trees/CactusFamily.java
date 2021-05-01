@@ -29,13 +29,13 @@ public class CactusFamily extends Family {
     }
 
     @Override
-    public float getPrimaryThickness() {
-        return 5.0f;
+    public int getPrimaryThickness() {
+        return 5;
     }
 
     @Override
-    public float getSecondaryThickness() {
-        return 4.0f;
+    public int getSecondaryThickness() {
+        return 4;
     }
 
 }

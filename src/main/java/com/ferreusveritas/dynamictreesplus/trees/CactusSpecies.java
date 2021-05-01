@@ -113,7 +113,7 @@ public class CactusSpecies extends Species {
         final Family family = getFamily();
         if (world.isEmptyBlock(pos.above()) && this.isAcceptableSoil(world, pos.below(), world.getBlockState(pos.below()))) {
             this.placeRootyDirtBlock(world, pos.below(), 15); // Set to fully fertilized rooty sand underneath.
-            world.setBlockAndUpdate(pos, family.getDynamicBranch().defaultBlockState().setValue(CactusBranchBlock.TRUNK_TYPE, this.thicknessForBranchPlaced(world, pos, false)));// Set to a single branch
+            world.setBlockAndUpdate(pos, family.getBranch().defaultBlockState().setValue(CactusBranchBlock.TRUNK_TYPE, this.thicknessForBranchPlaced(world, pos, false)));// Set to a single branch
             return true;
         }
 
@@ -173,7 +173,7 @@ public class CactusSpecies extends Species {
         public boolean setBlockForGeneration(IWorld world, Species species, BlockPos pos, Direction dir, boolean careful, boolean isLast) {
             if (!(species instanceof CactusSpecies))
                 return false;
-            BlockState defaultBranchState = species.getFamily().getDynamicBranch().defaultBlockState();
+            BlockState defaultBranchState = species.getFamily().getBranch().defaultBlockState();
             if (world.getBlockState(pos).canBeReplacedByLogs(world, pos) && (!careful || isClearOfNearbyBranches(world, pos, dir.getOpposite()))) {
                 CactusBranchBlock.CactusThickness trunk = ((CactusSpecies) species).thicknessForBranchPlaced(world, pos, isLast);
                 return !world.setBlock(pos, defaultBranchState.setValue(CactusBranchBlock.TRUNK_TYPE, trunk).setValue(CactusBranchBlock.ORIGIN, dir.getOpposite()), careful ? 3 : 2);

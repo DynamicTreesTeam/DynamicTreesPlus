@@ -102,7 +102,7 @@ public class CactusBranchBlock extends BranchBlock {
 	public float getHardness(IBlockReader worldIn, BlockPos pos) {
 		int radius = getRadius(worldIn.getBlockState(pos));
 		float hardness = getFamily().getPrimitiveLog().getBlock().defaultBlockState().getDestroySpeed(worldIn, pos) * (radius * radius) / 64.0f * 8.0f;
-		hardness = (float) Math.min(hardness, DTConfigs.maxTreeHardness.get());//So many youtube let's plays start with "OMG, this is taking so long to break this tree!"
+		hardness = (float) Math.min(hardness, DTConfigs.MAX_TREE_HARDNESS.get());//So many youtube let's plays start with "OMG, this is taking so long to break this tree!"
 		return hardness;
 	}
 
@@ -181,9 +181,9 @@ public class CactusBranchBlock extends BranchBlock {
 
 	@Override
 	public int setRadius(IWorld world, BlockPos pos, int radius, Direction originDir, int flags) {
-		destroyMode = DynamicTrees.EnumDestroyMode.SET_RADIUS;
+		destroyMode = DynamicTrees.DestroyMode.SET_RADIUS;
 		world.setBlock(pos, getStateForRadius(radius).setValue(ORIGIN, originDir), flags);
-		destroyMode = DynamicTrees.EnumDestroyMode.SLOPPY;
+		destroyMode = DynamicTrees.DestroyMode.SLOPPY;
 		return radius;
 	}
 
@@ -348,7 +348,7 @@ public class CactusBranchBlock extends BranchBlock {
 					}
 
 					// This should only be true for the originating block when the root node is found
-					if (signal.found && signal.localRootDir == null && fromDir == null) {
+					if (signal.foundRoot && signal.localRootDir == null && fromDir == null) {
 						signal.localRootDir = dir;
 					}
 				}
@@ -358,7 +358,7 @@ public class CactusBranchBlock extends BranchBlock {
 			BlockState state = world.getBlockState(pos);
 			if(state.getBlock() instanceof BranchBlock) {
 				BranchBlock branch = (BranchBlock) state.getBlock();
-				branch.breakDeliberate(world, pos, DynamicTrees.EnumDestroyMode.OVERFLOW);// Destroy one of the offending nodes
+				branch.breakDeliberate(world, pos, DynamicTrees.DestroyMode.OVERFLOW);// Destroy one of the offending nodes
 			}
 			signal.overflow = true;
 		}

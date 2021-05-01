@@ -33,4 +33,9 @@ public class CactusLogic extends GrowthLogicKit {
         return CactusSpecies.getEnergy(world, pos, species, signalEnergy, this.mod);
     }
 
+    @Override
+    public int getLowestBranchHeight(World world, BlockPos blockPos, Species species, int i) {
+        return i;
+    }
+
 }

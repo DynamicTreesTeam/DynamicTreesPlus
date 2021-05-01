@@ -23,6 +23,10 @@ repositories {
     maven {
         url "http://harleyoconnor.com/maven"
     }
+    //do not remove, this is for loading jars from the libs folder
+    flatDir {
+        dirs("libs")
+    }
 }
 
 apply plugin: 'net.minecraftforge.gradle'
@@ -101,7 +105,9 @@ dependencies {
     implementation fg.deobf("curse.maven:SereneSeasons-291874:3179424")
 
     // Compile Dynamic Trees, of course
-    implementation fg.deobf("com.ferreusveritas.dynamictrees:DynamicTrees-${config.mc_version}:${config.dynamic_trees_version}")
+    //implementation fg.deobf("com.ferreusveritas.dynamictrees:DynamicTrees-${config.mc_version}:${config.dynamic_trees_version}")
+    //don't delete this, just comment it out
+    implementation fg.deobf("blank:DynamicTrees-1.16.5:0.10.0-Beta5")
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..

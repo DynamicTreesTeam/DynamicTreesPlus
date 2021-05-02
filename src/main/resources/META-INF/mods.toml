@@ -7,7 +7,7 @@ issueTrackerURL="https://github.com/supermassimo/DynamicTreesPlus/issues"
 modId="dynamictreesplus"
 version="${file.jarVersion}"
 displayName="Dynamic Trees Plus"
-#updateJSONURL="http://minecraft.curseforge.com/projects/dynamictreesplus"
+updateJSONURL="https://github.com/supermassimo/DynamicTreesPlus/blob/1.16.5/version_info.json?raw=true"
 displayURL="http://minecraft.curseforge.com/projects/dynamictreesplus"
 logoFile="logo.png"
 credits=""
@@ -32,6 +32,6 @@ Vanilla addon for Dynamic Trees'''
 [[dependencies.dynamictreesplus]]
     modId="dynamictrees"
     mandatory=true
-    versionRange="[0.1.0,)"
+    versionRange="[0.10.0,)"
     ordering="AFTER"
     side="BOTH"

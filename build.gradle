@@ -1,3 +1,5 @@
+import org.w3c.dom.Element
+
 buildscript {
     repositories {
         maven { url = 'https://files.minecraftforge.net/maven' }
@@ -105,12 +107,11 @@ dependencies {
     implementation fg.deobf("curse.maven:SereneSeasons-291874:3179424")
 
     // Compile Dynamic Trees, of course
-    //implementation fg.deobf("com.ferreusveritas.dynamictrees:DynamicTrees-${config.mc_version}:${config.dynamic_trees_version}")
+    implementation fg.deobf("com.ferreusveritas.dynamictrees:DynamicTrees-${config.mc_version}:${config.dynamic_trees_version}")
     //don't delete this, just comment it out
-    implementation fg.deobf("blank:DynamicTrees-1.16.5:0.10.0-Beta5")
+//    implementation fg.deobf("blank:DynamicTrees-1.16.5:0.10.0-Beta5")
 }
 
-// Example for how to get properties into the manifest for reading by the runtime..
 jar {
     manifest {
         attributes([
@@ -118,8 +119,8 @@ jar {
                 "Specification-Vendor": "ferreusveritas",
                 "Specification-Version": "1",
                 "Implementation-Title": project.name,
-                "Implementation-Version": "${getArchiveVersion()}",
-                "Implementation-Vendor" :"ferreusveritas",
+                "Implementation-Version": version,
+                "Implementation-Vendor" : "ferreusveritas",
                 "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
     }
@@ -132,14 +133,42 @@ task sourcesJar(type: Jar) {
 
 jar.finalizedBy('reobfJar')
 
-artifacts {
-    archives sourcesJar
+java {
+    withSourcesJar()
 }
 
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            artifact jar
+            setArtifactId("${config.mod_name}-${config.mc_version}")
+            setVersion(config.mod_version)
+
+            from components.java
+
+            pom {
+                url = "https://github.com/supermassimo/${config.mod_name}"
+                licenses {
+                    license {
+                        name = 'MIT'
+                        url = 'https://mit-license.org'
+                    }
+                }
+                scm {
+                    connection = "scm:git:git://github.com/supermassimo/${config.mod_name}.git"
+                    developerConnection = "scm:git:ssh://github.com/supermassimo/${config.mod_name}.git"
+                    url = "https://github.com/supermassimo/${config.mod_name}"
+                }
+            }
+
+            pom.withXml { xmlProvider ->
+                final Element element = xmlProvider.asElement();
+
+                // Clear dependencies.
+                element.getChildNodes().each { node ->
+                    if (node.getNodeName() == "dependencies")
+                        element.removeChild(node)
+                }
+            }
         }
     }
     repositories {

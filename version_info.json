@@ -1,10 +1,11 @@
 {
   "homepage": "https://www.curseforge.com/minecraft/mc-mods/dynamictrees",
   "1.16.5": {
+    "1.16.5-0.1.0-Beta7": "Updated for DT 0.10.0-Beta7.",
     "1.16.5-0.1.0-Beta6": "Initial 1.16.5 beta for CF."
   },
   "promos": {
-    "1.16.5-latest": "1.16.5-0.1.0-Beta6",
-    "1.16.5-recommended": "1.16.5-0.1.0-Beta6"
+    "1.16.5-latest": "1.16.5-0.1.0-Beta7",
+    "1.16.5-recommended": "1.16.5-0.1.0-Beta7"
   }
 }

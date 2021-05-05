@@ -82,11 +82,6 @@ public class CactusSpecies extends Species {
     }
 
     @Override
-    public boolean showSpeciesOnWaila() {
-        return true;
-    }
-
-    @Override
     protected void setStandardSoils() {
         this.addAcceptableSoils(DirtHelper.SAND_LIKE);
     }

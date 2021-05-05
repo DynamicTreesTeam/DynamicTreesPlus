@@ -2,6 +2,7 @@
   "type": "dynamictreesplus:cactus",
   "family": "dynamictreesplus:cactus",
   "seed": "dynamictreesplus:saguaro_cactus_seed",
+  "always_show_on_waila": true,
   "signal_energy": 18,
   "up_probability": 1,
   "lowest_branch_height": 3,

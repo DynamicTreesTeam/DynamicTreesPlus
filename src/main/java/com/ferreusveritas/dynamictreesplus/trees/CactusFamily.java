@@ -6,6 +6,8 @@ import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictreesplus.DynamicTreesPlus;
 import com.ferreusveritas.dynamictreesplus.blocks.CactusBranchBlock;
+import net.minecraft.block.SoundType;
+import net.minecraft.block.material.Material;
 import net.minecraft.util.ResourceLocation;
 
 import java.util.Objects;
@@ -24,8 +26,18 @@ public class CactusFamily extends Family {
     }
 
     @Override
+    public Material getDefaultBranchMaterial() {
+        return Material.CACTUS;
+    }
+
+    @Override
+    public SoundType getDefaultBranchSoundType() {
+        return SoundType.WOOL;
+    }
+
+    @Override
     protected BranchBlock createBranchBlock() {
-        return new CactusBranchBlock();
+        return new CactusBranchBlock(this.getProperties());
     }
 
     @Override

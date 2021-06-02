@@ -67,12 +67,8 @@ public class CactusBranchBlock extends BranchBlock {
 		@Override public String getSerializedName() { return this.name; }
 	}
 
-	public CactusBranchBlock() {
-		super(Properties.of(Material.CACTUS)
-				.sound(SoundType.WOOL)
-				.harvestTool(ToolType.AXE)
-				.harvestLevel(0)
-				.sound(SoundType.WOOL));
+	public CactusBranchBlock(Properties properties) {
+		super(properties);
 
 		this.registerDefaultState(this.getStateDefinition().any().setValue(TRUNK_TYPE, CactusThickness.TRUNK).setValue(ORIGIN, Direction.DOWN));
 	}

@@ -28,6 +28,7 @@ repositories {
     flatDir {
         dirs("libs")
     }
+    mavenLocal()
 }
 
 apply plugin: 'net.minecraftforge.gradle'

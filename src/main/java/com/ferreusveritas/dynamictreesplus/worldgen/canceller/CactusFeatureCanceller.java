@@ -5,12 +5,15 @@ import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
 import net.minecraft.block.Block;
 import net.minecraft.block.CactusBlock;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.gen.blockstateprovider.BlockStateProvider;
 import net.minecraft.world.gen.blockstateprovider.SimpleBlockStateProvider;
 import net.minecraft.world.gen.feature.BlockClusterFeatureConfig;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
 import net.minecraft.world.gen.feature.DecoratedFeatureConfig;
 import net.minecraft.world.gen.feature.IFeatureConfig;
+
+import java.util.Random;
 
 /**
  * This class cancels any features that have a config that extends {@link BlockClusterFeatureConfig} and that
@@ -19,6 +22,8 @@ import net.minecraft.world.gen.feature.IFeatureConfig;
  * @author Harley O'Connor
  */
 public class CactusFeatureCanceller<T extends Block> extends FeatureCanceller {
+
+    private static final Random PLACEHOLDER_RAND = new Random();
 
     private final Class<T> cactusBlockClass;
 
@@ -53,7 +58,7 @@ public class CactusFeatureCanceller<T extends Block> extends FeatureCanceller {
             return false;
 
         // SimpleBlockStateProvider does not use random or BlockPos in getBlockState, so giving null is safe.
-        return this.cactusBlockClass.isInstance(stateProvider.getState(null, null).getBlock())
+        return this.cactusBlockClass.isInstance(stateProvider.getState(PLACEHOLDER_RAND, BlockPos.ZERO).getBlock())
                 && featureResLoc != null && featureCancellations.shouldCancelNamespace(featureResLoc.getNamespace());
     }
 

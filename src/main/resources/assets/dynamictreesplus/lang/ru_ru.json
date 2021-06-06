@@ -1,15 +1,15 @@
 {
-  "block.dynamictreesplus.cactus_branch": "Динамический кактус",
+  "block.dynamictreesplus.cactus_branch": "Кактус",
 
-  "species.dynamictreesplus.saguaro_cactus": "Saguaro Кактус",
-  "species.dynamictreesplus.pillar_cactus": "Pillar Кактус",
-  "species.dynamictreesplus.pipe_cactus": "Pipe Кактус",
-  "species.dynamictreesplus.mega_cactus": "Мега Кактус",
+  "species.dynamictreesplus.saguaro_cactus": "Кактус с ветвями",
+  "species.dynamictreesplus.pillar_cactus": "Длинный кактус",
+  "species.dynamictreesplus.pipe_cactus": "Столбчатый кактус",
+  "species.dynamictreesplus.mega_cactus": "Мега кактус",
 
-  "item.dynamictreesplus.saguaro_cactus_seed": "Saguaro Семя кактуса",
-  "item.dynamictreesplus.pillar_cactus_seed": "Pillar Семя кактуса",
-  "item.dynamictreesplus.pipe_cactus_seed": "Pipe Семя кактуса",
-  "item.dynamictreesplus.brown_mushroom_seed": "Шапочка коричневого гриба",
-  "item.dynamictreesplus.red_mushroom_seed": "Шапочка красного гриба",
-  "item.dynamictreesplus.chorus_seed": "Семя хоруса"
+  "item.dynamictreesplus.saguaro_cactus_seed": "Семена кактуса с ветвями",
+  "item.dynamictreesplus.pillar_cactus_seed": "Семена длинного кактуса",
+  "item.dynamictreesplus.pipe_cactus_seed": "Семена столбчатого кактуса",
+  "item.dynamictreesplus.brown_mushroom_seed": "Коричневая шляпа гриба",
+  "item.dynamictreesplus.red_mushroom_seed": "Красная шляпа гриба",
+  "item.dynamictreesplus.chorus_seed": "Плод хоруса"
 }

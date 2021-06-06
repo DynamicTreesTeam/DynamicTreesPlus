@@ -1,15 +1,15 @@
 {
   "block.dynamictreesplus.cactus_branch": "Cactus",
 
-  "species.dynamictreesplus.saguaro_cactus": "Cactus Saguaro",
-  "species.dynamictreesplus.pillar_cactus": "Cactus Pillier",
-  "species.dynamictreesplus.pipe_cactus": "Cactus Tuyau",
-  "species.dynamictreesplus.mega_cactus": "Cactus Géant",
+  "species.dynamictreesplus.saguaro_cactus": "Cactus saguaro",
+  "species.dynamictreesplus.pillar_cactus": "Cactus pillier",
+  "species.dynamictreesplus.pipe_cactus": "Cactus orgue",
+  "species.dynamictreesplus.mega_cactus": "Cactus géant",
 
-  "item.dynamictreesplus.saguaro_cactus_seed": "Graine de Cactus Saguaro",
-  "item.dynamictreesplus.pillar_cactus_seed": "Graine de Cactus Pilier",
-  "item.dynamictreesplus.pipe_cactus_seed": "Graine de Cactus Tuyau",
-  "item.dynamictreesplus.brown_mushroom_seed": "Chapeau de Champignon Brun",
-  "item.dynamictreesplus.red_mushroom_seed": "Chapeau de Champignon Rouge",
-  "item.dynamictreesplus.chorus_seed": "Graine de Chorus"
+  "item.dynamictreesplus.saguaro_cactus_seed": "Graine de cactus saguaro",
+  "item.dynamictreesplus.pillar_cactus_seed": "Graine de cactus pilier",
+  "item.dynamictreesplus.pipe_cactus_seed": "Graine de cactus orgue",
+  "item.dynamictreesplus.brown_mushroom_seed": "Chapeau de champignon brun",
+  "item.dynamictreesplus.red_mushroom_seed": "Chapeau de champignon rouge",
+  "item.dynamictreesplus.chorus_seed": "Graine de chorus"
 }

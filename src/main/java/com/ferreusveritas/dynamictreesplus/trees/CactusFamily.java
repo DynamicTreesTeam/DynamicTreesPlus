@@ -2,15 +2,11 @@ package com.ferreusveritas.dynamictreesplus.trees;
 
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
-import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.trees.Family;
-import com.ferreusveritas.dynamictreesplus.DynamicTreesPlus;
 import com.ferreusveritas.dynamictreesplus.blocks.CactusBranchBlock;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.util.ResourceLocation;
-
-import java.util.Objects;
 
 public class CactusFamily extends Family {
 
@@ -18,11 +14,6 @@ public class CactusFamily extends Family {
 
     public CactusFamily(final ResourceLocation registryName) {
         super(registryName);
-    }
-
-    @Override
-    public LeavesProperties getCommonLeaves() {
-        return Objects.requireNonNull(LeavesProperties.REGISTRY.get(DynamicTreesPlus.resLoc("bare")));
     }
 
     @Override

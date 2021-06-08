@@ -107,7 +107,7 @@ public class CactusBranchBlock extends BranchBlock {
 	///////////////////////////////////////////
 
 	@Override
-	public boolean checkForRot(IWorld world, BlockPos pos, Species species, int radius, Random rand, float chance, boolean rapid) {
+	public boolean checkForRot(IWorld world, BlockPos pos, Species species, int radius, int fertility, Random rand, float chance, boolean rapid) {
 		return false;//Do nothing.  Cacti don't rot
 	}
 

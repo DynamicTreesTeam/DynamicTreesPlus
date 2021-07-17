@@ -5,8 +5,8 @@ import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
+import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilHelper;
 import com.ferreusveritas.dynamictrees.event.SpeciesPostGenerationEvent;
-import com.ferreusveritas.dynamictrees.systems.DirtHelper;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.FindEndsNode;
 import com.ferreusveritas.dynamictrees.trees.Family;
@@ -83,7 +83,7 @@ public class CactusSpecies extends Species {
 
     @Override
     protected void setStandardSoils() {
-        this.addAcceptableSoils(DirtHelper.SAND_LIKE);
+        this.addAcceptableSoils(SoilHelper.SAND_LIKE);
     }
 
     @Override
@@ -136,7 +136,7 @@ public class CactusSpecies extends Species {
         }
 
         @Override
-        public void generate(World worldObj, IWorld world, Species species, BlockPos rootPos, Biome biome, Direction facing, int radius, SafeChunkBounds safeBounds) {
+        public void generate(World worldObj, IWorld world, Species species, BlockPos rootPos, Biome biome, Direction facing, int radius, SafeChunkBounds safeBounds, boolean secondChanceRegen) {
             BlockState initialDirtState = world.getBlockState(rootPos); // Save the initial state of the dirt in case this fails
             species.placeRootyDirtBlock(world, rootPos, 0); // Set to unfertilized rooty dirt
 

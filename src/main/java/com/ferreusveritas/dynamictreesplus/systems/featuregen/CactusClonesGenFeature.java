@@ -2,10 +2,10 @@ package com.ferreusveritas.dynamictreesplus.systems.featuregen;
 
 import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
 import com.ferreusveritas.dynamictrees.api.IPostGrowFeature;
+import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureProperty;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
@@ -24,11 +24,16 @@ import java.util.List;
 
 public class CactusClonesGenFeature extends GenFeature implements IPostGenFeature, IPostGrowFeature {
 
-    public static final GenFeatureProperty<Float> CHANCE_ON_GROW = GenFeatureProperty.createFloatProperty("chance_on_grow");
-    public static final GenFeatureProperty<CactusBranchBlock.CactusThickness> TRUNK_TYPE = GenFeatureProperty.createProperty("trunk_type", CactusBranchBlock.CactusThickness.class);
+    public static final ConfigurationProperty<Float> CHANCE_ON_GROW = ConfigurationProperty.floatProperty("chance_on_grow");
+    public static final ConfigurationProperty<CactusBranchBlock.CactusThickness> TRUNK_TYPE = ConfigurationProperty.property("trunk_type", CactusBranchBlock.CactusThickness.class);
 
     public CactusClonesGenFeature(ResourceLocation registryName) {
-        super(registryName, CHANCE_ON_GROW, TRUNK_TYPE);
+        super(registryName);
+    }
+
+    @Override
+    protected void registerProperties() {
+        this.register(CHANCE_ON_GROW, TRUNK_TYPE);
     }
 
     @Override

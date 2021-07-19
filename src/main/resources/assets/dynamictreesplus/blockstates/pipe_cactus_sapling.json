@@ -1,5 +1,5 @@
 {
     "variants": {
-        "": { "model": "dynamictreesplus:block/saplings/cactus" }
+        "": { "model": "dynamictreesplus:block/saplings/pipe_cactus" }
     }
 }

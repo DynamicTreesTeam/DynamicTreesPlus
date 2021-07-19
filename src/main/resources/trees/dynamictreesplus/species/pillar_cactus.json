@@ -4,10 +4,19 @@
   "always_show_on_waila": true,
   "generate_seed": true,
   "generate_sapling": true,
+  "sapling_shape": "dynamictreesplus:tall_cactus",
   "signal_energy": 8,
   "growth_rate": 1,
   "soil_longevity": 1,
-  "seed_per_branch": 1,
+  "drop_creators": [
+    "log",
+    {
+      "name": "dynamictreesplus:cactus_seeds",
+      "properties": {
+        "seeds_per_branch": 1.0
+      }
+    }
+  ],
   "cactus_thickness_logic": "dynamictreesplus:pillar",
   "mega_species": "dynamictreesplus:mega_cactus"
 }

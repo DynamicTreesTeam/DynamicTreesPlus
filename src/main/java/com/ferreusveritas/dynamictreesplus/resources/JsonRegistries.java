@@ -24,8 +24,7 @@ public final class JsonRegistries {
         if (!event.isReloadApplier())
             return;
 
-        event.getApplierList().register("seed_per_branch", CactusSpecies.class, Float.class, CactusSpecies::setSeedPerBranch)
-                .register("cactus_thickness_logic", CactusSpecies.class, CactusThicknessLogic.class, CactusSpecies::setThicknessLogic);
+        event.getApplierList().register("cactus_thickness_logic", CactusSpecies.class, CactusThicknessLogic.class, CactusSpecies::setThicknessLogic);
     }
 
     @SubscribeEvent

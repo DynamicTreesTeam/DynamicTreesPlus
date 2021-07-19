@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictreesplus;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
 import com.ferreusveritas.dynamictreesplus.init.DTPClient;
 import com.ferreusveritas.dynamictreesplus.init.DTPConfigs;
+import com.ferreusveritas.dynamictreesplus.init.DTPRegistries;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -24,6 +25,8 @@ public class DynamicTreesPlus {
         modBus.addListener(this::clientSetup);
 
         RegistryHandler.setup(MOD_ID);
+
+        DTPRegistries.setup();
     }
 
     private void clientSetup(final FMLClientSetupEvent event) {

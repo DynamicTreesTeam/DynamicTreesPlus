@@ -8,6 +8,7 @@ import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilHelper;
 import com.ferreusveritas.dynamictrees.event.SpeciesPostGenerationEvent;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreators;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.FindEndsNode;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -17,17 +18,14 @@ import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.ferreusveritas.dynamictreesplus.blocks.CactusBranchBlock;
 import com.ferreusveritas.dynamictreesplus.init.DTPConfigs;
 import com.ferreusveritas.dynamictreesplus.init.DTPRegistries;
-import com.ferreusveritas.dynamictreesplus.systems.dropcreators.CactusSeedDropCreator;
+import com.ferreusveritas.dynamictreesplus.systems.dropcreators.DTPDropCreators;
 import com.ferreusveritas.dynamictreesplus.systems.thicknesslogic.CactusThicknessLogic;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SoundType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -40,19 +38,18 @@ public class CactusSpecies extends Species {
 
     public static final TypedRegistry.EntryType<Species> TYPE = createDefaultType(CactusSpecies::new);
 
-    private final CactusSeedDropCreator cactusSeedDropCreator = new CactusSeedDropCreator();
     private CactusThicknessLogic thicknessLogic;
 
     public CactusSpecies(ResourceLocation name, Family family, LeavesProperties leavesProperties) {
         super(name, family, leavesProperties);
-
-        this.addDropCreator(this.cactusSeedDropCreator);
     }
 
     @Override
-    public Species setPreReloadDefaults() { ;
+    public Species setPreReloadDefaults() {
         this.setTransformable(false);
-        return super.setPreReloadDefaults().envFactor(BiomeDictionary.Type.SNOWY, 0.25f).envFactor(BiomeDictionary.Type.COLD, 0.5f)
+        this.addDropCreators(DropCreators.LOG, DTPDropCreators.CACTUS_SEEDS);
+        return this.setSaplingShape(DTPRegistries.MEDIUM_CACTUS_SAPLING_SHAPE).setSaplingSound(SoundType.WOOL).setDefaultGrowingParameters().
+                envFactor(BiomeDictionary.Type.SNOWY, 0.25f).envFactor(BiomeDictionary.Type.COLD, 0.5f)
                 .envFactor(BiomeDictionary.Type.SANDY, 1.05f).setGrowthLogicKit(DTPRegistries.PILLAR_LOGIC);
     }
 
@@ -63,10 +60,6 @@ public class CactusSpecies extends Species {
             this.thicknessLogic = CactusThicknessLogic.REGISTRY.get(this.getRegistryName());
 
         return super.setPostReloadDefaults();
-    }
-
-    public void setSeedPerBranch(float seedsPerBranch) {
-        this.cactusSeedDropCreator.setSeedPerBranch(seedsPerBranch);
     }
 
     public void setThicknessLogic(CactusThicknessLogic thicknessLogic) {
@@ -118,15 +111,6 @@ public class CactusSpecies extends Species {
     @Override
     public boolean canBoneMealTree() {
         return DTPConfigs.canBoneMealCactus.get();
-    }
-
-    @Override
-    public VoxelShape getSaplingShape() {
-        return VoxelShapes.create(new AxisAlignedBB(0.375f, 0.0f, 0.375f, 0.625f, 0.5f, 0.625f));
-    }
-
-    public SoundType getSaplingSound() {
-        return SoundType.WOOL;
     }
 
     private static class JoCodeCactus extends JoCode {

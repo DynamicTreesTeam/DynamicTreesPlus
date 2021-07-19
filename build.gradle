@@ -136,8 +136,8 @@ dependencies {
     // At runtime, use Patchouli mod (for the guide book, which is Json so we don't need the API).
     runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:${property("patchouliVersion")}")
 
-    // Compile full Serene Seasons mod and use in runtime.
-    implementation fg.deobf("curse.maven:SereneSeasons-291874:3179424")
+    // Runtime only serene seasons
+    runtimeOnly fg.deobf("curse.maven:SereneSeasons-291874:3202233")
 
     // Compile Dynamic Trees, of course
     implementation fg.deobf("com.ferreusveritas.dynamictrees:DynamicTrees-${mcVersion}:${property("dynamicTreesVersion")}")
@@ -168,6 +168,10 @@ jar.finalizedBy('reobfJar')
 
 java {
     withSourcesJar()
+}
+
+tasks.withType(GenerateModuleMetadata) {
+    enabled = false
 }
 
 publishing {

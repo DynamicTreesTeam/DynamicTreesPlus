@@ -6,9 +6,11 @@ import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilHelper;
+import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
 import com.ferreusveritas.dynamictrees.event.SpeciesPostGenerationEvent;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreators;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGenerationContext;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.FindEndsNode;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -141,7 +143,9 @@ public class CactusSpecies extends Species {
                 List<BlockPos> endPoints = endFinder.getEnds();
 
                 // Allow for special decorations by the tree itself
-                species.postGeneration(worldObj, world, rootPos, biome, radius, endPoints, safeBounds, initialDirtState);
+                species.postGeneration(new PostGenerationContext(world, rootPos, species, biome, radius, endPoints,
+                        safeBounds, initialDirtState, SeasonHelper.getSeasonValue(worldObj, rootPos),
+                        species.seasonalFruitProductionFactor(worldObj, rootPos)));
                 MinecraftForge.EVENT_BUS.post(new SpeciesPostGenerationEvent(world, species, rootPos, endPoints, safeBounds, initialDirtState));
             } else { // The growth failed.. turn the soil back to what it was
                 world.setBlock(rootPos, initialDirtState, careful ? 3 : 2);

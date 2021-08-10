@@ -2,10 +2,10 @@
 	"credit": "Made with Blockbench",
 	"parent": "block/block",
 	"textures": {
-		"particle": "block/cactus_side",
-		"side": "block/cactus_side",
-		"top": "block/cactus_top",
-		"bottom": "block/cactus_bottom"
+		"particle": "block/stone",
+		"side": "block/stone",
+		"top": "block/stone",
+		"bottom": "block/stone"
 	},
 	"elements": [
 		{

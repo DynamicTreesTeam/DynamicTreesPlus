@@ -1,7 +1,0 @@
-{
-    "loader": "dynamictreesplus:cactus",
-    "textures": {
-        "bark": "block/cactus_side",
-        "rings": "block/cactus_top"
-    }
-}

@@ -1,0 +1,9 @@
+{
+  "parent": "dynamictreesplus:block/smart_model/pillar_cactus",
+  "textures": {
+    "particle": "minecraft:block/cactus_side",
+    "side": "minecraft:block/cactus_side",
+    "top": "minecraft:block/cactus_top",
+    "bottom": "minecraft:block/cactus_bottom"
+  }
+}

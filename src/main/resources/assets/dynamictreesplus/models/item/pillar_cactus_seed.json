@@ -1,6 +1,0 @@
-{
-    "parent":"dynamictrees:item/standard_seed",
-    "textures": {
-        "layer0":"dynamictreesplus:item/pillar_cactus_seed"
-    }
-}

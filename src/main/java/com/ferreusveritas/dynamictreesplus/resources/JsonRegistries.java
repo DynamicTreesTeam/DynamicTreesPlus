@@ -20,11 +20,9 @@ public final class JsonRegistries {
 
     @SubscribeEvent
     public static void registerAppliers(final JsonApplierRegistryEvent<Species> event) {
-        // Add to reload appliers only.
-        if (!event.isReloadApplier())
-            return;
-
-        event.getApplierList().register("cactus_thickness_logic", CactusSpecies.class, CactusThicknessLogic.class, CactusSpecies::setThicknessLogic);
+        if (event.isReloadApplier() || event.getApplierListIdentifier().endsWith(JsonApplierRegistryEvent.GATHER_DATA_SUFFIX)) {
+            event.getApplierList().register("cactus_thickness_logic", CactusSpecies.class, CactusThicknessLogic.class, CactusSpecies::setThicknessLogic);
+        }
     }
 
     @SubscribeEvent

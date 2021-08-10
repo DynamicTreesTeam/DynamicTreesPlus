@@ -2,6 +2,10 @@ package com.ferreusveritas.dynamictreesplus;
 
 import com.ferreusveritas.dynamictrees.api.GatherDataHelper;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
+import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
+import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilProperties;
+import com.ferreusveritas.dynamictrees.trees.Family;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictreesplus.init.DTPClient;
 import com.ferreusveritas.dynamictreesplus.init.DTPConfigs;
 import com.ferreusveritas.dynamictreesplus.init.DTPRegistries;
@@ -37,7 +41,14 @@ public class DynamicTreesPlus {
     }
 
     private void gatherData(final GatherDataEvent event) {
-        GatherDataHelper.gatherAllData(MOD_ID, event);
+        GatherDataHelper.gatherAllData(
+                MOD_ID,
+                event,
+                SoilProperties.REGISTRY,
+                Family.REGISTRY,
+                Species.REGISTRY,
+                LeavesProperties.REGISTRY
+        );
     }
 
     public static ResourceLocation resLoc (final String path) {

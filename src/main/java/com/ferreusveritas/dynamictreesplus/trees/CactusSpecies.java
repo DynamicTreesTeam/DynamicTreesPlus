@@ -3,12 +3,9 @@ package com.ferreusveritas.dynamictreesplus.trees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
-import com.ferreusveritas.dynamictrees.blocks.DynamicSaplingBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilHelper;
-import com.ferreusveritas.dynamictrees.data.provider.DTBlockStateProvider;
-import com.ferreusveritas.dynamictrees.data.provider.TriGenerator;
 import com.ferreusveritas.dynamictrees.event.SpeciesPostGenerationEvent;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreators;
@@ -16,7 +13,6 @@ import com.ferreusveritas.dynamictrees.systems.nodemappers.FindEndsNode;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
-import com.ferreusveritas.dynamictrees.util.Optionals;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.ferreusveritas.dynamictreesplus.DynamicTreesPlus;
@@ -25,7 +21,6 @@ import com.ferreusveritas.dynamictreesplus.init.DTPConfigs;
 import com.ferreusveritas.dynamictreesplus.init.DTPRegistries;
 import com.ferreusveritas.dynamictreesplus.systems.dropcreators.DTPDropCreators;
 import com.ferreusveritas.dynamictreesplus.systems.thicknesslogic.CactusThicknessLogic;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SoundType;
 import net.minecraft.util.Direction;
@@ -35,16 +30,12 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-import net.minecraftforge.client.model.generators.BlockModelBuilder;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.MinecraftForge;
 
-import javax.annotation.Nullable;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.function.BiConsumer;
 
-import static com.ferreusveritas.dynamictrees.util.ResourceLocationUtils.prefix;
 import static com.ferreusveritas.dynamictrees.util.ResourceLocationUtils.suffix;
 
 public class CactusSpecies extends Species {
@@ -55,37 +46,6 @@ public class CactusSpecies extends Species {
 
     public CactusSpecies(ResourceLocation name, Family family, LeavesProperties leavesProperties) {
         super(name, family, leavesProperties);
-
-        this.saplingStateGenerator.reset(() -> new TriGenerator<DTBlockStateProvider, DynamicSaplingBlock, Block, Block>() {
-            @Override
-            public void generate(DTBlockStateProvider provider, DynamicSaplingBlock sapling, Block primitiveLog, @Nullable Block primitiveLeaves) {
-                final BlockModelBuilder builder = provider.models().getBuilder(
-                        "block/saplings/" + CactusSpecies.this.getRegistryName().getPath()
-                ).parent(provider.models().getExistingFile(CactusSpecies.this.getSaplingSmartModelLocation()));
-                CactusSpecies.this.addSaplingTextures(builder, null, provider.block(primitiveLog.getRegistryName()));
-                provider.simpleBlock(sapling, builder);
-            }
-
-            @Override
-            public void generate(DTBlockStateProvider provider, Optional<DynamicSaplingBlock> sapling, Optional<Block> primitiveLog, Optional<Block> primitiveLeaves) {
-                // Cacti don't have primitive leaves.
-                // TODO: Make a cleaner way of doing this: set of customisable conditions for generators?
-                Optionals.ifAllPresent(
-                        (a, b) -> this.generate(provider, a, b, null),
-                        sapling,
-                        primitiveLog
-                );
-            }
-        });
-    }
-
-    @Override
-    protected void addSaplingTextures(BlockModelBuilder builder, @Nullable ResourceLocation leavesTextureLocation, ResourceLocation barkTextureLocation) {
-        final ResourceLocation sideTextureLocation = suffix(barkTextureLocation, "_side");
-        builder.texture("particle", sideTextureLocation)
-                .texture("side", sideTextureLocation)
-                .texture("top", suffix(barkTextureLocation, "_top"))
-                .texture("bottom", suffix(barkTextureLocation, "_bottom"));
     }
 
     @Override
@@ -218,6 +178,15 @@ public class CactusSpecies extends Species {
     @Override
     public ResourceLocation getSaplingSmartModelLocation() {
         return DynamicTreesPlus.resLoc("block/smart_model/" + this.thicknessLogic.getRegistryName().getPath() + "_cactus");
+    }
+
+    @Override
+    public void addSaplingTextures(BiConsumer<String, ResourceLocation> textureConsumer, ResourceLocation leavesTextureLocation, ResourceLocation barkTextureLocation) {
+        final ResourceLocation sideTextureLocation = suffix(barkTextureLocation, "_side");
+        textureConsumer.accept("particle", sideTextureLocation);
+        textureConsumer.accept("side", sideTextureLocation);
+        textureConsumer.accept("top", suffix(barkTextureLocation, "_top"));
+        textureConsumer.accept("bottom", suffix(barkTextureLocation, "_bottom"));
     }
 
 }

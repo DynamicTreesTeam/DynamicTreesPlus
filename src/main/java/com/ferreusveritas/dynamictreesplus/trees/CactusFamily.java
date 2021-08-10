@@ -56,7 +56,7 @@ public class CactusFamily extends Family {
     }
 
     @Override
-    protected void addBranchTextures(BiConsumer<String, ResourceLocation> textureConsumer, ResourceLocation primitiveLogLocation) {
+    public void addBranchTextures(BiConsumer<String, ResourceLocation> textureConsumer, ResourceLocation primitiveLogLocation) {
         textureConsumer.accept("bark", suffix(primitiveLogLocation, "_side"));
         textureConsumer.accept("rings", suffix(primitiveLogLocation, "_top"));
     }

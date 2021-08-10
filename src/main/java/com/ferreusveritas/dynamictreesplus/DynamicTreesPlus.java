@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictreesplus;
 
+import com.ferreusveritas.dynamictrees.api.GatherDataHelper;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
 import com.ferreusveritas.dynamictreesplus.init.DTPClient;
 import com.ferreusveritas.dynamictreesplus.init.DTPConfigs;
@@ -10,6 +11,7 @@ import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.GatherDataEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 @Mod(DynamicTreesPlus.MOD_ID)
@@ -23,6 +25,7 @@ public class DynamicTreesPlus {
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, DTPConfigs.SERVER_CONFIG);
 
         modBus.addListener(this::clientSetup);
+        modBus.addListener(this::gatherData);
 
         RegistryHandler.setup(MOD_ID);
 
@@ -31,6 +34,10 @@ public class DynamicTreesPlus {
 
     private void clientSetup(final FMLClientSetupEvent event) {
         DTPClient.setup();
+    }
+
+    private void gatherData(final GatherDataEvent event) {
+        GatherDataHelper.gatherAllData(MOD_ID, event);
     }
 
     public static ResourceLocation resLoc (final String path) {

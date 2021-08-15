@@ -1,0 +1,15 @@
+{
+  "block.dynamictreesplus.cactus_branch": "仙人掌",
+
+  "species.dynamictreesplus.saguaro_cactus": "柱狀仙人掌",
+  "species.dynamictreesplus.pillar_cactus": "高柱仙人掌",
+  "species.dynamictreesplus.pipe_cactus": "管狀仙人掌",
+  "species.dynamictreesplus.mega_cactus": "巨管仙人掌",
+
+  "item.dynamictreesplus.saguaro_cactus_seed": "柱狀仙人掌籽",
+  "item.dynamictreesplus.pillar_cactus_seed": "高柱仙人掌籽",
+  "item.dynamictreesplus.pipe_cactus_seed": "管狀仙人掌籽",
+  "item.dynamictreesplus.brown_mushroom_seed": "棕色蘑菇菌傘",
+  "item.dynamictreesplus.red_mushroom_seed": "紅色蘑菇菌傘",
+  "item.dynamictreesplus.chorus_seed": "歌萊籽"
+}

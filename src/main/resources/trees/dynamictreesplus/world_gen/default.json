@@ -23,7 +23,7 @@
 	},
 	{
 		"__comment" : "This applies to badlands only (not the mesa)",
-		"select": { "name": "minecraft:badlands" },
+		"select": { "names": [ "minecraft:.*badlands.*", "!minecraft:.*badlands_plateau" ] },
 		"apply": {
 			"species" : "dynamictreesplus:saguaro_cactus",
 			"density" : { "math": { "add" : [ { "mul" : [ "noise", 0.6 ] }, 0.4 ] } },

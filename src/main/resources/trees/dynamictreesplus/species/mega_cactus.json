@@ -17,6 +17,11 @@
       }
     }
   ],
-  "growth_logic_kit": "dynamictreesplus:mega_cactus",
+  "growth_logic_kit": {
+    "name": "dynamictreesplus:mega_cactus",
+    "properties": {
+      "mod": 6
+    }
+  },
   "cactus_thickness_logic": "dynamictreesplus:mega"
 }

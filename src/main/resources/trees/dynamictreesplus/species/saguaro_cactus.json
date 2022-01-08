@@ -14,7 +14,12 @@
     "log",
     "dynamictreesplus:cactus_seeds"
   ],
-  "growth_logic_kit": "dynamictreesplus:saguaro_cactus",
+  "growth_logic_kit": {
+    "name": "dynamictreesplus:saguaro_cactus",
+    "properties": {
+      "mod": 3
+    }
+  },
   "cactus_thickness_logic": "dynamictreesplus:saguaro",
   "mega_species": "dynamictreesplus:mega_cactus",
   "common_override": { "type": "mesa" },

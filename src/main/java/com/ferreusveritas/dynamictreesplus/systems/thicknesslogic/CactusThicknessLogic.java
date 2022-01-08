@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictreesplus.systems.thicknesslogic;
 
 import com.ferreusveritas.dynamictrees.api.registry.Registry;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
+import com.ferreusveritas.dynamictrees.api.registry.SimpleRegistry;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictreesplus.DynamicTreesPlus;
 import com.ferreusveritas.dynamictreesplus.blocks.CactusBranchBlock;
@@ -17,7 +18,7 @@ public abstract class CactusThicknessLogic extends RegistryEntry<CactusThickness
         @Override public CactusBranchBlock.CactusThickness thicknessForBranchPlaced(IWorld world, BlockPos pos, boolean isLast) { return CactusBranchBlock.CactusThickness.BRANCH; }
     };
 
-    public static final Registry<CactusThicknessLogic> REGISTRY = new Registry<>(CactusThicknessLogic.class, NULL_LOGIC);
+    public static final Registry<CactusThicknessLogic> REGISTRY = new SimpleRegistry<>(CactusThicknessLogic.class, NULL_LOGIC);
 
     public CactusThicknessLogic(ResourceLocation registryName) {
         super(registryName);

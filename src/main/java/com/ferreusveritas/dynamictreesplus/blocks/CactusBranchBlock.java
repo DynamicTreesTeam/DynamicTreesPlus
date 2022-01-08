@@ -2,13 +2,14 @@ package com.ferreusveritas.dynamictreesplus.blocks;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.cells.Cell;
 import com.ferreusveritas.dynamictrees.api.cells.CellNull;
-import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
-import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
+import com.ferreusveritas.dynamictrees.api.treedata.TreePart;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
+import com.ferreusveritas.dynamictrees.growthlogic.context.DirectionSelectionContext;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -19,8 +20,7 @@ import com.ferreusveritas.dynamictreesplus.trees.CactusSpecies;
 import com.google.common.base.Predicate;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ItemEntity;
@@ -41,7 +41,6 @@ import net.minecraft.world.IBlockDisplayReader;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
-import net.minecraftforge.common.ToolType;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -96,10 +95,10 @@ public class CactusBranchBlock extends BranchBlock {
 
 	@Override
 	public float getHardness(IBlockReader worldIn, BlockPos pos) {
-		int radius = getRadius(worldIn.getBlockState(pos));
-		float hardness = getFamily().getPrimitiveLog().getBlock().defaultBlockState().getDestroySpeed(worldIn, pos) * (radius * radius) / 64.0f * 8.0f;
-		hardness = (float) Math.min(hardness, DTConfigs.MAX_TREE_HARDNESS.get());//So many youtube let's plays start with "OMG, this is taking so long to break this tree!"
-		return hardness;
+		final int radius = this.getRadius(worldIn.getBlockState(pos));
+		final float hardness = this.getFamily().getPrimitiveLog().orElse(Blocks.AIR).defaultBlockState()
+				.getDestroySpeed(worldIn, pos) * (radius * radius) / 64.0f * 8.0f;
+		return (float) Math.min(hardness, DTConfigs.MAX_TREE_HARDNESS.get()); // So many youtube let's plays start with "OMG, this is taking so long to break this tree!"
 	}
 
 	///////////////////////////////////////////
@@ -154,7 +153,7 @@ public class CactusBranchBlock extends BranchBlock {
 	///////////////////////////////////////////
 
 	@Override
-	public ICell getHydrationCell(IBlockReader blockAccess, BlockPos pos, BlockState blockState, Direction dir, LeavesProperties leavesProperties) {
+	public Cell getHydrationCell(IBlockReader blockAccess, BlockPos pos, BlockState blockState, Direction dir, LeavesProperties leavesProperties) {
 		return CellNull.NULL_CELL;
 	}
 
@@ -214,14 +213,16 @@ public class CactusBranchBlock extends BranchBlock {
 			Species species = signal.getSpecies();
 
 			//Direction originDir = signal.dir.getOpposite(); // Direction this signal originated from
-			Direction targetDir = species.selectNewDirection(world, pos, this, signal); // This must be cached on the stack for proper recursion
+			Direction targetDir = species.getGrowthLogicKit().selectNewDirection(
+					new DirectionSelectionContext(world, pos, signal.getSpecies(), this, signal)
+			); // This must be cached on the stack for proper recursion
 			signal.doTurn(targetDir);
 
 			BlockPos deltaPos = pos.relative(targetDir);
 			BlockState deltaState = world.getBlockState(deltaPos);
 
 			// Pass grow signal to next block in path
-			ITreePart treepart = TreeHelper.getTreePart(deltaState);
+			TreePart treepart = TreeHelper.getTreePart(deltaState);
 
 			if (treepart == this) {
 				signal = treepart.growSignal(world, deltaPos, signal); // Recurse
@@ -338,7 +339,7 @@ public class CactusBranchBlock extends BranchBlock {
 					BlockState deltaState = world.getBlockState(deltaPos);
 
 					if (deltaState.getBlock() == this && deltaState.getValue(ORIGIN) == dir.getOpposite()) {
-						signal = ((ITreePart) deltaState.getBlock()).analyse(deltaState, world, deltaPos, dir.getOpposite(), signal);
+						signal = ((TreePart) deltaState.getBlock()).analyse(deltaState, world, deltaPos, dir.getOpposite(), signal);
 					} else if (state.getBlock() == this && state.getValue(ORIGIN) == dir) {
 						signal = TreeHelper.getTreePart(deltaState).analyse(deltaState, world, deltaPos, dir.getOpposite(), signal);
 					}

@@ -31,8 +31,7 @@ import net.minecraftforge.fml.common.Mod;
 @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
 public class DTPRegistries {
 
-    public static final CactusLogic PILLAR_LOGIC = new CactusLogic(DynamicTreesPlus.resLoc("pillar_cactus"), 5);
-    public static final CactusLogic PIPE_LOGIC = new CactusLogic(DynamicTreesPlus.resLoc("pipe_cactus"), 3);
+    public static final CactusLogic CACTUS_LOGIC = new CactusLogic(DynamicTreesPlus.resLoc("cactus"));
     public static final SaguaroCactusLogic SAGUARO_CACTUS_LOGIC = new SaguaroCactusLogic(DynamicTreesPlus.resLoc("saguaro_cactus"));
     public static final MegaCactusLogic MEGA_CACTUS_LOGIC = new MegaCactusLogic(DynamicTreesPlus.resLoc("mega_cactus"));
 
@@ -53,7 +52,7 @@ public class DTPRegistries {
 
     @SubscribeEvent
     public static void registerGrowthLogic(final RegistryEvent<GrowthLogicKit> event) {
-        event.getRegistry().registerAll(PILLAR_LOGIC, PIPE_LOGIC, SAGUARO_CACTUS_LOGIC, MEGA_CACTUS_LOGIC);
+        event.getRegistry().registerAll(CACTUS_LOGIC, SAGUARO_CACTUS_LOGIC, MEGA_CACTUS_LOGIC);
     }
 
     @SubscribeEvent

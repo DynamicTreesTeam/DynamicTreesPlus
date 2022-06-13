@@ -22,6 +22,7 @@ apply {
 }
 
 repositories {
+    mavenLocal()
     maven("https://ldtteam.jfrog.io/ldtteam/modding/")
     maven("https://maven.tehnut.info")
     maven("https://www.cursemaven.com") {
@@ -137,8 +138,8 @@ dependencies {
     // At runtime use, CC for creating growth chambers.
     runtimeOnly(fg.deobf("org.squiddev:cc-tweaked-$mcVersion:${property("ccVersion")}"))
 
-//    implementation(fg.deobf("com.ferreusveritas.dynamictrees:DynamicTrees-${mcVersion}:${property("dynamicTreesVersion")}"))
-    implementation(fg.deobf("curse.maven:dynamictrees-252818:3815249"))
+    implementation(fg.deobf("com.ferreusveritas.dynamictrees:DynamicTrees-${mcVersion}:${property("dynamicTreesVersion")}"))
+//    implementation(fg.deobf("curse.maven:dynamictrees-252818:3815249"))
     // At runtime, use suggestion provider fix mod.
 //    runtimeOnly(fg.deobf("com.harleyoconnor.suggestionproviderfix:SuggestionProviderFix:${mcVersion}-${property("suggestionProviderFixVersion")}"))
     runtimeOnly(fg.deobf("curse.maven:suggestionproviderfix-469647:3623382"))

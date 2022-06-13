@@ -2,21 +2,20 @@ package com.ferreusveritas.dynamictreesplus.worldgen.canceller;
 
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
-import net.minecraft.block.Block;
-import net.minecraft.block.CactusBlock;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.gen.blockstateprovider.BlockStateProvider;
-import net.minecraft.world.gen.blockstateprovider.SimpleBlockStateProvider;
-import net.minecraft.world.gen.feature.BlockClusterFeatureConfig;
-import net.minecraft.world.gen.feature.ConfiguredFeature;
-import net.minecraft.world.gen.feature.DecoratedFeatureConfig;
-import net.minecraft.world.gen.feature.IFeatureConfig;
+import net.minecraft.data.worldgen.features.VegetationFeatures;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.CactusBlock;
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
+import net.minecraft.world.level.levelgen.feature.configurations.RandomPatchConfiguration;
+import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
+import net.minecraft.world.level.levelgen.feature.stateproviders.SimpleStateProvider;
 
 import java.util.Random;
 
 /**
- * This class cancels any features that have a config that extends {@link BlockClusterFeatureConfig} and that
+ * This class cancels any features that have a config that extends {@link RandomPatchConfiguration} and that
  * has a block set within that class that extends the cactus block class given (by default {@link CactusBlock}).
  *
  * @author Harley O'Connor
@@ -34,32 +33,25 @@ public class CactusFeatureCanceller<T extends Block> extends FeatureCanceller {
 
     @Override
     public boolean shouldCancel(ConfiguredFeature<?, ?> configuredFeature, BiomePropertySelectors.FeatureCancellations featureCancellations) {
-        IFeatureConfig featureConfig = configuredFeature.config;
+        FeatureConfiguration featureConfig = configuredFeature.config();
 
-        if (!(featureConfig instanceof DecoratedFeatureConfig))
-            return false;
 
-        featureConfig = ((DecoratedFeatureConfig) featureConfig).feature.get().config;
-
-        if (!(featureConfig instanceof DecoratedFeatureConfig))
-            return false;
-
-        final ConfiguredFeature<?, ?> currentConfiguredFeature = ((DecoratedFeatureConfig) featureConfig).feature.get();
-        final ResourceLocation featureResLoc = currentConfiguredFeature.feature.getRegistryName();
-        featureConfig = currentConfiguredFeature.config;
-
-        if (!(featureConfig instanceof BlockClusterFeatureConfig))
-            return false;
-
-        final BlockClusterFeatureConfig blockClusterFeatureConfig = ((BlockClusterFeatureConfig) featureConfig);
-        final BlockStateProvider stateProvider = blockClusterFeatureConfig.stateProvider;
-
-        if (!(stateProvider instanceof SimpleBlockStateProvider))
-            return false;
+//        final ConfiguredFeature<?, ?> currentConfiguredFeature =  featureConfig.getFeatures().findFirst().get();
+//        final ResourceLocation featureResLoc = currentConfiguredFeature.feature().getRegistryName();
+//        featureConfig = currentConfiguredFeature.config();
+//
+//        if (!(featureConfig instanceof RandomPatchConfiguration))
+//            return false;
+//
+//        final RandomPatchConfiguration blockClusterFeatureConfig = ((RandomPatchConfiguration) featureConfig);
+//        final BlockStateProvider stateProvider = blockClusterFeatureConfig.feature().value().;
+        boolean isCactus = configuredFeature.feature() == VegetationFeatures.PATCH_CACTUS.value().feature();
+//        if (!(stateProvider instanceof SimpleStateProvider))
+//            return false;
 
         // SimpleBlockStateProvider does not use random or BlockPos in getBlockState, so giving null is safe.
-        return this.cactusBlockClass.isInstance(stateProvider.getState(PLACEHOLDER_RAND, BlockPos.ZERO).getBlock())
-                && featureResLoc != null && featureCancellations.shouldCancelNamespace(featureResLoc.getNamespace());
+        return isCactus;/*this.cactusBlockClass.isInstance(stateProvider.getState(PLACEHOLDER_RAND, BlockPos.ZERO).getBlock())
+                && featureResLoc != null && featureCancellations.shouldCancelNamespace(featureResLoc.getNamespace());*/
     }
 
 }

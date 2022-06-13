@@ -1,6 +1,6 @@
 @MethodsReturnNonnullByDefault @ParametersAreNonnullByDefault
 package com.ferreusveritas.dynamictreesplus.models.bakedmodels;
 
-import mcp.MethodsReturnNonnullByDefault;
+import net.minecraft.MethodsReturnNonnullByDefault;
 
 import javax.annotation.ParametersAreNonnullByDefault;

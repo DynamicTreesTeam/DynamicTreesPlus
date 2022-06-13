@@ -9,14 +9,14 @@ import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictreesplus.init.DTPClient;
 import com.ferreusveritas.dynamictreesplus.init.DTPConfigs;
 import com.ferreusveritas.dynamictreesplus.init.DTPRegistries;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.GatherDataEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 
 @Mod(DynamicTreesPlus.MOD_ID)
 public class DynamicTreesPlus {

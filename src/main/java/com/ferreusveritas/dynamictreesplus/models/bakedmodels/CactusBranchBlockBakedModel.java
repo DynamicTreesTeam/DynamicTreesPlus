@@ -7,20 +7,23 @@ import com.ferreusveritas.dynamictrees.models.modeldata.ModelConnections;
 import com.ferreusveritas.dynamictreesplus.blocks.CactusBranchBlock;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.renderer.model.*;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.VertexFormatElement;
+import com.mojang.math.Vector3f;
+import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.client.renderer.vertex.VertexFormatElement;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Direction.Axis;
-import net.minecraft.util.Direction.AxisDirection;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.math.vector.Vector3f;
-import net.minecraft.world.IBlockDisplayReader;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.BlockModelRotation;
+import net.minecraft.client.resources.model.SimpleBakedModel;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.core.Direction.AxisDirection;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.data.IModelData;
@@ -33,14 +36,15 @@ import java.util.*;
 @OnlyIn(Dist.CLIENT)
 public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
 
+
     private TextureAtlasSprite barkTexture;
 
     // Not as many baked models as normal branches, although each model has more quads. Still less quads in total, though.
-    private final IBakedModel[][] sleeves = new IBakedModel[6][3];
-    private final IBakedModel[][] cores = new IBakedModel[3][3]; // 3 Cores for 3 axis with the bark texture all all 6 sides rotated appropriately.
-    private final IBakedModel[] rings = new IBakedModel[3]; // 3 Cores with the ring textures on all 6 sides
-    private final IBakedModel[] coreSpikes = new IBakedModel[3]; // 3 cores with only the spikey edges
-    private IBakedModel sleeveTopSpikes;
+    private final BakedModel[][] sleeves = new BakedModel[6][3];
+    private final BakedModel[][] cores = new BakedModel[3][3]; // 3 Cores for 3 axis with the bark texture all all 6 sides rotated appropriately.
+    private final BakedModel[] rings = new BakedModel[3]; // 3 Cores with the ring textures on all 6 sides
+    private final BakedModel[] coreSpikes = new BakedModel[3]; // 3 cores with only the spikey edges
+    private BakedModel sleeveTopSpikes;
 
     int[] radii = {4,5,7};
 
@@ -71,9 +75,9 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
         }
     }
 
-    private void putVertex(BakedQuadBuilder builder, Vector3d normal, double x, double y, double z, float u, float v, TextureAtlasSprite sprite, float r, float g, float b) {
+    private void putVertex(BakedQuadBuilder builder, Vec3 normal, double x, double y, double z, float u, float v, TextureAtlasSprite sprite, float r, float g, float b) {
 
-        final ImmutableList<VertexFormatElement> elements = DefaultVertexFormats.BLOCK.getElements().asList();
+        final ImmutableList<VertexFormatElement> elements = DefaultVertexFormat.BLOCK.getElements().asList();
         for (int j = 0 ; j < elements.size() ; j++) {
             VertexFormatElement e = elements.get(j);
             switch (e.getUsage()) {
@@ -108,8 +112,8 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
         }
     }
 
-    private BakedQuad createQuad(Vector3d v1, float v1u, float v1v, Vector3d v2, float v2u, float v2v, Vector3d v3, float v3u, float v3v, Vector3d v4, float v4u, float v4v, TextureAtlasSprite sprite) {
-        Vector3d normal = v3.subtract(v2).cross(v1.subtract(v2)).normalize();
+    private BakedQuad createQuad(Vec3 v1, float v1u, float v1v, Vec3 v2, float v2u, float v2v, Vec3 v3, float v3u, float v3v, Vec3 v4, float v4u, float v4v, TextureAtlasSprite sprite) {
+        Vec3 normal = v3.subtract(v2).cross(v1.subtract(v2)).normalize();
 
         BakedQuadBuilder builder = new BakedQuadBuilder(sprite);
         builder.setQuadOrientation(Direction.getNearest(normal.x, normal.y, normal.z));
@@ -120,7 +124,7 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
         return builder.build();
     }
 
-    public IBakedModel bakeSleeve(int radius, Direction dir, TextureAtlasSprite bark, TextureAtlasSprite top) {
+    public BakedModel bakeSleeve(int radius, Direction dir, TextureAtlasSprite bark, TextureAtlasSprite top) {
         // Work in double units(*2)
         int dradius = radius * 2;
         int halfSize = (16 - dradius) / 2;
@@ -140,7 +144,7 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
             negative = !negative;
         }
 
-        Map<Direction, BlockPartFace> mapFacesIn = Maps.newEnumMap(Direction.class);
+        Map<Direction, BlockElementFace> mapFacesIn = Maps.newEnumMap(Direction.class);
 
         for (Direction face: Direction.values()) {
             if (dir.getOpposite() != face) { // Discard side of sleeve that faces core
@@ -153,17 +157,17 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
                     uvface = new BlockFaceUV(new float[]{ 8 - radius, negative ? 16 - halfSize : 0, 8 + radius, negative ? 16 : halfSize }, getFaceAngle(dir.getAxis(), face));
                 }
                 if (uvface != null) {
-                    mapFacesIn.put(face, new BlockPartFace(null, -1, null, uvface));
+                    mapFacesIn.put(face, new BlockElementFace(null, -1, null, uvface));
                 }
             }
         }
 
-        BlockPart part = new BlockPart(posFrom, posTo, mapFacesIn, null, true);
-        SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(blockModel.customData, ItemOverrideList.EMPTY).particle(bark);
+        BlockElement part = new BlockElement(posFrom, posTo, mapFacesIn, null, true);
+        SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(blockModel.customData, ItemOverrides.EMPTY).particle(bark);
 
-        for (Map.Entry<Direction, BlockPartFace> e : part.faces.entrySet()) {
+        for (Map.Entry<Direction, BlockElementFace> e : part.faces.entrySet()) {
             Direction face = e.getKey();
-            builder.addCulledFace(face, ModelUtils.makeBakedQuad(part, e.getValue(), (dir == face) ? top : bark, face, ModelRotation.X0_Y0, this.modelResLoc));
+            builder.addCulledFace(face, ModelUtils.makeBakedQuad(part, e.getValue(), (dir == face) ? top : bark, face, BlockModelRotation.X0_Y0, this.modelResLoc));
         }
         float minV = negative ? 16 - halfSize : 0;
         float maxV = negative ? 16 : halfSize;
@@ -309,37 +313,37 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
         return builder.build();
     }
 
-    public IBakedModel bakeCore(int radius, Axis axis, TextureAtlasSprite icon) {
+    public BakedModel bakeCore(int radius, Axis axis, TextureAtlasSprite icon) {
 
         Vector3f posFrom = new Vector3f(8 - radius, 8 - radius, 8 - radius);
         Vector3f posTo = new Vector3f(8 + radius, 8 + radius, 8 + radius);
 
-        Map<Direction, BlockPartFace> mapFacesIn = Maps.newEnumMap(Direction.class);
+        Map<Direction, BlockElementFace> mapFacesIn = Maps.newEnumMap(Direction.class);
 
         for (Direction face: Direction.values()) {
             BlockFaceUV uvface = new BlockFaceUV(new float[]{ 8 - radius, 8 - radius, 8 + radius, 8 + radius }, getFaceAngle(axis, face));
-            mapFacesIn.put(face, new BlockPartFace(null, -1, null, uvface));
+            mapFacesIn.put(face, new BlockElementFace(null, -1, null, uvface));
         }
 
-        BlockPart part = new BlockPart(posFrom, posTo, mapFacesIn, null, true);
-        SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(blockModel.customData, ItemOverrideList.EMPTY).particle(icon);
+        BlockElement part = new BlockElement(posFrom, posTo, mapFacesIn, null, true);
+        SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(blockModel.customData, ItemOverrides.EMPTY).particle(icon);
 
-        for(Map.Entry<Direction, BlockPartFace> e : part.faces.entrySet()) {
+        for(Map.Entry<Direction, BlockElementFace> e : part.faces.entrySet()) {
             Direction face = e.getKey();
-            builder.addCulledFace(face, ModelUtils.makeBakedQuad(part, e.getValue(), icon, face, ModelRotation.X0_Y0, this.modelResLoc));
+            builder.addCulledFace(face, ModelUtils.makeBakedQuad(part, e.getValue(), icon, face, BlockModelRotation.X0_Y0, this.modelResLoc));
         }
 
         return builder.build();
     }
 
-    public IBakedModel bakeCoreSpikes(int radius, TextureAtlasSprite bark) {
+    public BakedModel bakeCoreSpikes(int radius, TextureAtlasSprite bark) {
         float minV = 8 - radius;
         float maxV = 8 + radius;
 
         Vector3f posFrom = new Vector3f(8 - radius, 8 - radius, 8 - radius);
         Vector3f posTo = new Vector3f(8 + radius, 8 + radius, 8 + radius);
 
-        SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(blockModel.customData, ItemOverrideList.EMPTY).particle(bark);
+        SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(blockModel.customData, ItemOverrides.EMPTY).particle(bark);
 
         // X
         builder.addCulledFace(Direction.UP, this.createQuad(
@@ -474,14 +478,14 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
         return builder.build();
     }
 
-    public IBakedModel bakeTopSleeveSpikes(TextureAtlasSprite bark) {
+    public BakedModel bakeTopSleeveSpikes(TextureAtlasSprite bark) {
         float minV = 4;
         float maxV = 12;
 
         Vector3f posFrom = new Vector3f(4, 16, 4);
         Vector3f posTo = new Vector3f(12, 16, 12);
 
-        SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(blockModel.customData, ItemOverrideList.EMPTY).particle(bark);
+        SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(blockModel.customData, ItemOverrides.EMPTY).particle(bark);
 
 
         builder.addCulledFace(Direction.UP, this.createQuad(
@@ -553,12 +557,12 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
         }
     }
 
-    private Vector3d v(Vector3f xVec, Vector3f yVec, Vector3f zVec, float xOffset, float yOffset, float zOffset){
+    private Vec3 v(Vector3f xVec, Vector3f yVec, Vector3f zVec, float xOffset, float yOffset, float zOffset){
         return v(xVec.x() / 16f + xOffset, yVec.y() / 16f + yOffset, zVec.z() / 16f + zOffset);
     }
 
-    private Vector3d v(float x, float y, float z) {
-        return new Vector3d(x, y, z);
+    private Vec3 v(float x, float y, float z) {
+        return new Vec3(x, y, z);
     }
 
     private int getRadiusIndex (int radius){
@@ -657,7 +661,7 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
      *
      */
     @Override
-    public IModelData getModelData(IBlockDisplayReader world, BlockPos pos, BlockState state, IModelData tileData) {
+    public IModelData getModelData(BlockAndTintGetter world, BlockPos pos, BlockState state, IModelData tileData) {
         Block block = state.getBlock();
         return block instanceof BranchBlock ? new ModelConnections(((BranchBlock) block).getConnectionData(world, pos, state)) : new ModelConnections();
     }
@@ -708,8 +712,9 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
         return true;
     }
 
+
     @Override
-    public TextureAtlasSprite getParticleTexture(IModelData data) {
+    public TextureAtlasSprite getParticleIcon(IModelData data) {
         return getParticleIcon();
     }
     @Override
@@ -729,8 +734,8 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
 
     @Nonnull
     @Override
-    public ItemOverrideList getOverrides() {
-        return ItemOverrideList.EMPTY;
+    public ItemOverrides getOverrides() {
+        return ItemOverrides.EMPTY;
     }
 
     @Override

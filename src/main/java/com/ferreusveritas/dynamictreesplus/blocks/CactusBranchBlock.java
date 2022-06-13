@@ -10,7 +10,6 @@ import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.growthlogic.context.DirectionSelectionContext;
-import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.Connections;
@@ -18,29 +17,28 @@ import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictreesplus.init.DTPConfigs;
 import com.ferreusveritas.dynamictreesplus.trees.CactusSpecies;
 import com.google.common.base.Predicate;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.state.EnumProperty;
-import net.minecraft.state.StateContainer;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.Direction;
-import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.shapes.IBooleanFunction;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.world.IBlockDisplayReader;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.shapes.BooleanOp;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -54,7 +52,7 @@ public class CactusBranchBlock extends BranchBlock {
 	 // Not sure it's technically called the 'trunk' on cacti, but whatever
 	public static final EnumProperty<CactusThickness> TRUNK_TYPE = EnumProperty.create("type", CactusThickness.class);
 
-	public enum CactusThickness implements IStringSerializable {
+	public enum CactusThickness implements StringRepresentable {
 		BRANCH("branch", 4),
 		TRUNK("trunk", 5),
 		CORE("core", 7);
@@ -76,7 +74,9 @@ public class CactusBranchBlock extends BranchBlock {
 	// BLOCKSTATES
 	///////////////////////////////////////////
 
-	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+
+
+	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 		builder.add(ORIGIN, TRUNK_TYPE);
 	}
 
@@ -85,7 +85,7 @@ public class CactusBranchBlock extends BranchBlock {
 	///////////////////////////////////////////
 
 	@Override
-	public int branchSupport(BlockState blockState, IBlockReader blockAccess, BranchBlock branch, BlockPos pos, Direction dir, int radius) {
+	public int branchSupport(BlockState blockState, BlockGetter blockAccess, BranchBlock branch, BlockPos pos, Direction dir, int radius) {
 		return 0; // Cacti don't have leaves and don't rot.
 	}
 
@@ -93,20 +93,20 @@ public class CactusBranchBlock extends BranchBlock {
 	// PHYSICAL PROPERTIES
 	///////////////////////////////////////////
 
-	@Override
-	public float getHardness(IBlockReader worldIn, BlockPos pos) {
-		final int radius = this.getRadius(worldIn.getBlockState(pos));
-		final float hardness = this.getFamily().getPrimitiveLog().orElse(Blocks.AIR).defaultBlockState()
-				.getDestroySpeed(worldIn, pos) * (radius * radius) / 64.0f * 8.0f;
-		return (float) Math.min(hardness, DTConfigs.MAX_TREE_HARDNESS.get()); // So many youtube let's plays start with "OMG, this is taking so long to break this tree!"
-	}
+//	@Override
+//	public float getHardness(BlockGetter worldIn, BlockPos pos) {
+//		final int radius = this.getRadius(worldIn.getBlockState(pos));
+//		final float hardness = this.getFamily().getPrimitiveLog().orElse(Blocks.AIR).defaultBlockState()
+//				.getDestroySpeed(worldIn, pos) * (radius * radius) / 64.0f * 8.0f;
+//		return (float) Math.min(hardness, DTConfigs.MAX_TREE_HARDNESS.get()); // So many youtube let's plays start with "OMG, this is taking so long to break this tree!"
+//	}
 
 	///////////////////////////////////////////
 	// WORLD UPDATE
 	///////////////////////////////////////////
 
 	@Override
-	public boolean checkForRot(IWorld world, BlockPos pos, Species species, int radius, int fertility, Random rand, float chance, boolean rapid) {
+	public boolean checkForRot(LevelAccessor world, BlockPos pos, Species species, int radius, int fertility, Random rand, float chance, boolean rapid) {
 		return false;//Do nothing.  Cacti don't rot
 	}
 
@@ -117,7 +117,7 @@ public class CactusBranchBlock extends BranchBlock {
 	private static final double hurtMovementDelta = 0.003;
 
 	@Override
-	public void entityInside(BlockState state, World worldIn, BlockPos pos, Entity entity) {
+	public void entityInside(BlockState state, Level worldIn, BlockPos pos, Entity entity) {
 		boolean damage = false;
 		if (DTPConfigs.cactusPrickleOnMoveOnly.get() && entity instanceof LivingEntity) {
 			boolean falling = entity.getDeltaMovement().y < 0;
@@ -137,9 +137,10 @@ public class CactusBranchBlock extends BranchBlock {
 		if (damage) entity.hurt(DamageSource.CACTUS, 1.0F);
 	}
 
+
 	@Nullable
 	@Override
-	public BlockState getStateForPlacement(BlockItemUseContext context) {
+	public BlockState getStateForPlacement(BlockPlaceContext context) {
 		BlockState returnState = this.defaultBlockState();
 
 		BlockState adjState = context.getLevel().getBlockState(context.getClickedPos().relative(context.getClickedFace().getOpposite()));
@@ -153,7 +154,7 @@ public class CactusBranchBlock extends BranchBlock {
 	///////////////////////////////////////////
 
 	@Override
-	public Cell getHydrationCell(IBlockReader blockAccess, BlockPos pos, BlockState blockState, Direction dir, LeavesProperties leavesProperties) {
+	public Cell getHydrationCell(BlockGetter blockAccess, BlockPos pos, BlockState blockState, Direction dir, LeavesProperties leavesProperties) {
 		return CellNull.NULL_CELL;
 	}
 
@@ -175,7 +176,7 @@ public class CactusBranchBlock extends BranchBlock {
 	}
 
 	@Override
-	public int setRadius(IWorld world, BlockPos pos, int radius, Direction originDir, int flags) {
+	public int setRadius(LevelAccessor world, BlockPos pos, int radius, Direction originDir, int flags) {
 		destroyMode = DynamicTrees.DestroyMode.SET_RADIUS;
 		world.setBlock(pos, getStateForRadius(radius).setValue(ORIGIN, originDir), flags);
 		destroyMode = DynamicTrees.DestroyMode.SLOPPY;
@@ -184,11 +185,11 @@ public class CactusBranchBlock extends BranchBlock {
 
 	// Directionless probability grabber
 	@Override
-	public int probabilityForBlock(BlockState blockState, IBlockReader blockAccess, BlockPos pos, BranchBlock from) {
+	public int probabilityForBlock(BlockState blockState, BlockGetter blockAccess, BlockPos pos, BranchBlock from) {
 		return isSameTree(from) ? getRadius(blockState) + 2 : 0;
 	}
 
-	public GrowSignal growIntoAir(World world, BlockPos pos, GrowSignal signal) {
+	public GrowSignal growIntoAir(Level world, BlockPos pos, GrowSignal signal) {
 		Direction originDir = signal.dir.getOpposite(); // Direction this signal originated from
 
 		CactusThickness trunk;
@@ -207,7 +208,7 @@ public class CactusBranchBlock extends BranchBlock {
 	}
 
 	@Override
-	public GrowSignal growSignal(World world, BlockPos pos, GrowSignal signal) {
+	public GrowSignal growSignal(Level world, BlockPos pos, GrowSignal signal) {
 
 		if (signal.step()) { // This is always placed at the beginning of every growSignal function
 			Species species = signal.getSpecies();
@@ -258,7 +259,7 @@ public class CactusBranchBlock extends BranchBlock {
 
 
 	@Override
-	public Connections getConnectionData(@Nonnull IBlockDisplayReader world, @Nonnull BlockPos pos, @Nonnull BlockState state) {
+	public Connections getConnectionData(@Nonnull BlockAndTintGetter world, @Nonnull BlockPos pos, @Nonnull BlockState state) {
 		Connections connections = new Connections();
 
 		for (Direction dir : Direction.values()) {
@@ -269,42 +270,42 @@ public class CactusBranchBlock extends BranchBlock {
 	}
 
 	@Override
-	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 		int thisRadius = getRadius(state);
 
-		VoxelShape shape = VoxelShapes.empty();
+		VoxelShape shape = Shapes.empty();
 
 		int numConnections = 0;
 		for (Direction dir : Direction.values()) {
 			int connRadius = getSideConnectionRadius(worldIn, pos, dir);
 			if (connRadius > 0) {
 				numConnections++;
-				double radius = MathHelper.clamp(connRadius, 1, thisRadius) / 16.0;
+				double radius = Mth.clamp(connRadius, 1, thisRadius) / 16.0;
 				double gap = 0.5 - radius;
-				AxisAlignedBB aabb = new AxisAlignedBB(0, 0, 0, 0, 0, 0).inflate(radius);
+				AABB aabb = new AABB(0, 0, 0, 0, 0, 0).inflate(radius);
 				aabb = aabb.move(dir.getStepX() * gap, dir.getStepY() * gap, dir.getStepZ() * gap).move(0.5, 0.5, 0.5);
-				shape = VoxelShapes.joinUnoptimized(shape, VoxelShapes.create(aabb), IBooleanFunction.OR);
+				shape = Shapes.joinUnoptimized(shape, Shapes.create(aabb), BooleanOp.OR);
 			}
 		}
 		if (state.getValue(TRUNK_TYPE) == CactusThickness.BRANCH && numConnections == 1 && state.getValue(ORIGIN).getAxis().isHorizontal()) {
-			double radius = MathHelper.clamp(getCactusRadius(CactusThickness.BRANCH), 1, thisRadius) / 16.0;
+			double radius = Mth.clamp(getCactusRadius(CactusThickness.BRANCH), 1, thisRadius) / 16.0;
 			double gap = 0.5 - radius;
-			AxisAlignedBB aabb = new AxisAlignedBB(0, 0, 0, 0, 0, 0).inflate(radius);
+			AABB aabb = new AABB(0, 0, 0, 0, 0, 0).inflate(radius);
 			aabb = aabb.move(Direction.UP.getStepX() * gap, Direction.UP.getStepY() * gap, Direction.UP.getStepZ() * gap).move(0.5, 0.5, 0.5);
-			shape = VoxelShapes.joinUnoptimized(shape, VoxelShapes.create(aabb), IBooleanFunction.OR);
+			shape = Shapes.joinUnoptimized(shape, Shapes.create(aabb), BooleanOp.OR);
 		}
 
 		double min = 0.5 - (thisRadius / 16.0), max = 0.5 + (thisRadius / 16.0);
-		shape = VoxelShapes.joinUnoptimized(shape, VoxelShapes.create(new AxisAlignedBB(min, min, min, max, max, max)), IBooleanFunction.OR);
+		shape = Shapes.joinUnoptimized(shape, Shapes.create(new AABB(min, min, min, max, max, max)), BooleanOp.OR);
 		return shape;
 	}
 
 	@Override
-	public int getRadiusForConnection(BlockState blockState, IBlockReader blockAccess, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
+	public int getRadiusForConnection(BlockState blockState, BlockGetter blockAccess, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
 		return this.getRadius(blockState);
 	}
 
-	protected int getSideConnectionRadius(IBlockReader blockAccess, BlockPos pos, Direction side) {
+	protected int getSideConnectionRadius(BlockGetter blockAccess, BlockPos pos, Direction side) {
 		BlockPos deltaPos = pos.relative(side);
 
 		final BlockState otherState = CoordUtils.getStateSafe(blockAccess, deltaPos);
@@ -328,7 +329,7 @@ public class CactusBranchBlock extends BranchBlock {
 	///////////////////////////////////////////
 
 	@Override
-	public MapSignal analyse(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir, MapSignal signal) {
+	public MapSignal analyse(BlockState blockState, LevelAccessor world, BlockPos pos, Direction fromDir, MapSignal signal) {
 		// Note: fromDir will be null in the origin node
 		if (signal.depth++ < 32) {// Prevents going too deep into large networks, or worse, being caught in a network loop
 			BlockState state = world.getBlockState(pos);

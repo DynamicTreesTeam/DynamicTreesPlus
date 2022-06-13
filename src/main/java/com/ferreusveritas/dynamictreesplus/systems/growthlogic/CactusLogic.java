@@ -6,7 +6,7 @@ import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKitConfiguration;
 import com.ferreusveritas.dynamictrees.growthlogic.context.DirectionManipulationContext;
 import com.ferreusveritas.dynamictrees.growthlogic.context.PositionalSpeciesContext;
 import com.ferreusveritas.dynamictreesplus.trees.CactusSpecies;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 
 public class CactusLogic extends GrowthLogicKit {
 

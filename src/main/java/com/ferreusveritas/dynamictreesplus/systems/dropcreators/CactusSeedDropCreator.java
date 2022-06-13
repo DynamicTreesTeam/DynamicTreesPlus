@@ -4,7 +4,7 @@ import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorConfiguration;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.LogDropContext;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 
 /**
  * @author ferreusveritas

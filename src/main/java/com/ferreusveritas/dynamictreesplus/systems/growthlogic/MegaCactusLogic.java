@@ -5,10 +5,11 @@ import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKitConfiguration;
 import com.ferreusveritas.dynamictrees.growthlogic.context.DirectionManipulationContext;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictreesplus.blocks.CactusBranchBlock;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 
 public final class MegaCactusLogic extends CactusLogic {
 
@@ -37,7 +38,7 @@ public final class MegaCactusLogic extends CactusLogic {
                                                  DirectionManipulationContext context) {
         final int[] probMap = context.probMap();
         final GrowSignal signal = context.signal();
-        final World world = context.world();
+        final Level world = context.world();
         final BlockPos pos = context.pos();
         final Direction originDir = signal.dir.getOpposite();
 
@@ -55,7 +56,7 @@ public final class MegaCactusLogic extends CactusLogic {
 
         //Alter probability map for direction change
         probMap[0] = 0; //Down is always disallowed for cactus
-        probMap[1] = (int) (context.species().getUpProbability() + signal.rootPos.distSqr(pos.getX(), signal.rootPos.getY(), pos.getZ(), true) * 0.8);
+        probMap[1] = (int) (context.species().getUpProbability() + signal.rootPos.distSqr(new Vec3i(pos.getX(), signal.rootPos.getY(), pos.getZ())) * 0.8);
         probMap[2] = probMap[3] = probMap[4] = probMap[5] = world.getBlockState(pos.above()).getBlock() instanceof CactusBranchBlock && signal.energy > 1 ? 3 : 0;
         if (signal.dir != Direction.UP) probMap[signal.dir.ordinal()] = 0; //Disable the current direction, unless that direction is up
         probMap[originDir.ordinal()] = 0; //Disable the direction we came from

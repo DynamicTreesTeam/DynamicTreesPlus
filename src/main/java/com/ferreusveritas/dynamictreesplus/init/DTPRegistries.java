@@ -20,11 +20,11 @@ import com.ferreusveritas.dynamictreesplus.systems.thicknesslogic.CactusThicknes
 import com.ferreusveritas.dynamictreesplus.trees.CactusFamily;
 import com.ferreusveritas.dynamictreesplus.trees.CactusSpecies;
 import com.ferreusveritas.dynamictreesplus.worldgen.canceller.CactusFeatureCanceller;
-import net.minecraft.block.CactusBlock;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.CactusBlock;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -35,12 +35,12 @@ public class DTPRegistries {
     public static final SaguaroCactusLogic SAGUARO_CACTUS_LOGIC = new SaguaroCactusLogic(DynamicTreesPlus.resLoc("saguaro_cactus"));
     public static final MegaCactusLogic MEGA_CACTUS_LOGIC = new MegaCactusLogic(DynamicTreesPlus.resLoc("mega_cactus"));
 
-    public static VoxelShape TALL_CACTUS_SAPLING_SHAPE = VoxelShapes.create(
-            new AxisAlignedBB(0.375f, 0.0f, 0.375f, 0.625f, 0.6875f, 0.625f));
-    public static VoxelShape MEDIUM_CACTUS_SAPLING_SHAPE = VoxelShapes.create(
-            new AxisAlignedBB(0.375f, 0.0f, 0.375f, 0.625f, 0.5625f, 0.625f));
-    public static VoxelShape SHORT_CACTUS_SAPLING_SHAPE = VoxelShapes.create(
-            new AxisAlignedBB(0.375f, 0.0f, 0.375f, 0.625f, 0.4375f, 0.625f));
+    public static VoxelShape TALL_CACTUS_SAPLING_SHAPE = Shapes.create(
+            new AABB(0.375f, 0.0f, 0.375f, 0.625f, 0.6875f, 0.625f));
+    public static VoxelShape MEDIUM_CACTUS_SAPLING_SHAPE = Shapes.create(
+            new AABB(0.375f, 0.0f, 0.375f, 0.625f, 0.5625f, 0.625f));
+    public static VoxelShape SHORT_CACTUS_SAPLING_SHAPE = Shapes.create(
+            new AABB(0.375f, 0.0f, 0.375f, 0.625f, 0.4375f, 0.625f));
 
 
     public static void setup(){

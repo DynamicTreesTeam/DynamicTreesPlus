@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictreesplus.event;
 
 import com.ferreusveritas.dynamictreesplus.DynamicTreesPlus;
 import com.ferreusveritas.dynamictreesplus.models.loaders.CactusBlockModelLoader;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoaderRegistry;

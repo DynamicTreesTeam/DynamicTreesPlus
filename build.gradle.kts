@@ -17,6 +17,9 @@ plugins {
     id("maven-publish")
     id("com.matthewprenger.cursegradle") version "1.4.0"
 }
+apply {
+    from("https://raw.githubusercontent.com/SizableShrimp/Forge-Class-Remapper/main/classremapper.gradle")
+}
 
 repositories {
     maven("https://ldtteam.jfrog.io/ldtteam/modding/")
@@ -119,9 +122,9 @@ dependencies {
     minecraft("net.minecraftforge:forge:${mcVersion}-${property("forgeVersion")}")
 
     // Compile Hwyla API, but don"t include in runtime.
-    compileOnly(fg.deobf("mcp.mobius.waila:Hwyla:${property("hwylaVersion")}:api"))
+//    compileOnly(fg.deobf("mcp.mobius.waila:Hwyla:${property("hwylaVersion")}:api"))
     // At runtime, use the full Hwyla mod.
-    runtimeOnly(fg.deobf("mcp.mobius.waila:Hwyla:${property("hwylaVersion")}"))
+//    runtimeOnly(fg.deobf("mcp.mobius.waila:Hwyla:${property("hwylaVersion")}"))
 
     // Compile JEI API, but don"t include in runtime.
     compileOnly(fg.deobf("mezz.jei:jei-${mcVersion}:${property("jeiVersion")}:api"))
@@ -134,10 +137,11 @@ dependencies {
     // At runtime use, CC for creating growth chambers.
     runtimeOnly(fg.deobf("org.squiddev:cc-tweaked-$mcVersion:${property("ccVersion")}"))
 
-    implementation(fg.deobf("com.ferreusveritas.dynamictrees:DynamicTrees-${mcVersion}:${property("dynamicTreesVersion")}"))
-
+//    implementation(fg.deobf("com.ferreusveritas.dynamictrees:DynamicTrees-${mcVersion}:${property("dynamicTreesVersion")}"))
+    implementation(fg.deobf("curse.maven:dynamictrees-252818:3815249"))
     // At runtime, use suggestion provider fix mod.
-    runtimeOnly(fg.deobf("com.harleyoconnor.suggestionproviderfix:SuggestionProviderFix:${mcVersion}-${property("suggestionProviderFixVersion")}"))
+//    runtimeOnly(fg.deobf("com.harleyoconnor.suggestionproviderfix:SuggestionProviderFix:${mcVersion}-${property("suggestionProviderFixVersion")}"))
+    runtimeOnly(fg.deobf("curse.maven:suggestionproviderfix-469647:3623382"))
 }
 
 tasks.jar {
@@ -159,7 +163,7 @@ java {
     withSourcesJar()
 
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(8))
+        languageVersion.set(JavaLanguageVersion.of(17))
     }
 }
 

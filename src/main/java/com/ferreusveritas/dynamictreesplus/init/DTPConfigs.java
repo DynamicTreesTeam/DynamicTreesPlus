@@ -3,7 +3,7 @@ package com.ferreusveritas.dynamictreesplus.init;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.loading.FMLPaths;
 
 import java.io.File;
@@ -49,6 +49,6 @@ public class DTPConfigs {
     }
 
     @SubscribeEvent
-    public static void onLoad (final ModConfig.Loading event) { }
+    public static void onLoad (final ModConfigEvent.Loading event) { }
 
 }

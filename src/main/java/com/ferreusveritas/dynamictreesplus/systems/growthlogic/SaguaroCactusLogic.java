@@ -3,8 +3,8 @@ package com.ferreusveritas.dynamictreesplus.systems.growthlogic;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKitConfiguration;
 import com.ferreusveritas.dynamictrees.growthlogic.context.DirectionManipulationContext;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
 
 public final class SaguaroCactusLogic extends CactusLogic {
 

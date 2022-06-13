@@ -10,11 +10,11 @@ import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictreesplus.blocks.CactusBranchBlock;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
-import net.minecraft.world.gen.WorldGenRegion;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.WorldGenRegion;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -50,7 +50,7 @@ public class CactusClonesGenFeature extends GenFeature {
                 this.tryToPlaceClones(context.world(), context.pos(), context.species(), false, SafeChunkBounds.ANY);
     }
 
-    private boolean tryToPlaceClones (IWorld world, BlockPos rootPos, Species species, boolean worldgen, SafeChunkBounds safeBounds){
+    private boolean tryToPlaceClones (LevelAccessor world, BlockPos rootPos, Species species, boolean worldgen, SafeChunkBounds safeBounds){
         if (world == null || areCactiAround(world, rootPos.above(), safeBounds)) return false;
         int clones = 3 + world.getRandom().nextInt(5); //between 3 and 8 clones
         List<CoordUtils.Surround> validDirs = new LinkedList<>(Arrays.asList(CoordUtils.Surround.values()));
@@ -64,7 +64,7 @@ public class CactusClonesGenFeature extends GenFeature {
         return clonePlaced;
     }
 
-    private boolean areCactiAround(IWorld world, BlockPos rootPos, SafeChunkBounds safeBounds){
+    private boolean areCactiAround(LevelAccessor world, BlockPos rootPos, SafeChunkBounds safeBounds){
         for (CoordUtils.Surround dir : CoordUtils.Surround.values()){
             for (int i=-1; i <= 1; i++){
                 BlockPos offsetPos = rootPos.offset(dir.getOffset()).above(i);
@@ -76,16 +76,16 @@ public class CactusClonesGenFeature extends GenFeature {
         return false;
     }
 
-    private boolean placeCloneAtLocation (IWorld world, BlockPos cloneRootPos, Species species, boolean worldgen, SafeChunkBounds safeBounds){
+    private boolean placeCloneAtLocation (LevelAccessor world, BlockPos cloneRootPos, Species species, boolean worldgen, SafeChunkBounds safeBounds){
         for (int i=1; i >= -1; i--){
             BlockPos offsetRootPos = cloneRootPos.above(i);
-            if (safeBounds.inBounds(offsetRootPos, false) && species.isAcceptableSoil(world.getBlockState(offsetRootPos))){
+            if (safeBounds.inBounds(offsetRootPos, false) && species.isAcceptableSoil(world.getBlockState(offsetRootPos),true)){
 
                 if (worldgen) {
                     if (world instanceof WorldGenRegion)
-                        species.generate(((WorldGenRegion)world).getLevel(), world, offsetRootPos, world.getNoiseBiome(offsetRootPos.getX(), offsetRootPos.getY(), offsetRootPos.getZ()), world.getRandom(), 2, safeBounds);
-                } else if (world instanceof World) {
-                    species.transitionToTree((World) world, offsetRootPos.above());
+                        species.generate(((WorldGenRegion)world).getLevel(), world, offsetRootPos, world.getNoiseBiome(offsetRootPos.getX(), offsetRootPos.getY(), offsetRootPos.getZ()).value(), world.getRandom(), 2, safeBounds);
+                } else if (world instanceof Level) {
+                    species.transitionToTree((Level) world, offsetRootPos.above());
                 }
                 return true;
             }

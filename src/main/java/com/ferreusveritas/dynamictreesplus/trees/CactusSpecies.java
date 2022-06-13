@@ -24,19 +24,24 @@ import com.ferreusveritas.dynamictreesplus.init.DTPConfigs;
 import com.ferreusveritas.dynamictreesplus.init.DTPRegistries;
 import com.ferreusveritas.dynamictreesplus.systems.dropcreators.DTPDropCreators;
 import com.ferreusveritas.dynamictreesplus.systems.thicknesslogic.CactusThicknessLogic;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.SoundType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.MinecraftForge;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
@@ -80,12 +85,12 @@ public class CactusSpecies extends Species {
         this.thicknessLogic = thicknessLogic;
     }
 
-    public CactusBranchBlock.CactusThickness thicknessAfterGrowthSignal(World world, BlockPos pos, GrowSignal signal,
+    public CactusBranchBlock.CactusThickness thicknessAfterGrowthSignal(Level world, BlockPos pos, GrowSignal signal,
                                                                         CactusBranchBlock.CactusThickness currentThickness) {
         return this.thicknessLogic.thicknessAfterGrowthSignal(world, pos, signal, currentThickness);
     }
 
-    public CactusBranchBlock.CactusThickness thicknessForBranchPlaced(IWorld world, BlockPos pos, boolean isLast) {
+    public CactusBranchBlock.CactusThickness thicknessForBranchPlaced(LevelAccessor world, BlockPos pos, boolean isLast) {
         return this.thicknessLogic.thicknessForBranchPlaced(world, pos, isLast);
     }
 
@@ -101,19 +106,20 @@ public class CactusSpecies extends Species {
 
     @Override
     public boolean isBiomePerfect(Biome biome) {
+        ResourceKey<Biome> key = ResourceKey.create(Registry.BIOME_REGISTRY, Objects.requireNonNull(biome.getRegistryName()));
         return this.perfectBiomes.size() > 0 ? super.isBiomePerfect(biome) :
-                BiomeDictionary.hasType(getBiomeKey(biome), BiomeDictionary.Type.DRY)
-                        && BiomeDictionary.hasType(getBiomeKey(biome), BiomeDictionary.Type.SANDY);
+                BiomeDictionary.hasType(key, BiomeDictionary.Type.DRY)
+                        && BiomeDictionary.hasType(key, BiomeDictionary.Type.SANDY);
     }
 
     @Override
-    public boolean handleRot(IWorld world, List<BlockPos> ends, BlockPos rootPos, BlockPos treePos, int soilLife,
+    public boolean handleRot(LevelAccessor world, List<BlockPos> ends, BlockPos rootPos, BlockPos treePos, int soilLife,
                              SafeChunkBounds safeBounds) {
         return false;
     }
 
     @Override
-    public boolean transitionToTree(World world, BlockPos pos) {
+    public boolean transitionToTree(Level world, BlockPos pos) {
         // Ensure planting conditions are right.
         final Family family = getFamily();
         if (world.isEmptyBlock(pos.above()) &&
@@ -141,14 +147,14 @@ public class CactusSpecies extends Species {
         }
 
         @Override
-        public void generate(World worldObj, IWorld world, Species species, BlockPos rootPos, Biome biome,
+        public void generate(Level worldObj, LevelAccessor world, Species species, BlockPos rootPos, Biome biome,
                              Direction facing, int radius, SafeChunkBounds safeBounds, boolean secondChanceRegen) {
             BlockState initialDirtState =
                     world.getBlockState(rootPos); // Save the initial state of the dirt in case this fails
             species.placeRootyDirtBlock(world, rootPos, 0); // Set to unfertilized rooty dirt
 
             // A Tree generation boundary radius is at least 2 and at most 8
-            radius = MathHelper.clamp(radius, 2, 8);
+            radius = Mth.clamp(radius, 2, 8);
             BlockPos treePos = rootPos.above();
 
             // Create tree
@@ -177,14 +183,17 @@ public class CactusSpecies extends Species {
         }
 
         @Override
-        public boolean setBlockForGeneration(IWorld world, Species species, BlockPos pos, Direction dir,
+        public boolean setBlockForGeneration(LevelAccessor world, Species species, BlockPos pos, Direction dir,
                                              boolean careful, boolean isLast) {
             final Optional<BranchBlock> branch = species.getFamily().getBranch();
             if (!(species instanceof CactusSpecies) || !branch.isPresent()) {
                 return false;
             }
             BlockState defaultBranchState = branch.get().defaultBlockState();
-            if (world.getBlockState(pos).canBeReplacedByLogs(world, pos) &&
+            BlockState replaceState = world.getBlockState(pos);
+            boolean replace = (replaceState.isAir() || replaceState.is(BlockTags.LEAVES)) || replaceState.is(Blocks.GRASS_BLOCK) || replaceState.is(BlockTags.DIRT)
+                    || replaceState.is(BlockTags.LOGS) || replaceState.is(BlockTags.SAPLINGS) || replaceState.is(Blocks.VINE);
+            if (replace &&
                     (!careful || isClearOfNearbyBranches(world, pos, dir.getOpposite()))) {
                 CactusBranchBlock.CactusThickness trunk =
                         ((CactusSpecies) species).thicknessForBranchPlaced(world, pos, isLast);

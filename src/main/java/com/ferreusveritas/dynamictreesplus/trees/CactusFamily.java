@@ -6,9 +6,9 @@ import com.ferreusveritas.dynamictrees.data.provider.BranchLoaderBuilder;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictreesplus.blocks.CactusBranchBlock;
 import com.ferreusveritas.dynamictreesplus.event.BakedModelEventHandler;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.material.Material;
 import net.minecraftforge.client.model.generators.BlockModelBuilder;
 import net.minecraftforge.common.data.ExistingFileHelper;
 

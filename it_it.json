@@ -1,0 +1,15 @@
+{
+  "block.dynamictreesplus.cactus_branch": "Cactus",
+
+  "species.dynamictreesplus.saguaro_cactus": "Cactus Saguaro",
+  "species.dynamictreesplus.pillar_cactus": "Cactus a colonna",
+  "species.dynamictreesplus.pipe_cactus": "Cactus a canne d'organo",
+  "species.dynamictreesplus.mega_cactus": "Cactus gigante",
+
+  "item.dynamictreesplus.saguaro_cactus_seed": "Seme di cactus saguaro",
+  "item.dynamictreesplus.pillar_cactus_seed": "Seme di cactus a colonna",
+  "item.dynamictreesplus.pipe_cactus_seed": "Seme di cactus a canne d'organo",
+  "item.dynamictreesplus.brown_mushroom_seed": "Cappello di fungo marrone",
+  "item.dynamictreesplus.red_mushroom_seed": "Cappello di fungo roso",
+  "item.dynamictreesplus.chorus_seed": "Seme di chorus"
+}

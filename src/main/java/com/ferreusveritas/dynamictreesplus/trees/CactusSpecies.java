@@ -17,6 +17,7 @@ import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
+import com.ferreusveritas.dynamictrees.util.WorldContext;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.ferreusveritas.dynamictreesplus.DynamicTreesPlus;
 import com.ferreusveritas.dynamictreesplus.blocks.CactusBranchBlock;
@@ -141,8 +142,9 @@ public class CactusSpecies extends Species {
         }
 
         @Override
-        public void generate(World worldObj, IWorld world, Species species, BlockPos rootPos, Biome biome,
+        public void generate(WorldContext worldContext, Species species, BlockPos rootPos, Biome biome,
                              Direction facing, int radius, SafeChunkBounds safeBounds, boolean secondChanceRegen) {
+            IWorld world = worldContext.access();
             BlockState initialDirtState =
                     world.getBlockState(rootPos); // Save the initial state of the dirt in case this fails
             species.placeRootyDirtBlock(world, rootPos, 0); // Set to unfertilized rooty dirt
@@ -166,8 +168,8 @@ public class CactusSpecies extends Species {
 
                 // Allow for special decorations by the tree itself
                 species.postGeneration(new PostGenerationContext(world, rootPos, species, biome, radius, endPoints,
-                        safeBounds, initialDirtState, SeasonHelper.getSeasonValue(worldObj, rootPos),
-                        species.seasonalFruitProductionFactor(worldObj, rootPos)));
+                        safeBounds, initialDirtState, SeasonHelper.getSeasonValue(worldContext.level(), rootPos),
+                        species.seasonalFruitProductionFactor(worldContext, rootPos)));
                 MinecraftForge.EVENT_BUS.post(
                         new SpeciesPostGenerationEvent(world, species, rootPos, endPoints, safeBounds,
                                 initialDirtState));

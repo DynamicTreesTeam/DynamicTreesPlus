@@ -94,10 +94,10 @@ public class CactusBranchBlock extends BranchBlock {
 	///////////////////////////////////////////
 
 	@Override
-	public float getHardness(IBlockReader worldIn, BlockPos pos) {
-		final int radius = this.getRadius(worldIn.getBlockState(pos));
+	public float getHardness(BlockState state, IBlockReader world, BlockPos pos) {
+		final int radius = this.getRadius(state);
 		final float hardness = this.getFamily().getPrimitiveLog().orElse(Blocks.AIR).defaultBlockState()
-				.getDestroySpeed(worldIn, pos) * (radius * radius) / 64.0f * 8.0f;
+				.getDestroySpeed(world, pos) * (radius * radius) / 64.0f * 8.0f;
 		return (float) Math.min(hardness, DTConfigs.MAX_TREE_HARDNESS.get()); // So many youtube let's plays start with "OMG, this is taking so long to break this tree!"
 	}
 

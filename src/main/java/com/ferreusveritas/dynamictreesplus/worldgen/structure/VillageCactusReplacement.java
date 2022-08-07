@@ -7,7 +7,6 @@ import com.ferreusveritas.dynamictreesplus.init.DTPCacti;
 import net.minecraft.world.gen.feature.jigsaw.JigsawPattern;
 import net.minecraft.world.gen.feature.jigsaw.JigsawPiece;
 import net.minecraft.world.gen.feature.jigsaw.LegacySingleJigsawPiece;
-import net.minecraft.world.gen.feature.template.ProcessorLists;
 
 /**
  * @author Harley O'Connor
@@ -16,7 +15,7 @@ public final class VillageCactusReplacement {
 
     public static void replaceTreesFromVanillaVillages() {
         // Replace cacti from Desert village.
-        final TreeJigsawPiece cactusTemplate = new TreeJigsawPiece(Species.REGISTRY.get(DTPCacti.PIPE),
+        final TreeJigsawPiece cactusTemplate = new TreeJigsawPiece(Species.REGISTRY.get(DTPCacti.PILLAR),
                 JigsawPattern.PlacementBehaviour.TERRAIN_MATCHING);
         RegularPatternModifier.village("desert", "decor")
                 .replaceTemplate(1, cactusTemplate);

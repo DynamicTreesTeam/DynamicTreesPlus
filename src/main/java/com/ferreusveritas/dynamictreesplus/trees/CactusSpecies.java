@@ -114,20 +114,13 @@ public class CactusSpecies extends Species {
     }
 
     @Override
-    public boolean transitionToTree(World world, BlockPos pos) {
-        // Ensure planting conditions are right.
-        final Family family = getFamily();
-        if (world.isEmptyBlock(pos.above()) &&
-                this.isAcceptableSoil(world, pos.below(), world.getBlockState(pos.below()))) {
-            this.placeRootyDirtBlock(world, pos.below(), 15); // Set to fully fertilized rooty sand underneath.
-            family.getBranch().ifPresent(branch -> {
-                world.setBlockAndUpdate(pos, branch.defaultBlockState().setValue(CactusBranchBlock.TRUNK_TYPE,
-                        this.thicknessForBranchPlaced(world, pos, false))); // Set to a single branch
-            });
-            return true;
-        }
-
-        return false;
+    protected boolean transitionToTree(World world, BlockPos pos, Family family) {
+        this.placeRootyDirtBlock(world, pos.below(), 15); // Set to fully fertilized rooty sand underneath.
+        family.getBranch().ifPresent(branch -> {
+            world.setBlockAndUpdate(pos, branch.defaultBlockState().setValue(CactusBranchBlock.TRUNK_TYPE,
+                    this.thicknessForBranchPlaced(world, pos, false))); // Set to a single branch
+        });
+        return true;
     }
 
     @Override

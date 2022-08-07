@@ -9,6 +9,7 @@ import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGrowConte
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
+import com.ferreusveritas.dynamictrees.util.WorldContext;
 import com.ferreusveritas.dynamictreesplus.blocks.CactusBranchBlock;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -83,7 +84,7 @@ public class CactusClonesGenFeature extends GenFeature {
 
                 if (worldgen) {
                     if (world instanceof WorldGenRegion)
-                        species.generate(((WorldGenRegion)world).getLevel(), world, offsetRootPos, world.getNoiseBiome(offsetRootPos.getX(), offsetRootPos.getY(), offsetRootPos.getZ()), world.getRandom(), 2, safeBounds);
+                        species.generate(WorldContext.create(world), offsetRootPos, world.getNoiseBiome(offsetRootPos.getX(), offsetRootPos.getY(), offsetRootPos.getZ()), world.getRandom(), 2, safeBounds);
                 } else if (world instanceof World) {
                     species.transitionToTree((World) world, offsetRootPos.above());
                 }

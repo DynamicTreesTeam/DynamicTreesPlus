@@ -10,7 +10,6 @@ import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
 import com.ferreusveritas.dynamictrees.event.SpeciesPostGenerationEvent;
 import com.ferreusveritas.dynamictrees.growthlogic.context.PositionalSpeciesContext;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreators;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGenerationContext;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.FindEndsNode;
 import com.ferreusveritas.dynamictrees.trees.Family;
@@ -56,7 +55,6 @@ public class CactusSpecies extends Species {
     @Override
     public Species setPreReloadDefaults() {
         this.setTransformable(false);
-        this.addDropCreators(DropCreators.LOG, DTPDropCreators.CACTUS_SEEDS);
         return this.setSaplingShape(DTPRegistries.MEDIUM_CACTUS_SAPLING_SHAPE)
                 .setSaplingSound(SoundType.WOOL)
                 .setDefaultGrowingParameters()
@@ -215,6 +213,11 @@ public class CactusSpecies extends Species {
         textureConsumer.accept("side", sideTextureLocation);
         textureConsumer.accept("top", suffix(barkTextureLocation, "_top"));
         textureConsumer.accept("bottom", suffix(barkTextureLocation, "_bottom"));
+    }
+
+    @Override
+    public boolean shouldGenerateVoluntaryDrops() {
+        return false;
     }
 
 }

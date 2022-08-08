@@ -4,7 +4,6 @@ import com.ferreusveritas.dynamictrees.api.registry.RegistryEvent;
 import com.ferreusveritas.dynamictrees.api.registry.TypeRegistryEvent;
 import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -84,9 +83,9 @@ public class DTPRegistries {
         event.getRegistry().registerAll(new CactusFeatureCanceller<>(DynamicTreesPlus.resLoc("cactus"), CactusBlock.class));
     }
 
-    @SubscribeEvent
-    public static void onDropCreatorRegistry (final com.ferreusveritas.dynamictrees.api.registry.RegistryEvent<DropCreator> event) {
-        DTPDropCreators.register(event.getRegistry());
-    }
+//    @SubscribeEvent
+//    public static void onDropCreatorRegistry (final com.ferreusveritas.dynamictrees.api.registry.RegistryEvent<DropCreator> event) {
+//        DTPDropCreators.register(event.getRegistry());
+//    }
 
 }

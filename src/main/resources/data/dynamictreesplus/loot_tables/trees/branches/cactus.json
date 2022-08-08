@@ -1,0 +1,45 @@
+{
+  "type": "dynamictrees:branches",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "dynamictrees:multiply_logs_count"
+            },
+            {
+              "function": "minecraft:explosion_decay"
+            }
+          ],
+          "name": "minecraft:cactus"
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "dynamictrees:item_by_species",
+          "functions": [
+            {
+              "_comment": "Leftover volume of a cactus is put into seeds rather than sticks, but the same calculation is used.",
+              "function": "dynamictrees:multiply_sticks_count"
+            },
+            {
+              "function": "minecraft:explosion_decay"
+            }
+          ],
+          "name_by_species": {
+            "dynamictreesplus:pillar_cactus": "dynamictreesplus:pillar_cactus_seed",
+            "dynamictreesplus:pipe_cactus": "dynamictreesplus:pipe_cactus_seed",
+            "dynamictreesplus:saguaro_cactus": "dynamictreesplus:saguaro_cactus_seed",
+            "dynamictreesplus:mega_cactus": "dynamictreesplus:saguaro_cactus_seed"
+          }
+        }
+      ]
+    }
+  ]
+}

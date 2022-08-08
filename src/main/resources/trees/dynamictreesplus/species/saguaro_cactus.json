@@ -10,10 +10,6 @@
   "lowest_branch_height": 2,
   "growth_rate": 1,
   "soil_longevity": 1,
-  "drop_creators": [
-    "log",
-    "dynamictreesplus:cactus_seeds"
-  ],
   "growth_logic_kit": {
     "name": "dynamictreesplus:saguaro_cactus",
     "properties": {

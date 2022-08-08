@@ -22,7 +22,6 @@ import com.ferreusveritas.dynamictreesplus.DynamicTreesPlus;
 import com.ferreusveritas.dynamictreesplus.blocks.CactusBranchBlock;
 import com.ferreusveritas.dynamictreesplus.init.DTPConfigs;
 import com.ferreusveritas.dynamictreesplus.init.DTPRegistries;
-import com.ferreusveritas.dynamictreesplus.systems.dropcreators.DTPDropCreators;
 import com.ferreusveritas.dynamictreesplus.systems.thicknesslogic.CactusThicknessLogic;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SoundType;

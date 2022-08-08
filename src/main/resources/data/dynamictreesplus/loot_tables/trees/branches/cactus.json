@@ -30,6 +30,26 @@
             },
             {
               "function": "minecraft:explosion_decay"
+            },
+            {
+              "function": "dynamictrees:multiply_count",
+              "multiplier": 0.5,
+              "conditions": [
+                {
+                  "condition": "dynamictrees:is_species",
+                  "name": "dynamictreesplus:saguaro_cactus"
+                }
+              ]
+            },
+            {
+              "function": "dynamictrees:multiply_count",
+              "multiplier": 0.125,
+              "conditions": [
+                {
+                  "condition": "dynamictrees:is_species",
+                  "name": "dynamictreesplus:mega_cactus"
+                }
+              ]
             }
           ],
           "name_by_species": {

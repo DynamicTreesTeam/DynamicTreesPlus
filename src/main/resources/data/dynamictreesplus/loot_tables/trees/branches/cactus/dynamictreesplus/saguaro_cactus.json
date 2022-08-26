@@ -30,6 +30,10 @@
             },
             {
               "function": "minecraft:explosion_decay"
+            },
+            {
+              "function": "dynamictrees:multiply_count",
+              "multiplier": 0.5
             }
           ]
         }

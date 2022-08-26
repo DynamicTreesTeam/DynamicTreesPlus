@@ -30,6 +30,7 @@ import net.minecraft.state.StateContainer;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Direction;
 import net.minecraft.util.IStringSerializable;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -66,8 +67,8 @@ public class CactusBranchBlock extends BranchBlock {
 		@Override public String getSerializedName() { return this.name; }
 	}
 
-	public CactusBranchBlock(Properties properties) {
-		super(properties);
+	public CactusBranchBlock(ResourceLocation name, Properties properties) {
+		super(name, properties);
 
 		this.registerDefaultState(this.getStateDefinition().any().setValue(TRUNK_TYPE, CactusThickness.TRUNK).setValue(ORIGIN, Direction.DOWN));
 	}

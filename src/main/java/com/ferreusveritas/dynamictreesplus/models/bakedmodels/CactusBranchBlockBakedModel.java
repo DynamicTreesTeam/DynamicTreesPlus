@@ -30,6 +30,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 
+@SuppressWarnings("deprecation")
 @OnlyIn(Dist.CLIENT)
 public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
 

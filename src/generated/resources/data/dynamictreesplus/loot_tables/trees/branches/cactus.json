@@ -25,7 +25,6 @@
           "type": "dynamictrees:seed_item",
           "functions": [
             {
-              "_comment": "Leftover volume of a cactus is put into seeds rather than sticks, but the same calculation is used.",
               "function": "dynamictrees:multiply_sticks_count"
             },
             {

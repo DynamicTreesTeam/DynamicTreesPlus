@@ -11,6 +11,10 @@ import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.growthlogic.context.DirectionSelectionContext;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
+import com.ferreusveritas.dynamictrees.loot.DTLootParameterSets;
+import com.ferreusveritas.dynamictrees.loot.entry.SeedItemLootEntry;
+import com.ferreusveritas.dynamictrees.loot.function.MultiplyLogsCount;
+import com.ferreusveritas.dynamictrees.loot.function.MultiplySticksCount;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.Connections;
@@ -25,6 +29,11 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.item.BlockItemUseContext;
+import net.minecraft.loot.ConstantRange;
+import net.minecraft.loot.ItemLootEntry;
+import net.minecraft.loot.LootPool;
+import net.minecraft.loot.LootTable;
+import net.minecraft.loot.functions.ExplosionDecay;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.util.DamageSource;
@@ -364,4 +373,20 @@ public class CactusBranchBlock extends BranchBlock {
 		return signal;
 	}
 
+	@Override
+	public LootTable.Builder createBranchDrops() {
+		return LootTable.lootTable().withPool(
+				LootPool.lootPool().setRolls(ConstantRange.exactly(1)).add(
+						ItemLootEntry.lootTableItem(getPrimitiveLog().get())
+								.apply(MultiplyLogsCount.multiplyLogsCount())
+								.apply(ExplosionDecay.explosionDecay())
+				)
+		).withPool(
+				LootPool.lootPool().setRolls(ConstantRange.exactly(1)).add(
+						SeedItemLootEntry.lootTableSeedItem()
+								.apply(MultiplySticksCount.multiplySticksCount())
+								.apply(ExplosionDecay.explosionDecay())
+				)
+		).setParamSet(DTLootParameterSets.BRANCHES);
+	}
 }

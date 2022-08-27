@@ -36,8 +36,8 @@ public class CactusFamily extends Family {
     }
 
     @Override
-    protected BranchBlock createBranchBlock() {
-        return new CactusBranchBlock(this.getProperties());
+    protected BranchBlock createBranchBlock(ResourceLocation name) {
+        return new CactusBranchBlock(name, this.getProperties());
     }
 
     @Override

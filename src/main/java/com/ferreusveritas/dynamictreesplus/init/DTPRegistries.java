@@ -4,13 +4,11 @@ import com.ferreusveritas.dynamictrees.api.registry.RegistryEvent;
 import com.ferreusveritas.dynamictrees.api.registry.TypeRegistryEvent;
 import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CommonVoxelShapes;
 import com.ferreusveritas.dynamictreesplus.DynamicTreesPlus;
-import com.ferreusveritas.dynamictreesplus.systems.dropcreators.DTPDropCreators;
 import com.ferreusveritas.dynamictreesplus.systems.featuregen.CactusClonesGenFeature;
 import com.ferreusveritas.dynamictreesplus.systems.growthlogic.CactusLogic;
 import com.ferreusveritas.dynamictreesplus.systems.growthlogic.MegaCactusLogic;
@@ -82,11 +80,6 @@ public class DTPRegistries {
     @SubscribeEvent
     public static void onFeatureCancellerRegistry(final com.ferreusveritas.dynamictrees.api.registry.RegistryEvent<FeatureCanceller> event) {
         event.getRegistry().registerAll(new CactusFeatureCanceller<>(DynamicTreesPlus.resLoc("cactus"), CactusBlock.class));
-    }
-
-    @SubscribeEvent
-    public static void onDropCreatorRegistry (final com.ferreusveritas.dynamictrees.api.registry.RegistryEvent<DropCreator> event) {
-        DTPDropCreators.register(event.getRegistry());
     }
 
 }

@@ -1,10 +1,10 @@
-package com.ferreusveritas.dynamictreesplus.models.bakedmodels;
+package com.ferreusveritas.dynamictreesplus.model.baked;
 
-import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
+import com.ferreusveritas.dynamictrees.block.branch.BranchBlock;
 import com.ferreusveritas.dynamictrees.client.ModelUtils;
-import com.ferreusveritas.dynamictrees.models.bakedmodels.BranchBlockBakedModel;
-import com.ferreusveritas.dynamictrees.models.modeldata.ModelConnections;
-import com.ferreusveritas.dynamictreesplus.blocks.CactusBranchBlock;
+import com.ferreusveritas.dynamictrees.model.baked.BranchBlockBakedModel;
+import com.ferreusveritas.dynamictrees.model.data.ModelConnections;
+import com.ferreusveritas.dynamictreesplus.block.CactusBranchBlock;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
@@ -46,21 +46,21 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
     private final BakedModel[] coreSpikes = new BakedModel[3]; // 3 cores with only the spikey edges
     private BakedModel sleeveTopSpikes;
 
-    int[] radii = {4,5,7};
+    int[] radii = {4, 5, 7};
 
     public CactusBranchBlockBakedModel(ResourceLocation modelResLoc, ResourceLocation barkResLoc, ResourceLocation ringsResLoc) {
-        super (modelResLoc, barkResLoc, ringsResLoc);
+        super(modelResLoc, barkResLoc, ringsResLoc);
     }
 
     @Override
-    public void setupModels () {
+    public void setupModels() {
         this.barkTexture = ModelUtils.getTexture(this.barkResLoc);
         TextureAtlasSprite ringsTexture = ModelUtils.getTexture(this.ringsResLoc);
 
         for (int i = 0; i < 3; i++) {
             int radius = radii[i];
 
-            for (Direction dir: Direction.values()) {
+            for (Direction dir : Direction.values()) {
                 sleeves[dir.get3DDataValue()][i] = bakeSleeve(radius, dir, barkTexture, ringsTexture);
             }
 
@@ -78,7 +78,7 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
     private void putVertex(BakedQuadBuilder builder, Vec3 normal, double x, double y, double z, float u, float v, TextureAtlasSprite sprite, float r, float g, float b) {
 
         final ImmutableList<VertexFormatElement> elements = DefaultVertexFormat.BLOCK.getElements().asList();
-        for (int j = 0 ; j < elements.size() ; j++) {
+        for (int j = 0; j < elements.size(); j++) {
             VertexFormatElement e = elements.get(j);
             switch (e.getUsage()) {
                 case POSITION:
@@ -146,15 +146,15 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
 
         Map<Direction, BlockElementFace> mapFacesIn = Maps.newEnumMap(Direction.class);
 
-        for (Direction face: Direction.values()) {
+        for (Direction face : Direction.values()) {
             if (dir.getOpposite() != face) { // Discard side of sleeve that faces core
                 BlockFaceUV uvface = null;
                 if (dir == face) { // Side of sleeve that faces away from core
                     if (radius == 4 || (radius == 5 && dir == Direction.DOWN)) {
-                        uvface = new BlockFaceUV(new float[] {8 - radius, 8 - radius, 8 + radius, 8 + radius}, 0);
+                        uvface = new BlockFaceUV(new float[]{8 - radius, 8 - radius, 8 + radius, 8 + radius}, 0);
                     }
                 } else { // UV for Bark texture
-                    uvface = new BlockFaceUV(new float[]{ 8 - radius, negative ? 16 - halfSize : 0, 8 + radius, negative ? 16 : halfSize }, getFaceAngle(dir.getAxis(), face));
+                    uvface = new BlockFaceUV(new float[]{8 - radius, negative ? 16 - halfSize : 0, 8 + radius, negative ? 16 : halfSize}, getFaceAngle(dir.getAxis(), face));
                 }
                 if (uvface != null) {
                     mapFacesIn.put(face, new BlockElementFace(null, -1, null, uvface));
@@ -320,15 +320,15 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
 
         Map<Direction, BlockElementFace> mapFacesIn = Maps.newEnumMap(Direction.class);
 
-        for (Direction face: Direction.values()) {
-            BlockFaceUV uvface = new BlockFaceUV(new float[]{ 8 - radius, 8 - radius, 8 + radius, 8 + radius }, getFaceAngle(axis, face));
+        for (Direction face : Direction.values()) {
+            BlockFaceUV uvface = new BlockFaceUV(new float[]{8 - radius, 8 - radius, 8 + radius, 8 + radius}, getFaceAngle(axis, face));
             mapFacesIn.put(face, new BlockElementFace(null, -1, null, uvface));
         }
 
         BlockElement part = new BlockElement(posFrom, posTo, mapFacesIn, null, true);
         SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(blockModel.customData, ItemOverrides.EMPTY).particle(icon);
 
-        for(Map.Entry<Direction, BlockElementFace> e : part.faces.entrySet()) {
+        for (Map.Entry<Direction, BlockElementFace> e : part.faces.entrySet()) {
             Direction face = e.getKey();
             builder.addCulledFace(face, ModelUtils.makeBakedQuad(part, e.getValue(), icon, face, BlockModelRotation.X0_Y0, this.modelResLoc));
         }
@@ -355,7 +355,7 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
                 v(posTo.x() / 16f, posFrom.y() / 16f + 0.0625f, posFrom.z() / 16f - 0.002f), 2, minV,
                 v(posTo.x() / 16f, posFrom.y() / 16f - 0.0625f, posFrom.z() / 16f - 0.002f), 0, minV,
                 v(posFrom.x() / 16f, posFrom.y() / 16f - 0.0625f, posFrom.z() / 16f - 0.002f), 0, maxV,
-                v(posFrom.x() / 16f, posFrom.y() / 16f + 0.0625f, posFrom.z() / 16f - 0.002f),  2, maxV, bark));
+                v(posFrom.x() / 16f, posFrom.y() / 16f + 0.0625f, posFrom.z() / 16f - 0.002f), 2, maxV, bark));
         builder.addCulledFace(Direction.UP, this.createQuad(
                 v(posFrom.x() / 16f, posTo.y() / 16f + 0.0625f, posTo.z() / 16f + 0.002f), 16, maxV,
                 v(posFrom.x() / 16f, posTo.y() / 16f - 0.0625f, posTo.z() / 16f + 0.002f), 14, maxV,
@@ -386,7 +386,7 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
                 v(posFrom.x() / 16f, posTo.y() / 16f + 0.002f, posFrom.z() / 16f - 0.0625f), 0, maxV,
                 v(posFrom.x() / 16f, posTo.y() / 16f + 0.002f, posFrom.z() / 16f + 0.0625f), 2, maxV,
                 v(posTo.x() / 16f, posTo.y() / 16f + 0.002f, posFrom.z() / 16f + 0.0625f), 2, minV,
-                v(posTo.x() / 16f, posTo.y() / 16f + 0.002f, posFrom.z() / 16f - 0.0625f),  0, minV, bark));
+                v(posTo.x() / 16f, posTo.y() / 16f + 0.002f, posFrom.z() / 16f - 0.0625f), 0, minV, bark));
 
         // Y
         builder.addCulledFace(Direction.SOUTH, this.createQuad(
@@ -489,25 +489,25 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
 
 
         builder.addCulledFace(Direction.UP, this.createQuad(
-                v(posTo, posTo, posFrom, 0, + 0.0625f, - 0.002f), 16, minV,
-                v(posTo, posTo, posFrom, 0, - 0.0625f, - 0.002f), 14, minV,
-                v(posFrom, posTo, posFrom, 0, - 0.0625f, - 0.002f), 14, maxV,
-                v(posFrom, posTo, posFrom, 0, + 0.0625f, - 0.002f), 16, maxV, bark));
+                v(posTo, posTo, posFrom, 0, +0.0625f, -0.002f), 16, minV,
+                v(posTo, posTo, posFrom, 0, -0.0625f, -0.002f), 14, minV,
+                v(posFrom, posTo, posFrom, 0, -0.0625f, -0.002f), 14, maxV,
+                v(posFrom, posTo, posFrom, 0, +0.0625f, -0.002f), 16, maxV, bark));
         builder.addCulledFace(Direction.UP, this.createQuad(
-                v(posFrom, posTo, posTo, 0, + 0.0625f, + 0.002f), 16, maxV,
-                v(posFrom, posTo, posTo, 0, - 0.0625f, + 0.002f), 14, maxV,
-                v(posTo, posTo, posTo, 0, - 0.0625f, + 0.002f), 14, minV,
-                v(posTo, posTo, posTo, 0, + 0.0625f, + 0.002f), 16, minV, bark));
+                v(posFrom, posTo, posTo, 0, +0.0625f, +0.002f), 16, maxV,
+                v(posFrom, posTo, posTo, 0, -0.0625f, +0.002f), 14, maxV,
+                v(posTo, posTo, posTo, 0, -0.0625f, +0.002f), 14, minV,
+                v(posTo, posTo, posTo, 0, +0.0625f, +0.002f), 16, minV, bark));
         builder.addCulledFace(Direction.UP, this.createQuad(
-                v(posFrom, posTo, posTo, 0, + 0.002f, - 0.0625f), 14, maxV,
-                v(posFrom, posTo, posTo, 0, + 0.002f, + 0.0625f), 16, maxV,
-                v(posTo, posTo, posTo, 0, + 0.002f, + 0.0625f), 16, minV,
-                v(posTo, posTo, posTo, 0, + 0.002f, - 0.0625f), 14, minV, bark));
+                v(posFrom, posTo, posTo, 0, +0.002f, -0.0625f), 14, maxV,
+                v(posFrom, posTo, posTo, 0, +0.002f, +0.0625f), 16, maxV,
+                v(posTo, posTo, posTo, 0, +0.002f, +0.0625f), 16, minV,
+                v(posTo, posTo, posTo, 0, +0.002f, -0.0625f), 14, minV, bark));
         builder.addCulledFace(Direction.UP, this.createQuad(
-                v(posFrom, posTo, posFrom, 0, + 0.002f, - 0.0625f), 0, maxV,
-                v(posFrom, posTo, posFrom, 0, + 0.002f, + 0.0625f), 2, maxV,
-                v(posTo, posTo, posFrom, 0, + 0.002f, + 0.0625f), 2, minV,
-                v(posTo, posTo, posFrom, 0, + 0.002f, - 0.0625f), 0, minV, bark));
+                v(posFrom, posTo, posFrom, 0, +0.002f, -0.0625f), 0, maxV,
+                v(posFrom, posTo, posFrom, 0, +0.002f, +0.0625f), 2, maxV,
+                v(posTo, posTo, posFrom, 0, +0.002f, +0.0625f), 2, minV,
+                v(posTo, posTo, posFrom, 0, +0.002f, -0.0625f), 0, minV, bark));
 
         builder.addCulledFace(Direction.UP, this.createQuad(
                 v(posFrom.x() / 16f - 0.002f, posTo.y() / 16f + 0.0625f, posFrom.z() / 16f), 16, minV,
@@ -541,23 +541,26 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
      * @param face
      * @return
      */
-    public int getFaceAngle (Axis axis, Direction face) {
-        if(axis == Axis.Y) { //UP / DOWN
+    public int getFaceAngle(Axis axis, Direction face) {
+        if (axis == Axis.Y) { //UP / DOWN
             return 0;
-        }
-        else if(axis == Axis.Z) {//NORTH / SOUTH
-            switch(face) {
-                case UP: return 0;
-                case WEST: return 270;
-                case DOWN: return 180;
-                default: return 90;
+        } else if (axis == Axis.Z) {//NORTH / SOUTH
+            switch (face) {
+                case UP:
+                    return 0;
+                case WEST:
+                    return 270;
+                case DOWN:
+                    return 180;
+                default:
+                    return 90;
             }
         } else { //EAST/WEST
             return (face == Direction.NORTH) ? 270 : 90;
         }
     }
 
-    private Vec3 v(Vector3f xVec, Vector3f yVec, Vector3f zVec, float xOffset, float yOffset, float zOffset){
+    private Vec3 v(Vector3f xVec, Vector3f yVec, Vector3f zVec, float xOffset, float yOffset, float zOffset) {
         return v(xVec.x() / 16f + xOffset, yVec.y() / 16f + yOffset, zVec.z() / 16f + zOffset);
     }
 
@@ -565,8 +568,8 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
         return new Vec3(x, y, z);
     }
 
-    private int getRadiusIndex (int radius){
-        for (int i=0; i<radii.length; i++){
+    private int getRadiusIndex(int radius) {
+        for (int i = 0; i < radii.length; i++) {
             if (radius == radii[i]) return i;
         }
         return 0;
@@ -580,75 +583,75 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
 
             int coreRadius = this.getRadius(state);
 
-            int[] connections = new int[] {0,0,0,0,0,0};
+            int[] connections = new int[]{0, 0, 0, 0, 0, 0};
             Direction forceRingDir = null;
-            if (extraData instanceof ModelConnections){
+            if (extraData instanceof ModelConnections) {
                 connections = ((ModelConnections) extraData).getAllRadii();
                 forceRingDir = ((ModelConnections) extraData).getRingOnly();
             }
 
 
-                //Count number of connections
-                int numConnections = 0;
-                for(int i: connections) {
-                    numConnections += (i != 0) ? 1: 0;
+            //Count number of connections
+            int numConnections = 0;
+            for (int i : connections) {
+                numConnections += (i != 0) ? 1 : 0;
+            }
+
+            if (numConnections == 0 && forceRingDir != null) {
+                quadsList.addAll(rings[getRadiusIndex(coreRadius)].getQuads(state, forceRingDir, rand, extraData));
+            } else {
+                boolean extraUpSleeve = false;
+                if (coreRadius == radii[0] && numConnections == 1 && state.getValue(CactusBranchBlock.ORIGIN).getAxis().isHorizontal()) {
+                    connections[1] = radii[0];
+                    extraUpSleeve = true;
                 }
 
-                if (numConnections == 0 && forceRingDir != null){
-                    quadsList.addAll(rings[getRadiusIndex(coreRadius)].getQuads(state, forceRingDir, rand, extraData));
-                } else {
-                    boolean extraUpSleeve = false;
-                    if (coreRadius == radii[0] && numConnections == 1 && state.getValue(CactusBranchBlock.ORIGIN).getAxis().isHorizontal()) {
-                        connections[1] = radii[0];
-                        extraUpSleeve = true;
-                    }
+                //The source direction is the biggest connection from one of the 6 directions
+                Direction sourceDir = getSourceDir(coreRadius, connections);
+                if (sourceDir == null) {
+                    sourceDir = Direction.DOWN;
+                }
+                int coreDir = resolveCoreDir(sourceDir);
 
-                    //The source direction is the biggest connection from one of the 6 directions
-                    Direction sourceDir = getSourceDir(coreRadius, connections);
-                    if(sourceDir == null) {
-                        sourceDir = Direction.DOWN;
-                    }
-                    int coreDir = resolveCoreDir(sourceDir);
+                // This is for drawing the rings on a terminating branch
+                Direction coreRingDir = (numConnections == 1) ? sourceDir.getOpposite() : null;
 
-                    // This is for drawing the rings on a terminating branch
-                    Direction coreRingDir = (numConnections == 1) ? sourceDir.getOpposite() : null;
-
-                    for (Direction face : Direction.values()) {
-                        //Get quads for core model
-                        if (coreRadius != connections[face.get3DDataValue()]) {
-                            if (coreRingDir == null || coreRingDir != face) {
-                                quadsList.addAll(cores[coreDir][getRadiusIndex(coreRadius)].getQuads(state, face, rand, extraData));
-                            } else {
-                                quadsList.addAll(rings[getRadiusIndex(coreRadius)].getQuads(state, face, rand, extraData));
-                            }
+                for (Direction face : Direction.values()) {
+                    //Get quads for core model
+                    if (coreRadius != connections[face.get3DDataValue()]) {
+                        if (coreRingDir == null || coreRingDir != face) {
+                            quadsList.addAll(cores[coreDir][getRadiusIndex(coreRadius)].getQuads(state, face, rand, extraData));
+                        } else {
+                            quadsList.addAll(rings[getRadiusIndex(coreRadius)].getQuads(state, face, rand, extraData));
                         }
+                    }
 
-                        // Get quads for core spikes
-                        for (Direction dir : Direction.values()) {
-                            if (coreRadius > connections[dir.get3DDataValue()]) {
-                                for (BakedQuad quad : coreSpikes[getRadiusIndex(coreRadius)].getQuads(state, dir, rand, extraData)) {
-                                    if (coreRadius > connections[quad.getDirection().get3DDataValue()]) {
-                                        quadsList.add(quad);
-                                    }
+                    // Get quads for core spikes
+                    for (Direction dir : Direction.values()) {
+                        if (coreRadius > connections[dir.get3DDataValue()]) {
+                            for (BakedQuad quad : coreSpikes[getRadiusIndex(coreRadius)].getQuads(state, dir, rand, extraData)) {
+                                if (coreRadius > connections[quad.getDirection().get3DDataValue()]) {
+                                    quadsList.add(quad);
                                 }
                             }
                         }
+                    }
 
-                        // Get quads for sleeves models
-                        for (Direction connDir : Direction.values()) {
-                            int idx = connDir.get3DDataValue();
-                            int connRadius = connections[idx];
-                            // If the connection side matches the quadpull side then cull the sleeve face.  Don't cull radius 1 connections for leaves(which are partly transparent).
-                            if (connRadius >= radii[0] && ((connDir == Direction.UP && connRadius == radii[0] && extraUpSleeve) || face != connDir || connDir == Direction.DOWN)) {
-                                quadsList.addAll(sleeves[idx][getRadiusIndex(connRadius)].getQuads(state, face, rand, extraData));
-                            }
+                    // Get quads for sleeves models
+                    for (Direction connDir : Direction.values()) {
+                        int idx = connDir.get3DDataValue();
+                        int connRadius = connections[idx];
+                        // If the connection side matches the quadpull side then cull the sleeve face.  Don't cull radius 1 connections for leaves(which are partly transparent).
+                        if (connRadius >= radii[0] && ((connDir == Direction.UP && connRadius == radii[0] && extraUpSleeve) || face != connDir || connDir == Direction.DOWN)) {
+                            quadsList.addAll(sleeves[idx][getRadiusIndex(connRadius)].getQuads(state, face, rand, extraData));
                         }
                     }
-
-                    if (extraUpSleeve) {
-                        quadsList.addAll(sleeveTopSpikes.getQuads(state, Direction.UP, rand, extraData));
-                    }
                 }
+
+                if (extraUpSleeve) {
+                    quadsList.addAll(sleeveTopSpikes.getQuads(state, Direction.UP, rand, extraData));
+                }
+            }
 
             return quadsList;
         }
@@ -658,7 +661,6 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
 
     /**
      * Checks all neighboring tree parts to determine the connection radius for each side of this branch block.
-     *
      */
     @Override
     public IModelData getModelData(BlockAndTintGetter world, BlockPos pos, BlockState state, IModelData tileData) {
@@ -678,15 +680,15 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
         int largestConnection = 0;
         Direction sourceDir = null;
 
-        for(Direction dir: Direction.values()){
+        for (Direction dir : Direction.values()) {
             int connRadius = connections[dir.get3DDataValue()];
-            if(connRadius > largestConnection){
+            if (connRadius > largestConnection) {
                 largestConnection = connRadius;
                 sourceDir = dir;
             }
         }
 
-        if(largestConnection < coreRadius){
+        if (largestConnection < coreRadius) {
             sourceDir = null;//Has no source node
         }
         return sourceDir;
@@ -717,6 +719,7 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
     public TextureAtlasSprite getParticleIcon(IModelData data) {
         return getParticleIcon();
     }
+
     @Override
     public TextureAtlasSprite getParticleIcon() {
         return barkTexture;

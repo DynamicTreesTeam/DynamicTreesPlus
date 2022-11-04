@@ -1,15 +1,15 @@
 package com.ferreusveritas.dynamictreesplus.resources;
 
-import com.ferreusveritas.dynamictrees.api.treepacks.ApplierRegistryEvent;
+import com.ferreusveritas.dynamictrees.api.applier.ApplierRegistryEvent;
 import com.ferreusveritas.dynamictrees.deserialisation.EnumDeserialiser;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
 import com.ferreusveritas.dynamictrees.deserialisation.PropertyAppliers;
 import com.ferreusveritas.dynamictrees.deserialisation.RegistryEntryDeserialiser;
-import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictreesplus.DynamicTreesPlus;
-import com.ferreusveritas.dynamictreesplus.blocks.CactusBranchBlock;
+import com.ferreusveritas.dynamictreesplus.block.CactusBranchBlock;
 import com.ferreusveritas.dynamictreesplus.systems.thicknesslogic.CactusThicknessLogic;
-import com.ferreusveritas.dynamictreesplus.trees.CactusSpecies;
+import com.ferreusveritas.dynamictreesplus.tree.CactusSpecies;
 import com.google.gson.JsonElement;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -31,8 +31,7 @@ public final class JsonRegistries {
     }
 
     public static void registerCactusThicknessApplier(PropertyAppliers<Species, JsonElement> appliers) {
-        appliers.register("cactus_thickness_logic", CactusSpecies.class, CactusThicknessLogic.class,
-                CactusSpecies::setThicknessLogic);
+        appliers.register("cactus_thickness_logic", CactusSpecies.class, CactusThicknessLogic.class, CactusSpecies::setThicknessLogic);
     }
 
     @SubscribeEvent

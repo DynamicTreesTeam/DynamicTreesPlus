@@ -1,5 +1,5 @@
 @MethodsReturnNonnullByDefault @ParametersAreNonnullByDefault
-package com.ferreusveritas.dynamictreesplus.blocks;
+package com.ferreusveritas.dynamictreesplus.model.loader;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 

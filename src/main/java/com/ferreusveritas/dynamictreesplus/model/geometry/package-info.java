@@ -1,5 +1,5 @@
 @MethodsReturnNonnullByDefault @ParametersAreNonnullByDefault
-package com.ferreusveritas.dynamictreesplus.models.geometry;
+package com.ferreusveritas.dynamictreesplus.model.geometry;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 

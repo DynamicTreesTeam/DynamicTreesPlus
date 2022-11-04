@@ -19,12 +19,12 @@ plugins {
 }
 apply {
     from("https://raw.githubusercontent.com/SizableShrimp/Forge-Class-Remapper/main/classremapper.gradle")
+    from("https://gist.githubusercontent.com/Harleyoc1/4d23d4e991e868d98d548ac55832381e/raw/applesiliconfg.gradle")
 }
 
 repositories {
     mavenLocal()
     maven("https://ldtteam.jfrog.io/ldtteam/modding/")
-    // maven("https://maven.tehnut.info")
     maven("https://www.cursemaven.com") {
         content {
             includeGroup("curse.maven")
@@ -119,30 +119,18 @@ sourceSets.main.get().resources {
 }
 
 dependencies {
-    // Not sure if we need this one, what is a "forge" anyway?
     minecraft("net.minecraftforge:forge:${mcVersion}-${property("forgeVersion")}")
 
-    // Compile Hwyla API, but don"t include in runtime.
-//    compileOnly(fg.deobf("mcp.mobius.waila:Hwyla:${property("hwylaVersion")}:api"))
-    // At runtime, use the full Hwyla mod.
-//    runtimeOnly(fg.deobf("mcp.mobius.waila:Hwyla:${property("hwylaVersion")}"))
+    implementation(fg.deobf("curse.maven:jade-324717:3970956"))
 
-    // Compile JEI API, but don"t include in runtime.
-    compileOnly(fg.deobf("mezz.jei:jei-${mcVersion}:${property("jeiVersion")}:api"))
-    // At runtime, use the full JEI mod.
-    runtimeOnly(fg.deobf("mezz.jei:jei-${mcVersion}:${property("jeiVersion")}"))
-
-    // At runtime, use Patchouli mod (for the guide book, which is Json so we don"t need the API).
-    runtimeOnly(fg.deobf("vazkii.patchouli:Patchouli:${property("patchouliVersion")}"))
-
-    // At runtime use, CC for creating growth chambers.
-    runtimeOnly(fg.deobf("org.squiddev:cc-tweaked-$mcVersion:${property("ccVersion")}"))
+    compileOnly(fg.deobf("mezz.jei:jei-$mcVersion:${property("jeiVersion")}:api"))
+    runtimeOnly(fg.deobf("mezz.jei:jei-$mcVersion:${property("jeiVersion")}"))
 
     implementation(fg.deobf("com.ferreusveritas.dynamictrees:DynamicTrees-${mcVersion}:${property("dynamicTreesVersion")}"))
-//    implementation(fg.deobf("curse.maven:dynamictrees-252818:3815249"))
-    // At runtime, use suggestion provider fix mod.
-//    runtimeOnly(fg.deobf("com.harleyoconnor.suggestionproviderfix:SuggestionProviderFix:${mcVersion}-${property("suggestionProviderFixVersion")}"))
-    runtimeOnly(fg.deobf("curse.maven:suggestionproviderfix-469647:3623382"))
+
+    runtimeOnly(fg.deobf("vazkii.patchouli:Patchouli:${property("patchouliVersion")}"))
+    runtimeOnly(fg.deobf("org.squiddev:cc-tweaked-$mcVersion:${property("ccVersion")}"))
+    runtimeOnly(fg.deobf("com.harleyoconnor.suggestionproviderfix:SuggestionProviderFix-1.18.1:${property("suggestionProviderFixVersion")}"))
 }
 
 tasks.jar {
@@ -168,14 +156,6 @@ java {
     }
 }
 
-fun readChangelog(): String? {
-    val versionInfoFile = file("version_info.json")
-    val jsonObject = Gson().fromJson(InputStreamReader(versionInfoFile.inputStream()), JsonObject::class.java)
-    return jsonObject
-        .get(mcVersion)?.asJsonObject
-        ?.get(project.version.toString())?.asString
-}
-
 curseforge {
     if (project.hasProperty("curseApiKey") && project.hasProperty("curseFileType")) {
         apiKey = property("curseApiKey")
@@ -183,10 +163,9 @@ curseforge {
         project {
             id = "478155"
 
-            addGameVersion("1.16.4")
             addGameVersion(mcVersion)
 
-            changelog = readChangelog() ?: "No changelog provided."
+            changelog = "Changelog will be added shortly..."
             changelogType = "markdown"
             releaseType = property("curseFileType")
 

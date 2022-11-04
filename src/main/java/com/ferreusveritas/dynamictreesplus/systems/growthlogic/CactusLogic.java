@@ -1,11 +1,11 @@
 package com.ferreusveritas.dynamictreesplus.systems.growthlogic;
 
-import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
+import com.ferreusveritas.dynamictrees.api.configuration.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKitConfiguration;
 import com.ferreusveritas.dynamictrees.growthlogic.context.DirectionManipulationContext;
 import com.ferreusveritas.dynamictrees.growthlogic.context.PositionalSpeciesContext;
-import com.ferreusveritas.dynamictreesplus.trees.CactusSpecies;
+import com.ferreusveritas.dynamictreesplus.tree.CactusSpecies;
 import net.minecraft.resources.ResourceLocation;
 
 public class CactusLogic extends GrowthLogicKit {
@@ -30,7 +30,7 @@ public class CactusLogic extends GrowthLogicKit {
     @Override
     public int[] populateDirectionProbabilityMap(GrowthLogicKitConfiguration configuration,
                                                  DirectionManipulationContext context) {
-        return new int[] {0,1,0,0,0,0};
+        return new int[]{0, 1, 0, 0, 0, 0};
     }
 
     @Override

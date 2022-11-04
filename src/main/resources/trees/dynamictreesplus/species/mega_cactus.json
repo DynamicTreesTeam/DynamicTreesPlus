@@ -8,15 +8,6 @@
   "lowest_branch_height": 3,
   "growth_rate": 0.6,
   "soil_longevity": 10,
-  "drop_creators": [
-    "log",
-    {
-      "name": "dynamictreesplus:cactus_seeds",
-      "properties": {
-        "seeds_per_branch": 0.125
-      }
-    }
-  ],
   "growth_logic_kit": {
     "name": "dynamictreesplus:mega_cactus",
     "properties": {

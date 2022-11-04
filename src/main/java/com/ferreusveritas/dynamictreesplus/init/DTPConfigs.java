@@ -17,9 +17,9 @@ public class DTPConfigs {
 //    public static ForgeConfigSpec COMMON_CONFIG;
 //    public static ForgeConfigSpec CLIENT_CONFIG;
 
-    public static ForgeConfigSpec.BooleanValue canBoneMealCactus;
-    public static ForgeConfigSpec.BooleanValue cactusPrickleOnMoveOnly;
-    public static ForgeConfigSpec.BooleanValue cactusKillItems;
+    public static final ForgeConfigSpec.BooleanValue CAN_BONE_MEAL_CACTUS;
+    public static final ForgeConfigSpec.BooleanValue CACTUS_PRICKLE_ON_MOVE_ONLY;
+    public static final ForgeConfigSpec.BooleanValue CACTUS_KILL_ITEMS;
 
     static {
         configDirectory = new File(FMLPaths.CONFIGDIR.get().toUri());
@@ -29,11 +29,11 @@ public class DTPConfigs {
 //        final ForgeConfigSpec.Builder CLIENT_BUILDER = new ForgeConfigSpec.Builder();
 
         SERVER_BUILDER.comment("Cactus Settings").push("cactus");
-        canBoneMealCactus = SERVER_BUILDER.comment("If enabled bone meal can be used to speed up cactus growth.").
+        CAN_BONE_MEAL_CACTUS = SERVER_BUILDER.comment("If enabled bone meal can be used to speed up cactus growth.").
                 define("canBoneMealCactus", false);
-        cactusPrickleOnMoveOnly = SERVER_BUILDER.comment("If enabled dynamic cacti will only prickle when moving (similar to how berry bushes prickle)").
+        CACTUS_PRICKLE_ON_MOVE_ONLY = SERVER_BUILDER.comment("If enabled dynamic cacti will only prickle when moving (similar to how berry bushes prickle)").
                 define("cactusPrickleOnMoveOnly", true);
-        cactusKillItems = SERVER_BUILDER.comment("If enabled dynamic cacti will destroy items on contact").
+        CACTUS_KILL_ITEMS = SERVER_BUILDER.comment("If enabled dynamic cacti will destroy items on contact").
                 define("cactusKillItems", false);
         SERVER_BUILDER.pop();
 

@@ -2,10 +2,10 @@ package com.ferreusveritas.dynamictreesplus;
 
 import com.ferreusveritas.dynamictrees.api.GatherDataHelper;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
-import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
-import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilProperties;
-import com.ferreusveritas.dynamictrees.trees.Family;
-import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.block.leaves.LeavesProperties;
+import com.ferreusveritas.dynamictrees.block.rooty.SoilProperties;
+import com.ferreusveritas.dynamictrees.tree.family.Family;
+import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictreesplus.init.DTPClient;
 import com.ferreusveritas.dynamictreesplus.init.DTPConfigs;
 import com.ferreusveritas.dynamictreesplus.init.DTPRegistries;
@@ -23,7 +23,7 @@ public class DynamicTreesPlus {
 
     public static final String MOD_ID = "dynamictreesplus";
 
-    public DynamicTreesPlus () {
+    public DynamicTreesPlus() {
         final IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, DTPConfigs.SERVER_CONFIG);
@@ -51,7 +51,7 @@ public class DynamicTreesPlus {
         );
     }
 
-    public static ResourceLocation resLoc (final String path) {
+    public static ResourceLocation location(final String path) {
         return new ResourceLocation(MOD_ID, path);
     }
 

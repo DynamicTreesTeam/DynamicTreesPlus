@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictreesplus.event;
 
 import com.ferreusveritas.dynamictreesplus.DynamicTreesPlus;
-import com.ferreusveritas.dynamictreesplus.models.loaders.CactusBlockModelLoader;
+import com.ferreusveritas.dynamictreesplus.model.loader.CactusBlockModelLoader;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ModelRegistryEvent;
@@ -15,7 +15,7 @@ import net.minecraftforge.fml.common.Mod;
 @Mod.EventBusSubscriber(modid = DynamicTreesPlus.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public final class BakedModelEventHandler {
 
-    public static final ResourceLocation CACTUS = DynamicTreesPlus.resLoc("cactus");
+    public static final ResourceLocation CACTUS = DynamicTreesPlus.location("cactus");
 
     @SubscribeEvent
     public static void onModelRegistryEvent(ModelRegistryEvent event) {

@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictreesplus.init;
 
-import com.ferreusveritas.dynamictreesplus.blocks.CactusBranchBlock;
+import com.ferreusveritas.dynamictreesplus.block.CactusBranchBlock;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraftforge.registries.ForgeRegistries;

@@ -1,5 +1,5 @@
 @MethodsReturnNonnullByDefault @ParametersAreNonnullByDefault
-package com.ferreusveritas.dynamictreesplus.models.loaders;
+package com.ferreusveritas.dynamictreesplus.model.baked;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 

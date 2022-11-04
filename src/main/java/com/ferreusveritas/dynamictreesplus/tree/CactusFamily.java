@@ -1,10 +1,10 @@
-package com.ferreusveritas.dynamictreesplus.trees;
+package com.ferreusveritas.dynamictreesplus.tree;
 
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
-import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
+import com.ferreusveritas.dynamictrees.block.branch.BranchBlock;
 import com.ferreusveritas.dynamictrees.data.provider.BranchLoaderBuilder;
-import com.ferreusveritas.dynamictrees.trees.Family;
-import com.ferreusveritas.dynamictreesplus.blocks.CactusBranchBlock;
+import com.ferreusveritas.dynamictrees.tree.family.Family;
+import com.ferreusveritas.dynamictreesplus.block.CactusBranchBlock;
 import com.ferreusveritas.dynamictreesplus.event.BakedModelEventHandler;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.SoundType;
@@ -36,8 +36,8 @@ public class CactusFamily extends Family {
     }
 
     @Override
-    protected BranchBlock createBranchBlock() {
-        return new CactusBranchBlock(this.getProperties());
+    protected BranchBlock createBranchBlock(ResourceLocation name) {
+        return new CactusBranchBlock(name, this.getProperties());
     }
 
     @Override

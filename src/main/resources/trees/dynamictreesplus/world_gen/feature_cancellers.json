@@ -1,0 +1,10 @@
+[
+  {
+    "__comment": "Cancel standard cactus features from the desert and badlands.",
+    "select": { "name": "minecraft.*", "OR": [ { "category": "desert" }, { "category": "mesa" } ] },
+    "cancellers": {
+      "type": "dynamictreesplus:cactus",
+      "namespace": "minecraft"
+    }
+  }
+]

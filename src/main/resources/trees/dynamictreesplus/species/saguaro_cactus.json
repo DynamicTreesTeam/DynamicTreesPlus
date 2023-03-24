@@ -19,5 +19,16 @@
   "cactus_thickness_logic": "dynamictreesplus:saguaro",
   "mega_species": "dynamictreesplus:mega_cactus",
   "common_override": { "type": "mesa" },
-  "perfect_biomes": { "type": "mesa" }
+  "perfect_biomes": { "type": "mesa" },
+  "fruits": [
+    "dynamictreesplus:saguaro"
+  ],
+  "features": [
+    {
+      "name": "dynamictreesplus:cactus_fruit",
+      "properties": {
+        "fruit": "dynamictreesplus:saguaro"
+      }
+    }
+  ]
 }

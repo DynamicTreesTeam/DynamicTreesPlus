@@ -1,15 +1,22 @@
 package com.ferreusveritas.dynamictreesplus.init;
 
+import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryEvent;
 import com.ferreusveritas.dynamictrees.api.registry.TypeRegistryEvent;
 import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
+import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
+import com.ferreusveritas.dynamictrees.systems.BranchConnectables;
+import com.ferreusveritas.dynamictrees.systems.fruit.Fruit;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CommonVoxelShapes;
 import com.ferreusveritas.dynamictreesplus.DynamicTreesPlus;
+import com.ferreusveritas.dynamictreesplus.blocks.CactusFruit;
 import com.ferreusveritas.dynamictreesplus.systems.featuregen.CactusClonesGenFeature;
+import com.ferreusveritas.dynamictreesplus.systems.featuregen.CactusFruitGenFeature;
+import com.ferreusveritas.dynamictreesplus.systems.featuregen.DynamicTreesPlusGenFeatures;
 import com.ferreusveritas.dynamictreesplus.systems.growthlogic.CactusLogic;
 import com.ferreusveritas.dynamictreesplus.systems.growthlogic.MegaCactusLogic;
 import com.ferreusveritas.dynamictreesplus.systems.growthlogic.SaguaroCactusLogic;
@@ -18,13 +25,18 @@ import com.ferreusveritas.dynamictreesplus.systems.thicknesslogic.CactusThicknes
 import com.ferreusveritas.dynamictreesplus.trees.CactusFamily;
 import com.ferreusveritas.dynamictreesplus.trees.CactusSpecies;
 import com.ferreusveritas.dynamictreesplus.worldgen.canceller.CactusFeatureCanceller;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.CactusBlock;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import org.apache.logging.log4j.LogManager;
 
 @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
 public class DTPRegistries {
@@ -58,11 +70,9 @@ public class DTPRegistries {
         event.getRegistry().registerAll(CactusThicknessLogicKits.PILLAR, CactusThicknessLogicKits.PIPE, CactusThicknessLogicKits.SAGUARO, CactusThicknessLogicKits.MEGA);
     }
 
-    public static final GenFeature CACTUS_CLONES = new CactusClonesGenFeature(DynamicTreesPlus.resLoc("cactus_clones"));
-
     @SubscribeEvent
     public static void registerGenFeature(final RegistryEvent<GenFeature> event) {
-        event.getRegistry().registerAll(CACTUS_CLONES);
+        DynamicTreesPlusGenFeatures.registerGenFeatures(event);
     }
 
     public static final ResourceLocation CACTUS = DynamicTreesPlus.resLoc("cactus");
@@ -75,6 +85,11 @@ public class DTPRegistries {
     @SubscribeEvent
     public static void registerSpeciesType(final TypeRegistryEvent<Species> event) {
         event.registerType(CACTUS, CactusSpecies.TYPE);
+    }
+
+    @SubscribeEvent
+    public static void registerFruitType(final TypeRegistryEvent<Fruit> event) {
+        event.registerType(DynamicTreesPlus.resLoc("cactus_fruit"), CactusFruit.TYPE);
     }
 
     @SubscribeEvent

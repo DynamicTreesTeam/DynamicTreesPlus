@@ -3,6 +3,7 @@
 		"__comment": "Cancel standard tree features from the overworld.",
 		"select": { "name": "minecraft.*", "type": "sandy" },
 		"cancellers": {
+			"method": "splice_before",
 			"type": "dynamictreesplus:cactus",
 			"namespace": "minecraft"
 		}

@@ -1,0 +1,11 @@
+{
+  "type": "dynamictreesplus:cactus_fruit",
+  "block_registry_name": "saguaro_fruit",
+  "item_stack": "dynamictreesplus:saguaro_cactus_seed",
+  "block_shapes": [
+    { "function": "fruit", "parameters": { "radius": 4, "height": 3, "stem_length": 13, "fraction": 16 } },
+    { "function": "fruit", "parameters": { "radius": 4, "height": 10, "stem_length": 16 } },
+    { "function": "fruit", "parameters": { "radius": 5, "height": 20, "stem_length": 16 } },
+    { "function": "fruit", "parameters": { "radius": 5, "height": 24, "stem_length": 16 } }
+  ]
+}

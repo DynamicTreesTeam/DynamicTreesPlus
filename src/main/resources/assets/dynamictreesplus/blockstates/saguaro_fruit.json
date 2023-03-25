@@ -26,10 +26,18 @@
         },
         {   "when": { "age": 3, "is_offset": false },
             "apply": [
-                { "model": "dynamictreesplus:block/fruit/saguaro_age3" },
-                { "model": "dynamictreesplus:block/fruit/saguaro_age3", "y": 90 },
-                { "model": "dynamictreesplus:block/fruit/saguaro_age3", "y": 180 },
-                { "model": "dynamictreesplus:block/fruit/saguaro_age3", "y": 270 }
+                { "model": "dynamictreesplus:block/fruit/saguaro_age3_a" },
+                { "model": "dynamictreesplus:block/fruit/saguaro_age3_a", "y": 90 },
+                { "model": "dynamictreesplus:block/fruit/saguaro_age3_a", "y": 180 },
+                { "model": "dynamictreesplus:block/fruit/saguaro_age3_a", "y": 270 },
+                { "model": "dynamictreesplus:block/fruit/saguaro_age3_b" },
+                { "model": "dynamictreesplus:block/fruit/saguaro_age3_b", "y": 90 },
+                { "model": "dynamictreesplus:block/fruit/saguaro_age3_b", "y": 180 },
+                { "model": "dynamictreesplus:block/fruit/saguaro_age3_b", "y": 270 },
+                { "model": "dynamictreesplus:block/fruit/saguaro_age3_c" },
+                { "model": "dynamictreesplus:block/fruit/saguaro_age3_c", "y": 90 },
+                { "model": "dynamictreesplus:block/fruit/saguaro_age3_c", "y": 180 },
+                { "model": "dynamictreesplus:block/fruit/saguaro_age3_c", "y": 270 }
             ]
         },
 
@@ -61,10 +69,18 @@
         },
         {   "when": { "age": 3, "is_offset": true },
             "apply": [
-                { "model": "dynamictreesplus:block/fruit/saguaro_offset_age3" },
-                { "model": "dynamictreesplus:block/fruit/saguaro_offset_age3", "y": 90 },
-                { "model": "dynamictreesplus:block/fruit/saguaro_offset_age3", "y": 180 },
-                { "model": "dynamictreesplus:block/fruit/saguaro_offset_age3", "y": 270 }
+                { "model": "dynamictreesplus:block/fruit/saguaro_offset_age3_a" },
+                { "model": "dynamictreesplus:block/fruit/saguaro_offset_age3_a", "y": 90 },
+                { "model": "dynamictreesplus:block/fruit/saguaro_offset_age3_a", "y": 180 },
+                { "model": "dynamictreesplus:block/fruit/saguaro_offset_age3_a", "y": 270 },
+                { "model": "dynamictreesplus:block/fruit/saguaro_offset_age3_b" },
+                { "model": "dynamictreesplus:block/fruit/saguaro_offset_age3_b", "y": 90 },
+                { "model": "dynamictreesplus:block/fruit/saguaro_offset_age3_b", "y": 180 },
+                { "model": "dynamictreesplus:block/fruit/saguaro_offset_age3_b", "y": 270 },
+                { "model": "dynamictreesplus:block/fruit/saguaro_offset_age3_c" },
+                { "model": "dynamictreesplus:block/fruit/saguaro_offset_age3_c", "y": 90 },
+                { "model": "dynamictreesplus:block/fruit/saguaro_offset_age3_c", "y": 180 },
+                { "model": "dynamictreesplus:block/fruit/saguaro_offset_age3_c", "y": 270 }
             ]
         }
     ]

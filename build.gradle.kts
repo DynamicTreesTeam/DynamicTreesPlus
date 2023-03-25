@@ -88,6 +88,8 @@ dependencies {
     runtimeOnly(fg.deobf("com.harleyoconnor.suggestionproviderfix:SuggestionProviderFix:${mcVersion}-${property("suggestionProviderFixVersion")}"))
 
     implementation(fg.deobf("com.ferreusveritas.dynamictrees:DynamicTrees-${mcVersion}:${property("dynamicTreesVersion")}"))
+
+    runtimeOnly(fg.deobf("curse.maven:SereneSeasons-291874:3650681"))
 }
 
 tasks.jar {

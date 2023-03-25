@@ -7,6 +7,8 @@ import net.minecraft.block.BlockState;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.shapes.ISelectionContext;
+import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.world.IBlockReader;
 
 public class CactusFruitBlock extends FruitBlock {
@@ -29,4 +31,10 @@ public class CactusFruitBlock extends FruitBlock {
         super.createBlockStateDefinition(builder.add(OFFSET));
     }
 
+    @Override
+    public VoxelShape getShape(BlockState state, IBlockReader world, BlockPos pos, ISelectionContext context) {
+        VoxelShape shape = super.getShape(state, world, pos, context);
+        if (state.getValue(OFFSET)) return shape.move(0,-0.25f,0);
+        return shape;
+    }
 }

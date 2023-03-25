@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictreesplus.init;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryEvent;
+import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
 import com.ferreusveritas.dynamictrees.api.registry.TypeRegistryEvent;
 import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
@@ -14,6 +15,7 @@ import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CommonVoxelShapes;
 import com.ferreusveritas.dynamictreesplus.DynamicTreesPlus;
 import com.ferreusveritas.dynamictreesplus.blocks.CactusFruit;
+import com.ferreusveritas.dynamictreesplus.items.FoodSeed;
 import com.ferreusveritas.dynamictreesplus.systems.featuregen.CactusClonesGenFeature;
 import com.ferreusveritas.dynamictreesplus.systems.featuregen.CactusFruitGenFeature;
 import com.ferreusveritas.dynamictreesplus.systems.featuregen.DynamicTreesPlusGenFeatures;
@@ -52,12 +54,10 @@ public class DTPRegistries {
     public static VoxelShape SHORT_CACTUS_SAPLING_SHAPE = VoxelShapes.create(
             new AxisAlignedBB(0.375f, 0.0f, 0.375f, 0.625f, 0.4375f, 0.625f));
 
-
     public static void setup(){
         CommonVoxelShapes.SHAPES.put(DynamicTreesPlus.resLoc("tall_cactus").toString(), TALL_CACTUS_SAPLING_SHAPE);
         CommonVoxelShapes.SHAPES.put(DynamicTreesPlus.resLoc("medium_cactus").toString(), MEDIUM_CACTUS_SAPLING_SHAPE);
         CommonVoxelShapes.SHAPES.put(DynamicTreesPlus.resLoc("short_cactus").toString(), SHORT_CACTUS_SAPLING_SHAPE);
-
     }
 
     @SubscribeEvent

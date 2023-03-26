@@ -10,7 +10,7 @@ import javax.annotation.Nonnull;
 
 public class FoodSeed extends Seed {
 
-    public static final Food SAGUARO_FRUIT = (new Food.Builder()).nutrition(3).saturationMod(0.4F).build();
+    public static final Food SAGUARO_FRUIT = (new Food.Builder()).nutrition(2).saturationMod(0.2F).build();
 
     public FoodSeed(Species species) {
         super(species, new Item.Properties().food(SAGUARO_FRUIT));

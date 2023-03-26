@@ -4,12 +4,15 @@ import com.ferreusveritas.dynamictrees.api.registry.RegistryEvent;
 import com.ferreusveritas.dynamictrees.api.registry.TypeRegistryEvent;
 import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
+import com.ferreusveritas.dynamictrees.systems.fruit.Fruit;
 import com.ferreusveritas.dynamictrees.systems.genfeature.GenFeature;
 import com.ferreusveritas.dynamictrees.tree.family.Family;
 import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictrees.util.CommonVoxelShapes;
 import com.ferreusveritas.dynamictreesplus.DynamicTreesPlus;
+import com.ferreusveritas.dynamictreesplus.block.CactusFruit;
 import com.ferreusveritas.dynamictreesplus.systems.featuregen.CactusClonesGenFeature;
+import com.ferreusveritas.dynamictreesplus.systems.featuregen.DynamicTreesPlusGenFeatures;
 import com.ferreusveritas.dynamictreesplus.systems.growthlogic.CactusLogic;
 import com.ferreusveritas.dynamictreesplus.systems.growthlogic.MegaCactusLogic;
 import com.ferreusveritas.dynamictreesplus.systems.growthlogic.SaguaroCactusLogic;
@@ -55,11 +58,13 @@ public class DTPRegistries {
         event.getRegistry().registerAll(CactusThicknessLogicKits.PILLAR, CactusThicknessLogicKits.PIPE, CactusThicknessLogicKits.SAGUARO, CactusThicknessLogicKits.MEGA);
     }
 
-    public static final GenFeature CACTUS_CLONES = new CactusClonesGenFeature(DynamicTreesPlus.location("cactus_clones"));
-
     @SubscribeEvent
     public static void registerGenFeature(final RegistryEvent<GenFeature> event) {
-        event.getRegistry().registerAll(CACTUS_CLONES);
+        DynamicTreesPlusGenFeatures.registerGenFeatures(event);
+    }
+    @SubscribeEvent
+    public static void registerFruitType(final TypeRegistryEvent<Fruit> event) {
+        event.registerType(DynamicTreesPlus.location("cactus_fruit"), CactusFruit.TYPE);
     }
 
     public static final ResourceLocation CACTUS = DynamicTreesPlus.location("cactus");

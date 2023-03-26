@@ -2,6 +2,8 @@
   "type": "dynamictreesplus:cactus",
   "family": "dynamictreesplus:cactus",
   "always_show_on_waila": true,
+  "is_seed_edible": true,
+  "drop_seeds": false,
   "generate_seed": true,
   "generate_sapling": true,
   "sapling_shape": "dynamictreesplus:medium_cactus",
@@ -19,5 +21,16 @@
   "cactus_thickness_logic": "dynamictreesplus:saguaro",
   "mega_species": "dynamictreesplus:mega_cactus",
   "common_override": { "type": "mesa" },
-  "perfect_biomes": { "type": "mesa" }
+  "perfect_biomes": { "type": "mesa" },
+  "fruits": [
+    "dynamictreesplus:saguaro"
+  ],
+  "features": [
+    {
+      "name": "dynamictreesplus:cactus_fruit",
+      "properties": {
+        "fruit": "dynamictreesplus:saguaro"
+      }
+    }
+  ]
 }

@@ -21,18 +21,29 @@ import net.minecraftforge.fml.common.Mod;
 public final class JsonRegistries {
 
     @SubscribeEvent
-    public static void registerAppliers(final ApplierRegistryEvent.Reload<Species, JsonElement> event) {
-        registerCactusThicknessApplier(event.getAppliers());
+    public static void registerLoadAppliers(final ApplierRegistryEvent.Load<Species, JsonElement> event) {
+        registerCactusLoadApplier(event.getAppliers());
+    }
+
+    @SubscribeEvent
+    public static void registerReloadAppliers(final ApplierRegistryEvent.Reload<Species, JsonElement> event) {
+        registerCactusReloadApplier(event.getAppliers());
     }
 
     @SubscribeEvent
     public static void registerAppliers(final ApplierRegistryEvent.GatherData<Species, JsonElement> event) {
-        registerCactusThicknessApplier(event.getAppliers());
+        registerCactusReloadApplier(event.getAppliers());
     }
 
-    public static void registerCactusThicknessApplier(PropertyAppliers<Species, JsonElement> appliers) {
+    public static void registerCactusLoadApplier(PropertyAppliers<Species, JsonElement> appliers) {
+        appliers.register("is_seed_edible", CactusSpecies.class, Boolean.class,
+                CactusSpecies::setSeedEdible);
+    }
+
+    public static void registerCactusReloadApplier(PropertyAppliers<Species, JsonElement> appliers) {
         appliers.register("cactus_thickness_logic", CactusSpecies.class, CactusThicknessLogic.class, CactusSpecies::setThicknessLogic);
     }
+
 
     @SubscribeEvent
     public static void registerJsonDeserialisers(final JsonDeserialisers.RegistryEvent event) {

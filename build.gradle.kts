@@ -128,6 +128,8 @@ dependencies {
     runtimeOnly(fg.deobf("vazkii.patchouli:Patchouli:${property("patchouliVersion")}"))
     runtimeOnly(fg.deobf("org.squiddev:cc-tweaked-$mcVersion:${property("ccVersion")}"))
     runtimeOnly(fg.deobf("com.harleyoconnor.suggestionproviderfix:SuggestionProviderFix-1.18.1:${property("suggestionProviderFixVersion")}"))
+
+    runtimeOnly(fg.deobf("curse.maven:SereneSeasons-291874:3693807"))
 }
 
 tasks.jar {

@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictreesplus.tree;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
+import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.block.branch.BranchBlock;
 import com.ferreusveritas.dynamictrees.block.leaves.LeavesProperties;
@@ -9,6 +10,7 @@ import com.ferreusveritas.dynamictrees.block.rooty.SoilHelper;
 import com.ferreusveritas.dynamictrees.compat.season.SeasonHelper;
 import com.ferreusveritas.dynamictrees.event.SpeciesPostGenerationEvent;
 import com.ferreusveritas.dynamictrees.growthlogic.context.PositionalSpeciesContext;
+import com.ferreusveritas.dynamictrees.item.Seed;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.genfeature.context.PostGenerationContext;
 import com.ferreusveritas.dynamictrees.systems.nodemapper.FindEndsNode;
@@ -22,6 +24,7 @@ import com.ferreusveritas.dynamictreesplus.DynamicTreesPlus;
 import com.ferreusveritas.dynamictreesplus.block.CactusBranchBlock;
 import com.ferreusveritas.dynamictreesplus.init.DTPConfigs;
 import com.ferreusveritas.dynamictreesplus.init.DTPRegistries;
+import com.ferreusveritas.dynamictreesplus.items.FoodSeed;
 import com.ferreusveritas.dynamictreesplus.systems.thicknesslogic.CactusThicknessLogic;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -51,6 +54,7 @@ public class CactusSpecies extends Species {
     public static final TypedRegistry.EntryType<Species> TYPE = createDefaultType(CactusSpecies::new);
 
     private CactusThicknessLogic thicknessLogic;
+    private boolean isSeedEdible = false;
 
     public CactusSpecies(ResourceLocation name, Family family, LeavesProperties leavesProperties) {
         super(name, family, leavesProperties);
@@ -223,6 +227,20 @@ public class CactusSpecies extends Species {
     @Override
     public boolean shouldGenerateVoluntaryDrops() {
         return false;
+    }
+
+    @Override
+    public Species generateSeed() {
+        return !this.shouldGenerateSeed() || this.seed != null ? this :
+                this.setSeed(RegistryHandler.addItem(getSeedName(), this::createSeedItem));
+    }
+
+    public Seed createSeedItem(){
+        return isSeedEdible ? new FoodSeed(this) : new Seed(this);
+    }
+
+    public void setSeedEdible (boolean edible){
+        this.isSeedEdible = edible;
     }
 
 }

@@ -340,12 +340,12 @@ public class CactusBranchBlock extends BranchBlock {
         final BlockState state = CoordUtils.getStateSafe(blockAccess, pos);
 
         // If the blocks aren't loaded, assume there is no connection.
-        if (otherState == null || state == null)
+        if (otherState == null || state == null || state.getBlock() != this)
             return 0;
 
-        if (otherState.getBlock() == this && state.getBlock() == this && (otherState.getValue(ORIGIN) == side.getOpposite() || state.getValue(ORIGIN) == side)) {
+        if (otherState.getBlock() == this && (otherState.getValue(ORIGIN) == side.getOpposite() || state.getValue(ORIGIN) == side)) {
             return Math.min(getCactusRadius(state.getValue(TRUNK_TYPE)), getCactusRadius(otherState.getValue(TRUNK_TYPE)));
-        } else if (side == Direction.DOWN && state.getBlock() == this && state.getValue(ORIGIN) == side && (otherState.getBlock() == this || otherState.getBlock() instanceof RootyBlock)) {
+        } else if (side == Direction.DOWN && state.getValue(ORIGIN) == side && (otherState.getBlock() == this || otherState.getBlock() instanceof RootyBlock)) {
             return getCactusRadius(state.getValue(TRUNK_TYPE));
         }
 

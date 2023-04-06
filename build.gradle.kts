@@ -13,6 +13,7 @@ plugins {
     id("idea")
     id("maven-publish")
     id("com.matthewprenger.cursegradle") version "1.4.0"
+    id("com.harleyoconnor.autoupdatetool") version "1.0.0"
 }
 apply {
     from("https://raw.githubusercontent.com/SizableShrimp/Forge-Class-Remapper/main/classremapper.gradle")
@@ -164,7 +165,7 @@ curseforge {
 
             addGameVersion(mcVersion)
 
-            changelog = "Changelog will be added shortly..."
+            changelog = file("build/changelog.txt")
             changelogType = "markdown"
             releaseType = property("curseFileType")
 
@@ -252,6 +253,17 @@ publishing {
             logger.log(LogLevel.WARN, "Credentials for maven not detected; it will be disabled.")
         }
     }
+}
+
+autoUpdateTool {
+    this.mcVersion.set(mcVersion)
+    this.version.set(modVersion)
+    this.versionRecommended.set(property("versionRecommended") == "true")
+    this.updateCheckerFile.set(file(property("dynamictrees.version_info_repo.path") + File.separatorChar + property("updateCheckerPath")))
+}
+
+tasks.autoUpdate {
+    finalizedBy("publishMavenJavaPublicationToHarleyOConnorRepository", "curseforge")
 }
 
 // Extensions to make CurseGradle extension slightly neater.

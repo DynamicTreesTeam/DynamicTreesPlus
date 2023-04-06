@@ -10,6 +10,7 @@ import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.LevelContext;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
+import com.ferreusveritas.dynamictrees.worldgen.GenerationContext;
 import com.ferreusveritas.dynamictreesplus.block.CactusBranchBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
@@ -82,11 +83,12 @@ public class CactusClonesGenFeature extends GenFeature {
         LevelAccessor level = levelContext.accessor();
         for (int i = 1; i >= -1; i--) {
             BlockPos offsetRootPos = cloneRootPos.above(i);
-            if (safeBounds.inBounds(offsetRootPos, false) && species.isAcceptableSoil(level.getBlockState(offsetRootPos), true)) {
+            if (safeBounds.inBounds(offsetRootPos, false) && species.isAcceptableSoil(level.getBlockState(offsetRootPos))) {
 
                 if (worldgen) {
-                    if (level instanceof WorldGenRegion)
-                        species.generate(levelContext, offsetRootPos, level.getNoiseBiome(offsetRootPos.getX(), offsetRootPos.getY(), offsetRootPos.getZ()).value(), level.getRandom(), 2, safeBounds);
+                    if (level instanceof WorldGenRegion) {
+                        species.generate(new GenerationContext(levelContext, species, offsetRootPos, offsetRootPos.mutable(), level.getNoiseBiome(offsetRootPos.getX(), offsetRootPos.getY(), offsetRootPos.getZ()).value(), CoordUtils.getRandomDir(level.getRandom()), 2, safeBounds));
+                    }
                 } else if (level instanceof Level) {
                     species.transitionToTree((Level) level, offsetRootPos.above());
                 }

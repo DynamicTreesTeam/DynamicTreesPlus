@@ -19,6 +19,7 @@ import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.LevelContext;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
+import com.ferreusveritas.dynamictrees.worldgen.GenerationContext;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.ferreusveritas.dynamictreesplus.DynamicTreesPlus;
 import com.ferreusveritas.dynamictreesplus.block.CactusBranchBlock;
@@ -141,20 +142,19 @@ public class CactusSpecies extends Species {
         }
 
         @Override
-        public void generate(LevelContext levelContext, Species species, BlockPos rootPos, Biome biome,
-                             Direction facing, int radius, SafeChunkBounds safeBounds, boolean secondChanceRegen) {
-            LevelAccessor level = levelContext.accessor();
-            BlockState initialDirtState =
-                    level.getBlockState(rootPos); // Save the initial state of the dirt in case this fails
-            species.placeRootyDirtBlock(level, rootPos, 0); // Set to unfertilized rooty dirt
+        public void generate(GenerationContext context) {
+            LevelAccessor level = context.level();
+            BlockPos.MutableBlockPos rootPos = context.rootPos();
+            BlockState initialDirtState = level.getBlockState(rootPos); // Save the initial state of the dirt in case this fails
+            context.species().placeRootyDirtBlock(level, rootPos, 0); // Set to unfertilized rooty dirt
 
             // A Tree generation boundary radius is at least 2 and at most 8
-            radius = Mth.clamp(radius, 2, 8);
+            int radius = Mth.clamp(context.radius(), 2, 8);
             BlockPos treePos = rootPos.above();
 
             // Create tree
-            setFacing(facing);
-            generateFork(level, species, 0, rootPos, false);
+            setFacing(context.facing());
+            generateFork(level, context.species(), 0, rootPos, false);
 
             // Fix branch thicknesses and map out leaf locations
             BranchBlock branch = TreeHelper.getBranch(level.getBlockState(treePos));
@@ -165,12 +165,8 @@ public class CactusSpecies extends Species {
                 List<BlockPos> endPoints = endFinder.getEnds();
 
                 // Allow for special decorations by the tree itself
-                species.postGeneration(new PostGenerationContext(level, rootPos, species, biome, radius, endPoints,
-                        safeBounds, initialDirtState, SeasonHelper.getSeasonValue(levelContext, rootPos),
-                        species.seasonalFruitProductionFactor(levelContext, rootPos)));
-                MinecraftForge.EVENT_BUS.post(
-                        new SpeciesPostGenerationEvent(level, species, rootPos, endPoints, safeBounds,
-                                initialDirtState));
+                context.species().postGeneration(new PostGenerationContext(context, endPoints, initialDirtState));
+                MinecraftForge.EVENT_BUS.post(new SpeciesPostGenerationEvent(level, context.species(), rootPos, endPoints, context.safeBounds(), initialDirtState));
             } else { // The growth failed.. turn the soil back to what it was
                 level.setBlock(rootPos, initialDirtState, careful ? 3 : 2);
             }

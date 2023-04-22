@@ -1,0 +1,9 @@
+{
+  "primitive_cap": "brown_mushroom",
+  "mushroom_shape_kit": {
+    "name": "dynamictreesplus:mushroom",
+    "properties": {
+      "curve_factor": 0
+    }
+  }
+}

@@ -7,6 +7,7 @@ import com.ferreusveritas.dynamictrees.block.rooty.SoilProperties;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.tree.family.Family;
 import com.ferreusveritas.dynamictrees.tree.species.Species;
+import com.ferreusveritas.dynamictreesplus.block.mushroom.CapProperties;
 import com.ferreusveritas.dynamictreesplus.init.DTPClient;
 import com.ferreusveritas.dynamictreesplus.init.DTPConfigs;
 import com.ferreusveritas.dynamictreesplus.init.DTPRegistries;
@@ -57,7 +58,8 @@ public class DynamicTreesPlus {
                 SoilProperties.REGISTRY,
                 Family.REGISTRY,
                 Species.REGISTRY,
-                LeavesProperties.REGISTRY
+                LeavesProperties.REGISTRY,
+                CapProperties.REGISTRY
         );
     }
 

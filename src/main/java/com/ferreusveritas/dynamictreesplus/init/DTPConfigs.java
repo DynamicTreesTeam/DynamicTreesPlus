@@ -37,7 +37,7 @@ public class DTPConfigs {
                 define("cactusKillItems", false);
         SERVER_BUILDER.pop();
 
-        SERVER_BUILDER.comment("Mushroom Settings").push("mushroom");
+        SERVER_BUILDER.comment("Mushroom Settings").push("mushroom.json");
         SERVER_BUILDER.pop();
 
         SERVER_BUILDER.comment("Miscellaneous").push("misc");

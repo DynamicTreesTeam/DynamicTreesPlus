@@ -1,0 +1,6 @@
+{
+  "type": "dynamictreesplus:mushroom",
+  "primitive_log": "stem",
+  "stick": "air",
+  "generate_stripped_branch": false
+}

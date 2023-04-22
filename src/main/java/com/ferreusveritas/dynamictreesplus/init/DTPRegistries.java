@@ -1,9 +1,10 @@
 package com.ferreusveritas.dynamictreesplus.init;
 
-import com.ferreusveritas.dynamictrees.api.registry.RegistryEvent;
-import com.ferreusveritas.dynamictrees.api.registry.TypeRegistryEvent;
+import com.ferreusveritas.dynamictrees.api.registry.*;
 import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
+import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
+import com.ferreusveritas.dynamictrees.resources.Resources;
 import com.ferreusveritas.dynamictrees.systems.fruit.Fruit;
 import com.ferreusveritas.dynamictrees.systems.genfeature.GenFeature;
 import com.ferreusveritas.dynamictrees.tree.family.Family;
@@ -11,6 +12,8 @@ import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictrees.util.CommonVoxelShapes;
 import com.ferreusveritas.dynamictreesplus.DynamicTreesPlus;
 import com.ferreusveritas.dynamictreesplus.block.CactusFruit;
+import com.ferreusveritas.dynamictreesplus.block.mushroom.CapProperties;
+import com.ferreusveritas.dynamictreesplus.resources.CapPropertiesResourceLoader;
 import com.ferreusveritas.dynamictreesplus.systems.featuregen.CactusClonesGenFeature;
 import com.ferreusveritas.dynamictreesplus.systems.featuregen.DynamicTreesPlusGenFeatures;
 import com.ferreusveritas.dynamictreesplus.systems.growthlogic.CactusLogic;
@@ -22,12 +25,17 @@ import com.ferreusveritas.dynamictreesplus.tree.CactusFamily;
 import com.ferreusveritas.dynamictreesplus.tree.CactusSpecies;
 import com.ferreusveritas.dynamictreesplus.worldgen.canceller.CactusFeatureCanceller;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.CactusBlock;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.registries.NewRegistryEvent;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class DTPRegistries {
@@ -82,6 +90,21 @@ public class DTPRegistries {
     @SubscribeEvent
     public static void onFeatureCancellerRegistry(final com.ferreusveritas.dynamictrees.api.registry.RegistryEvent<FeatureCanceller> event) {
         event.getRegistry().registerAll(new CactusFeatureCanceller<>(DynamicTreesPlus.location("cactus"), CactusBlock.class));
+    }
+
+    @SubscribeEvent
+    public static void newRegistry(NewRegistryEvent event) {
+        // Post registry events.
+        CapProperties.REGISTRY.postRegistryEvent();
+
+        Resources.MANAGER.addLoader(CapPropertiesResourceLoader.CAP_PROPERTIES_LOADER);
+
+    }
+
+    @SubscribeEvent
+    public static void onRegisterBlocks(net.minecraftforge.event.RegistryEvent.Register<Block> event) {
+        // Lock the cap registry
+        CapProperties.REGISTRY.lock();
     }
 
 }

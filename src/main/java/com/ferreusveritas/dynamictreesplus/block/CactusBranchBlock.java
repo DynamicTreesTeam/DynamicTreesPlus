@@ -53,6 +53,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Objects;
 import java.util.Random;
 
 @SuppressWarnings("deprecation")
@@ -204,9 +205,9 @@ public class CactusBranchBlock extends BranchBlock {
     }
 
     @Override
-    public int setRadius(LevelAccessor world, BlockPos pos, int radius, Direction originDir, int flags) {
+    public int setRadius(LevelAccessor world, BlockPos pos, int radius, @Nullable Direction originDir, int flags) {
         destroyMode = DynamicTrees.DestroyMode.SET_RADIUS;
-        world.setBlock(pos, getStateForRadius(radius).setValue(ORIGIN, originDir), flags);
+        world.setBlock(pos, getStateForRadius(radius).setValue(ORIGIN, Objects.requireNonNullElse(originDir, Direction.DOWN)), flags);
         destroyMode = DynamicTrees.DestroyMode.SLOPPY;
         return radius;
     }

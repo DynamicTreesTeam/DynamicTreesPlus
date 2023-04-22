@@ -13,7 +13,7 @@
     }
   },
   {
-    "select": { "tag": "minecraft:is_badlands", "name": "!minecraft:wooded_badlands" },
+    "select": { "category": "mesa", "names": ["minecraft:.*", "!minecraft:wooded_badlands"] },
     "apply": {
       "species": "dynamictreesplus:saguaro_cactus",
       "density": { "math": { "add": [ { "mul": [ "noise", 0.6 ] }, 0.4 ] } },

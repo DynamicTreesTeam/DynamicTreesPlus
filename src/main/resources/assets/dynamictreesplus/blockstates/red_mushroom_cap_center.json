@@ -1,0 +1,44 @@
+{
+  "multipart": [
+    {
+      "apply": {
+        "model": "minecraft:block/red_mushroom_block",
+        "x": 270,
+        "uvlock": true
+      }
+    },
+    {
+      "apply": {
+        "model": "minecraft:block/mushroom_block_inside"
+      }
+    },
+    {
+      "apply": {
+        "model": "minecraft:block/mushroom_block_inside",
+        "y": 90,
+        "uvlock": false
+      }
+    },
+    {
+      "apply": {
+        "model": "minecraft:block/mushroom_block_inside",
+        "y": 180,
+        "uvlock": false
+      }
+    },
+    {
+      "apply": {
+        "model": "minecraft:block/mushroom_block_inside",
+        "y": 270,
+        "uvlock": false
+      }
+    },
+    {
+      "apply": {
+        "model": "minecraft:block/mushroom_block_inside",
+        "x": 90,
+        "uvlock": false
+      }
+    }
+  ]
+}

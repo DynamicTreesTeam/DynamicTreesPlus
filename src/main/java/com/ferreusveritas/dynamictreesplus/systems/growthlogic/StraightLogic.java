@@ -1,30 +1,27 @@
 package com.ferreusveritas.dynamictreesplus.systems.growthlogic;
 
-import com.ferreusveritas.dynamictrees.api.configuration.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKitConfiguration;
 import com.ferreusveritas.dynamictrees.growthlogic.context.DirectionManipulationContext;
 import com.ferreusveritas.dynamictrees.growthlogic.context.PositionalSpeciesContext;
-import com.ferreusveritas.dynamictreesplus.tree.CactusSpecies;
+import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import net.minecraft.resources.ResourceLocation;
 
-public class CactusLogic extends GrowthLogicKit {
+public class StraightLogic extends GrowthLogicKit {
 
-    private static final ConfigurationProperty<Integer> MOD = ConfigurationProperty.integer("mod");
-
-    public CactusLogic(final ResourceLocation registryName) {
+    public StraightLogic(final ResourceLocation registryName) {
         super(registryName);
     }
 
     @Override
     protected void registerProperties() {
-        this.register(MOD);
+        this.register(HEIGHT_VARIATION);
     }
 
     @Override
     protected GrowthLogicKitConfiguration createDefaultConfiguration() {
         return super.createDefaultConfiguration()
-                .with(MOD, 5);
+                .with(HEIGHT_VARIATION, 5);
     }
 
     @Override
@@ -35,7 +32,13 @@ public class CactusLogic extends GrowthLogicKit {
 
     @Override
     public float getEnergy(GrowthLogicKitConfiguration configuration, PositionalSpeciesContext context) {
-        return CactusSpecies.getEnergy(context, configuration.get(MOD));
+        long day = context.level().getGameTime() / 24000L;
+        int month = (int) day / 30; //Change the hashs every in-game month
+
+        // Vary the height energy by a psuedorandom hash function
+        return context.species().getSignalEnergy() *
+                context.species().biomeSuitability(context.level(), context.pos()) +
+                (CoordUtils.coordHashCode(context.pos().above(month), 2) % configuration.get(HEIGHT_VARIATION));
     }
 
     @Override

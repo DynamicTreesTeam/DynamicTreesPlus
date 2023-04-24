@@ -1,6 +1,10 @@
 {
   "type": "dynamictreesplus:mushroom",
-  "primitive_log": "stem",
+  "common_cap": "dynamictreesplus:red_mushroom",
+  "common_species": "dynamictreesplus:red_mushroom",
+  "primitive_log": "mushroom_stem",
+  "outside_branch_texture": "block/mushroom_stem",
+  "inside_branch_texture": "block/mushroom_block_inside",
   "stick": "air",
   "generate_stripped_branch": false
 }

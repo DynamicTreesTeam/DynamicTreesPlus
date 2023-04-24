@@ -6,7 +6,7 @@ import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 
-public final class SaguaroCactusLogic extends CactusLogic {
+public final class SaguaroCactusLogic extends StraightLogic {
 
     public SaguaroCactusLogic(final ResourceLocation registryName) {
         super(registryName);

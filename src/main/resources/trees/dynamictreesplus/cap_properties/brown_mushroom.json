@@ -1,9 +1,10 @@
 {
-  "primitive_cap": "brown_mushroom",
+  "primitive_cap": "brown_mushroom_block",
   "mushroom_shape_kit": {
-    "name": "dynamictreesplus:mushroom",
+    "name": "dynamictreesplus:mushroom_block",
     "properties": {
       "curve_factor": 0
     }
-  }
+  },
+  "material_color": "DIRT"
 }

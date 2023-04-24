@@ -2,10 +2,17 @@ package com.ferreusveritas.dynamictreesplus.resources;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.resource.loading.preparation.JsonRegistryResourceLoader;
+import com.ferreusveritas.dynamictrees.deserialisation.JsonHelper;
+import com.ferreusveritas.dynamictrees.deserialisation.ResourceLocationDeserialiser;
+import com.ferreusveritas.dynamictrees.deserialisation.result.JsonResult;
 import com.ferreusveritas.dynamictrees.tree.family.Family;
 import com.ferreusveritas.dynamictreesplus.block.mushroom.CapProperties;
+import com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.MushroomShapeKit;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 
 public class CapPropertiesResourceLoader extends JsonRegistryResourceLoader<CapProperties> {
     public static final CapPropertiesResourceLoader CAP_PROPERTIES_LOADER = new CapPropertiesResourceLoader();
@@ -36,10 +43,60 @@ public class CapPropertiesResourceLoader extends JsonRegistryResourceLoader<CapP
                     ));
                 });
 
-//        this.reloadAppliers.register("fire_spread", Integer.class, CapProperties::setFireSpreadSpeed)
-//                .register("flammability", Integer.class, CapProperties::setFlammability);
+        this.reloadAppliers.register("fire_spread", Integer.class, CapProperties::setFireSpreadSpeed)
+                .register("flammability", Integer.class, CapProperties::setFlammability)
+                .register("mushroom_shape_kit", MushroomShapeKit.class, CapProperties::setMushroomShapeKit);
 
         super.registerAppliers();
+    }
+
+    @Override
+    protected void applyLoadAppliers(JsonRegistryResourceLoader<CapProperties>.LoadData loadData, JsonObject json) {
+        final CapProperties capProperties = loadData.getResource();
+        this.readCustomBlockRegistryName(capProperties, json);
+
+        if (this.shouldGenerateBlocks(json)) {
+            this.generateBlocks(capProperties, json);
+        }
+
+        super.applyLoadAppliers(loadData, json);
+    }
+
+    private void readCustomBlockRegistryName(CapProperties capProperties, JsonObject json) {
+        JsonResult.forInput(json)
+                .mapIfContains("block_registry_name", JsonElement.class, input ->
+                        ResourceLocationDeserialiser.create(capProperties.getRegistryName().getNamespace())
+                                .deserialise(input).orElseThrow(), capProperties.getBlockRegistryName()
+                ).ifSuccessOrElse(
+                        capProperties::setBlockRegistryName,
+                        error -> this.logError(capProperties.getRegistryName(), error),
+                        warning -> this.logWarning(capProperties.getRegistryName(), warning)
+                ).mapIfContains("center_block_registry_name", JsonElement.class, input ->
+                        ResourceLocationDeserialiser.create(capProperties.getRegistryName().getNamespace())
+                                .deserialise(input).orElseThrow(), capProperties.getCenterBlockRegistryName()
+                ).ifSuccessOrElse(
+                        capProperties::setCenterBlockRegistryName,
+                        error -> this.logError(capProperties.getRegistryName(), error),
+                        warning -> this.logWarning(capProperties.getRegistryName(), warning)
+                );
+    }
+
+    private Boolean shouldGenerateBlocks(JsonObject json) {
+        return JsonHelper.getOrDefault(json, "generate_block", Boolean.class, true);
+    }
+
+    private void generateBlocks(CapProperties capProperties, JsonObject json) {
+        final BlockBehaviour.Properties blockProperties = JsonHelper.getBlockProperties(
+                json,
+                capProperties.getDefaultMaterial(),
+                capProperties.getDefaultMaterial().getColor(),
+                capProperties::getDefaultBlockProperties,
+                error -> this.logError(capProperties.getRegistryName(), error),
+                warning -> this.logWarning(capProperties.getRegistryName(), warning)
+        );
+
+        capProperties.generateDynamicCap(blockProperties);
+        capProperties.generateDynamicCapCenter(blockProperties);
     }
 
 }

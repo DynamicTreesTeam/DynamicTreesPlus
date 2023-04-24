@@ -1,0 +1,8 @@
+{
+  "parent": "dynamictrees:block/smartmodel/mushroom_flat",
+  "textures": {
+    "particle": "dynamictreesplus:block/brown_mushroom_cap",
+    "stem": "dynamictreesplus:block/brown_mushroom_cap",
+    "cap": "dynamictreesplus:block/brown_mushroom_cap"
+  }
+}

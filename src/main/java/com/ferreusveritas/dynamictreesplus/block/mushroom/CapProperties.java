@@ -18,8 +18,8 @@ import com.ferreusveritas.dynamictrees.tree.family.Family;
 import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictrees.util.*;
 import com.ferreusveritas.dynamictreesplus.data.CapStateGenerator;
+import com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.MushroomShapeConfiguration;
 import com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.MushroomShapeKit;
-import com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.MushroomShapeKits;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
@@ -83,8 +83,8 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
         }
 
         @Override
-        public MushroomShapeKit getMushroomShapeKit() {
-            return MushroomShapeKit.NULL_MUSHROOM_SHAPE_KIT;
+        public MushroomShapeConfiguration getMushroomShapeKit() {
+            return MushroomShapeKit.DEFAULT.getDefaultConfiguration();
         }
 
         @Override
@@ -115,13 +115,13 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
     }
 
     public CapProperties(@Nullable final BlockState primitiveCap, final ResourceLocation registryName) {
-        this(primitiveCap, MushroomShapeKits.BELL, registryName);
+        this(primitiveCap, MushroomShapeKit.DEFAULT.getDefaultConfiguration(), registryName);
     }
 
-    public CapProperties(@Nullable final BlockState primitiveCap, final MushroomShapeKit cellKit, final ResourceLocation registryName) {
+    public CapProperties(@Nullable final BlockState primitiveCap, final MushroomShapeConfiguration shapeKit, final ResourceLocation registryName) {
         this.family = Family.NULL_FAMILY;
         this.primitiveCap = primitiveCap != null ? primitiveCap : BlockStates.AIR;
-        this.mushroomShapeKit = cellKit;
+        this.mushroomShapeKit = shapeKit;
         this.setRegistryName(registryName);
         this.centerBlockRegistryName = ResourceLocationUtils.suffix(registryName, this.getCenterBlockRegistryNameSuffix());
         this.blockRegistryName = ResourceLocationUtils.suffix(registryName, this.getBlockRegistryNameSuffix());
@@ -139,13 +139,12 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
     /**
      * The {@link MushroomShapeKit}, which is for leaves automata.
      */
-    protected MushroomShapeKit mushroomShapeKit;
+    protected MushroomShapeConfiguration mushroomShapeKit;
     protected Family family;
     protected BlockState[] dynamicMushroomBlockDistanceStates = new BlockState[maxDistance + 1];
     protected BlockState dynamicMushroomCenterBlock;
     protected int flammability = 0;// Mimic vanilla mushroom
     protected int fireSpreadSpeed = 0;// Mimic vanilla mushroom
-    protected boolean connectAnyRadius = false;
     protected float chanceToAge = 0.5f;
 
     ///////////////////////////////////////////
@@ -213,11 +212,11 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
      *
      * @return The {@link CellKit} object.
      */
-    public MushroomShapeKit getMushroomShapeKit() {
+    public MushroomShapeConfiguration getMushroomShapeKit() {
         return mushroomShapeKit;
     }
 
-    public void setMushroomShapeKit(MushroomShapeKit mushroomShapeKit) {
+    public void setMushroomShapeConfiguration(MushroomShapeConfiguration mushroomShapeKit) {
         this.mushroomShapeKit = mushroomShapeKit;
     }
 
@@ -229,10 +228,6 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
         return BlockBehaviour.Properties.of(material, materialColor)
                 .strength(0.2F)
                 .sound(SoundType.WOOD);
-    }
-
-    public void setConnectAnyRadius(boolean connectAnyRadius) {
-        this.connectAnyRadius = connectAnyRadius;
     }
 
     public float getChanceToAge() {
@@ -417,8 +412,8 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
     ///////////////////////////////////////////
 
     public int getRadiusForConnection(BlockState state, BlockGetter blockAccess, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
-        final int twigRadius = from.getFamily().getPrimaryThickness();
-        return (fromRadius == twigRadius || this.connectAnyRadius) && from.getFamily() == family ? twigRadius : 0;
+        if (from.getFamily() != family) return 0;
+        return fromRadius;
     }
 
     protected final MutableLazyValue<Generator<DTBlockStateProvider, CapProperties>> stateGenerator =

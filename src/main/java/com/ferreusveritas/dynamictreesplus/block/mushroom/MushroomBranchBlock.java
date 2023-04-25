@@ -47,7 +47,7 @@ public class MushroomBranchBlock extends ThickBranchBlock {
         final DynamicCapCenterBlock cap = species.getCapCenterBlock().orElse(null);
         if (cap != null) {
             if (fromRadius == getFamily().getPrimaryThickness()) {// If we came from a twig (and we're not a stripped branch) then just make some leaves
-                signal.success = cap.tryGrowCap(level, species.getCapProperties(), 0, pos);
+                signal.success = cap.tryGrowCap(level, species.getCapProperties(),0, signal.getSpecies(), pos);
             } else {// Otherwise make a proper branch
                 return cap.branchOut(level, pos, signal, 0);
             }

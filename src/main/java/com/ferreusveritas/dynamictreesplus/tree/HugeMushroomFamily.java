@@ -36,8 +36,8 @@ public class HugeMushroomFamily extends Family {
 
     @Override
     public Family setPreReloadDefaults() {
-        this.setPrimaryThickness(3);
-        this.setSecondaryThickness(4);
+        this.setPrimaryThickness(2);
+        this.setSecondaryThickness(3);
         return this;
     }
 

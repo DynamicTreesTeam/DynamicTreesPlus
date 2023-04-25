@@ -10,8 +10,10 @@ import com.ferreusveritas.dynamictrees.block.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.poissondisc.PoissonDisc;
 import com.ferreusveritas.dynamictrees.tree.family.Family;
+import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.MushroomCapDisc;
+import com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.context.MushroomCapContext;
 import com.ferreusveritas.dynamictreesplus.tree.HugeMushroomSpecies;
 import com.mojang.math.Vector3f;
 import net.minecraft.client.Minecraft;
@@ -142,6 +144,10 @@ public class DynamicCapCenterBlock extends Block implements TreePart {
     // GROWTH
     ///////////////////////////////////////////
 
+    public void updateCap (){
+
+    }
+
     @Override
     public GrowSignal growSignal(Level level, BlockPos pos, GrowSignal signal) {
         if (signal.step()) // This is always placed at the beginning of every growSignal function.
@@ -155,7 +161,19 @@ public class DynamicCapCenterBlock extends Block implements TreePart {
             if (age != 0 && level.getRandom().nextFloat() < properties.getChanceToAge()){
                 age = Math.min(age+1, properties.getMaxAge());
                 level.setBlock(pos, getCapBlockStateForPlacement(level, pos, age == 0 ? 1 : age, properties.getDynamicCapState(true), false), 2); // Removed Notify Neighbors Flag for performance.
-                generateCap(age, level, pos);
+                generateCap(age, level, signal.getSpecies(), pos);
+
+                Family family = signal.getSpecies().getFamily();
+                BlockState capCenter = level.getBlockState(pos);
+                int thickness = family.getPrimaryThickness() + (capCenter.hasProperty(DynamicCapCenterBlock.AGE)
+                        ? capCenter.getValue(DynamicCapCenterBlock.AGE)
+                        : 0);
+
+                BlockPos branchPos = pos.offset(signal.dir.getOpposite().getNormal());
+                family.getBranchForPlacement(level, signal.getSpecies(), branchPos).ifPresent(branch ->
+                        branch.setRadius(level, branchPos, Math.min(thickness, family.getMaxBranchRadius()), null)
+                );
+                signal.radius = Math.min(thickness+1, family.getMaxBranchRadius());
             }
 
         }
@@ -166,25 +184,25 @@ public class DynamicCapCenterBlock extends Block implements TreePart {
         if (!(signal.getSpecies() instanceof HugeMushroomSpecies species)) return signal;
         CapProperties capProperties = species.getCapProperties();
 
-        if (!tryGrowCap(level, capProperties, age, pos)) {
-            signal.success = false;
-            return signal;
-        }
-
         if (BranchBlock.isNextToBranch(level, pos, signal.dir.getOpposite())) {
             signal.success = false;
             return signal;
         }
 
-        boolean couldGrow = tryGrowCap(level, capProperties, age, pos.relative(signal.dir));
+        boolean couldGrow = tryGrowCap(level, capProperties, age, signal.getSpecies(), pos.relative(signal.dir));
 
         if (couldGrow) {
-            //Finally set the leaves block to a branch
             Family family = species.getFamily();
+
+            BlockState capCenter = level.getBlockState(pos.offset(signal.dir.getNormal()));
+            int thickness = family.getPrimaryThickness() + (capCenter.hasProperty(DynamicCapCenterBlock.AGE)
+                    ? capCenter.getValue(DynamicCapCenterBlock.AGE)
+                    : 0);
+
             family.getBranchForPlacement(level, species, pos).ifPresent(branch ->
-                    branch.setRadius(level, pos, family.getPrimaryThickness(), null)
+                    branch.setRadius(level, pos, Math.min(thickness, family.getMaxBranchRadius()), null)
             );
-            signal.radius = family.getSecondaryThickness();//For the benefit of the parent branch
+            signal.radius = Math.min(thickness+1, family.getMaxBranchRadius());//For the benefit of the parent branch
         }
 
         signal.success = couldGrow;
@@ -192,13 +210,13 @@ public class DynamicCapCenterBlock extends Block implements TreePart {
         return signal;
     }
 
-    public boolean tryGrowCap(LevelAccessor level, CapProperties capProp, int currentAge, BlockPos pos) {
+    public boolean tryGrowCap(Level level, CapProperties capProp, int currentAge, Species species, BlockPos pos) {
         if (level.isEmptyBlock(pos)) {
             int age = currentAge;
             if (currentAge != 0 && level.getRandom().nextFloat() < properties.getChanceToAge())
                 age = Math.min(age+1, properties.getMaxAge());
             level.setBlock(pos, getCapBlockStateForPlacement(level, pos, age == 0 ? 1 : age, capProp.getDynamicCapState(true), false), 2); // Removed Notify Neighbors Flag for performance.
-            generateCap(age, level, pos);
+            generateCap(age, level, species, pos);
             return true;
         } else {
             final TreePart treePart = TreeHelper.getTreePart(level.getBlockState(pos));
@@ -206,68 +224,50 @@ public class DynamicCapCenterBlock extends Block implements TreePart {
         }
     }
 
-    public void neighborChanged(BlockState pState, Level pLevel, BlockPos pPos, Block pBlock, BlockPos pFromPos, boolean pIsMoving) {
-        generateCap(pState.getValue(AGE), pLevel, pPos);
-    }
-
-    protected void generateCap(int age, LevelAccessor pLevel, BlockPos pPos){
+    protected void generateCap(int age, Level pLevel, Species species, BlockPos pPos){
+        DynamicCapBlock capBlock = properties.getDynamicCapBlock().orElse(null);
+        if (capBlock == null) return;
 
         for (BlockPos pos : BlockPos.withinManhattan(pPos, 8, 8, 8)){
             BlockState posState = pLevel.getBlockState(pos);
-            if (posState.is(BlockTags.MINEABLE_WITH_PICKAXE)){
+            if (posState.is(capBlock)){
                 pLevel.setBlock(pos, Blocks.AIR.defaultBlockState(), 2);
             }
         }
-        float offset = 0.0f;
-        float factorMax = 1f;
-        float factorMin = 0.5f;
 
-        float fac = (((float)age)/(properties.maxAge)) * (factorMin - factorMax) + factorMax;
-        //float fac = 0;
+        properties.mushroomShapeKit.generateMushroomCap(new MushroomCapContext(pLevel, pPos, species, age));
 
-        int y = 0;
-        int radius = 1;
-        for (int i=1; i<=age; i++){
-            int nextY = (int)Math.floor(Math.pow(fac * radius, 3) - offset);
+    }
 
-            if (nextY != y){
-                y+= (int)Math.signum(fac);
-            }
+    public void placeRing (LevelAccessor level, BlockPos pos, int radius, int step){
+        MushroomCapDisc circle = new MushroomCapDisc(pos.getX(), pos.getZ(), radius);
 
-            MushroomCapDisc circle = new MushroomCapDisc(pPos.getX(), pPos.getZ(), radius);
-
-            for (int ix = -circle.radius; ix <= circle.radius; ix++) {
-                for (int iz = -circle.radius; iz <= circle.radius; iz++) {
-                    int circleX = circle.x + ix;
-                    int circleZ = circle.z + iz;
-                    if (circle.isEdge(circleX, circleZ)) {
-                        pLevel.setBlock(new BlockPos(circleX, pPos.getY() - y, circleZ), getStateForAge(properties, i),2);
-                    }
+        for (int ix = -circle.radius; ix <= circle.radius; ix++) {
+            for (int iz = -circle.radius; iz <= circle.radius; iz++) {
+                int circleX = circle.x + ix;
+                int circleZ = circle.z + iz;
+                if (circle.isEdge(circleX, circleZ)) {
+                    level.setBlock(new BlockPos(circleX, pos.getY(), circleZ), getStateForAge(properties, step),2);
                 }
             }
-
-            if (i >= nextY){
-                radius++;
-            }
-
         }
     }
 
     @Nonnull
     private BlockState getStateForAge(CapProperties properties, int age){
-//        return properties.getDynamicCapState(age);
-        return switch (age) {
-            default -> Blocks.BLACK_CONCRETE.defaultBlockState();
-            case 0 -> Blocks.LIGHT_BLUE_CONCRETE.defaultBlockState();
-            case 1 -> Blocks.BLUE_CONCRETE.defaultBlockState();
-            case 2 -> Blocks.PURPLE_CONCRETE.defaultBlockState();
-            case 3 -> Blocks.MAGENTA_CONCRETE.defaultBlockState();
-            case 4 -> Blocks.RED_CONCRETE.defaultBlockState();
-            case 5 -> Blocks.ORANGE_CONCRETE.defaultBlockState();
-            case 6 -> Blocks.YELLOW_CONCRETE.defaultBlockState();
-            case 7 -> Blocks.LIME_CONCRETE.defaultBlockState();
-            case 8 -> Blocks.GREEN_CONCRETE.defaultBlockState();
-        };
+        return properties.getDynamicCapState(age);
+//        return switch (age) {
+//            default -> Blocks.BLACK_CONCRETE.defaultBlockState();
+//            case 0 -> Blocks.LIGHT_BLUE_CONCRETE.defaultBlockState();
+//            case 1 -> Blocks.BLUE_CONCRETE.defaultBlockState();
+//            case 2 -> Blocks.PURPLE_CONCRETE.defaultBlockState();
+//            case 3 -> Blocks.MAGENTA_CONCRETE.defaultBlockState();
+//            case 4 -> Blocks.RED_CONCRETE.defaultBlockState();
+//            case 5 -> Blocks.ORANGE_CONCRETE.defaultBlockState();
+//            case 6 -> Blocks.YELLOW_CONCRETE.defaultBlockState();
+//            case 7 -> Blocks.LIME_CONCRETE.defaultBlockState();
+//            case 8 -> Blocks.GREEN_CONCRETE.defaultBlockState();
+//        };
     }
 
 }

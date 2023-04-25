@@ -7,6 +7,7 @@ import com.ferreusveritas.dynamictrees.deserialisation.ResourceLocationDeseriali
 import com.ferreusveritas.dynamictrees.deserialisation.result.JsonResult;
 import com.ferreusveritas.dynamictrees.tree.family.Family;
 import com.ferreusveritas.dynamictreesplus.block.mushroom.CapProperties;
+import com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.MushroomShapeConfiguration;
 import com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.MushroomShapeKit;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -45,7 +46,7 @@ public class CapPropertiesResourceLoader extends JsonRegistryResourceLoader<CapP
 
         this.reloadAppliers.register("fire_spread", Integer.class, CapProperties::setFireSpreadSpeed)
                 .register("flammability", Integer.class, CapProperties::setFlammability)
-                .register("mushroom_shape_kit", MushroomShapeKit.class, CapProperties::setMushroomShapeKit);
+                .register("mushroom_shape_kit", MushroomShapeConfiguration.class, CapProperties::setMushroomShapeConfiguration);
 
         super.registerAppliers();
     }

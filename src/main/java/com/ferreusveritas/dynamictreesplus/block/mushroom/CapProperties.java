@@ -355,6 +355,17 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
                 .orElse(Blocks.AIR.defaultBlockState());
     }
 
+    public BlockState getDynamicCapState(int distance, boolean[] directions){
+        return DynamicCapBlock.setDirectionValues(getDynamicCapState(distance), directions);
+    }
+
+    public boolean isPartOfCap(BlockState state){
+        DynamicCapBlock capBlock = getDynamicCapBlock().orElse(null);
+        DynamicCapCenterBlock capCenterBlock = getDynamicCapCenterBlock().orElse(null);
+        if (capBlock == null || capCenterBlock == null) return false;
+        return state.is(capBlock) || state.is(capCenterBlock);
+    }
+
     ///////////////////////////////////////////
     // LOOT
     ///////////////////////////////////////////

@@ -1,14 +1,11 @@
 package com.ferreusveritas.dynamictreesplus.block.mushroom;
 
-import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.cell.Cell;
 import com.ferreusveritas.dynamictrees.api.cell.CellNull;
 import com.ferreusveritas.dynamictrees.block.branch.BranchBlock;
 import com.ferreusveritas.dynamictrees.block.branch.ThickBranchBlock;
-import com.ferreusveritas.dynamictrees.block.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.block.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
-import com.ferreusveritas.dynamictrees.tree.family.Family;
 import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictrees.util.BlockBounds;
 import com.ferreusveritas.dynamictrees.util.BlockStates;
@@ -47,7 +44,7 @@ public class MushroomBranchBlock extends ThickBranchBlock {
         final DynamicCapCenterBlock cap = species.getCapCenterBlock().orElse(null);
         if (cap != null) {
             if (fromRadius == getFamily().getPrimaryThickness()) {// If we came from a twig (and we're not a stripped branch) then just make some leaves
-                signal.success = cap.tryGrowCap(level, species.getCapProperties(),0, signal.getSpecies(), pos);
+                signal.success = cap.tryGrowCap(level, species.getCapProperties(),0, signal, pos, pos);
             } else {// Otherwise make a proper branch
                 return cap.branchOut(level, pos, signal, 0);
             }

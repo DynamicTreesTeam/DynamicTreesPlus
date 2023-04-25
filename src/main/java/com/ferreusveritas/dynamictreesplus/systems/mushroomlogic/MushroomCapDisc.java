@@ -1,7 +1,14 @@
 package com.ferreusveritas.dynamictreesplus.systems.mushroomlogic;
 
 import com.ferreusveritas.dynamictrees.systems.poissondisc.PoissonDisc;
+import com.ferreusveritas.dynamictrees.systems.poissondisc.Vec2i;
 import com.ferreusveritas.dynamictrees.util.SimpleBitmap;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
+import net.minecraft.world.level.block.Block;
+
+import java.util.LinkedList;
+import java.util.List;
 
 public class MushroomCapDisc extends PoissonDisc {
 
@@ -37,6 +44,28 @@ public class MushroomCapDisc extends PoissonDisc {
         //Treat radius 0 as if it is 1
         cbm[0] = cbm[minRad];
         icbm[0] = icbm[minRad];
+    }
+
+    private static final List<List<Vec2i>> precomputedRings = new LinkedList<>();
+    static {
+        precomputedRings.add(new LinkedList<>());
+        for (int r = minRad; r <= maxRad; r++){
+            MushroomCapDisc circle = new MushroomCapDisc(0, 0, r);
+            precomputedRings.add(new LinkedList<>());
+            for (int ix = -circle.radius; ix <= circle.radius; ix++) {
+                for (int iz = -circle.radius; iz <= circle.radius; iz++) {
+                    int circleX = circle.x + ix;
+                    int circleZ = circle.z + iz;
+                    if (circle.isEdge(circleX, circleZ)) {
+                        precomputedRings.get(r).add(new Vec2i(circleX, circleZ));
+                    }
+                }
+            }
+        }
+    }
+
+    public static List<Vec2i> getPrecomputedRing (int radius){
+        return precomputedRings.get(Math.min(Math.max(radius, minRad), maxRad));
     }
 
     public MushroomCapDisc(int x, int z, int radius) {

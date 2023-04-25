@@ -83,4 +83,8 @@ public final class MushroomShapeConfiguration extends Configuration<MushroomShap
         this.configurable.generateMushroomCap(this, context);
     }
 
+    public void clearMushroomCap(MushroomCapContext context){
+        this.configurable.clearMushroomCap(this, context);
+    }
+
 }

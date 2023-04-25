@@ -9,6 +9,7 @@ import com.ferreusveritas.dynamictrees.block.branch.BranchBlock;
 import com.ferreusveritas.dynamictrees.block.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.poissondisc.PoissonDisc;
+import com.ferreusveritas.dynamictrees.systems.poissondisc.Vec2i;
 import com.ferreusveritas.dynamictrees.tree.family.Family;
 import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
@@ -34,14 +35,16 @@ import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec2;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
+import java.util.List;
 import java.util.Random;
 
 public class DynamicCapCenterBlock extends Block implements TreePart {
 
-    public static final IntegerProperty AGE = IntegerProperty.create("age", 1, 8);
+    public static final IntegerProperty AGE = IntegerProperty.create("age", 0, 8);
 
     public CapProperties properties = CapProperties.NULL;
 
@@ -53,7 +56,7 @@ public class DynamicCapCenterBlock extends Block implements TreePart {
 
     public DynamicCapCenterBlock(Properties properties) {
         super(properties);
-        this.registerDefaultState(stateDefinition.any().setValue(AGE, 1));
+        this.registerDefaultState(stateDefinition.any().setValue(AGE, 0));
     }
 
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
@@ -118,10 +121,10 @@ public class DynamicCapCenterBlock extends Block implements TreePart {
         return this.getFlammability(state, level, pos, face) > 0 || face == Direction.UP;
     }
 
+    // Only center of cap should allow for support.
     @Override
     public int branchSupport(BlockState state, BlockGetter level, BranchBlock branch, BlockPos pos, Direction dir, int radius) {
-        // Only center of cap should allow for support.
-        return radius == branch.getFamily().getPrimaryThickness() && branch.getFamily() == getFamily(state, level, pos) ? BranchBlock.setSupport(0, 1) : 0;
+        return branch.getFamily() == getFamily(state, level, pos) ? BranchBlock.setSupport(0, 2) : 0;
     }
 
     @Override
@@ -154,28 +157,11 @@ public class DynamicCapCenterBlock extends Block implements TreePart {
         {
             BlockState thisState = level.getBlockState(pos);
             int age = thisState.hasProperty(AGE) ? thisState.getValue(AGE) : 0;
-            this.branchOut(level, pos, signal, age); // When a growth signal hits a cap block it attempts to become a tree branch.
-        } else {
-            BlockState thisState = level.getBlockState(pos);
-            int age = thisState.hasProperty(AGE) ? thisState.getValue(AGE) : 0;
             if (age != 0 && level.getRandom().nextFloat() < properties.getChanceToAge()){
-                age = Math.min(age+1, properties.getMaxAge());
-                level.setBlock(pos, getCapBlockStateForPlacement(level, pos, age == 0 ? 1 : age, properties.getDynamicCapState(true), false), 2); // Removed Notify Neighbors Flag for performance.
-                generateCap(age, level, signal.getSpecies(), pos);
-
-                Family family = signal.getSpecies().getFamily();
-                BlockState capCenter = level.getBlockState(pos);
-                int thickness = family.getPrimaryThickness() + (capCenter.hasProperty(DynamicCapCenterBlock.AGE)
-                        ? capCenter.getValue(DynamicCapCenterBlock.AGE)
-                        : 0);
-
-                BlockPos branchPos = pos.offset(signal.dir.getOpposite().getNormal());
-                family.getBranchForPlacement(level, signal.getSpecies(), branchPos).ifPresent(branch ->
-                        branch.setRadius(level, branchPos, Math.min(thickness, family.getMaxBranchRadius()), null)
-                );
-                signal.radius = Math.min(thickness+1, family.getMaxBranchRadius());
+                tryGrowCap(level, properties, age, signal, pos, pos);
+            } else {
+                this.branchOut(level, pos, signal, age); // When a growth signal hits a cap block it attempts to become a tree branch.
             }
-
         }
         return signal;
     }
@@ -189,7 +175,7 @@ public class DynamicCapCenterBlock extends Block implements TreePart {
             return signal;
         }
 
-        boolean couldGrow = tryGrowCap(level, capProperties, age, signal.getSpecies(), pos.relative(signal.dir));
+        boolean couldGrow = tryGrowCap(level, capProperties, age, signal, pos.relative(signal.dir), pos);
 
         if (couldGrow) {
             Family family = species.getFamily();
@@ -210,13 +196,18 @@ public class DynamicCapCenterBlock extends Block implements TreePart {
         return signal;
     }
 
-    public boolean tryGrowCap(Level level, CapProperties capProp, int currentAge, Species species, BlockPos pos) {
+    public boolean tryGrowCap(Level level, CapProperties capProp, int currentAge, GrowSignal signal, BlockPos pos, BlockPos previousPos) {
         if (level.isEmptyBlock(pos)) {
             int age = currentAge;
-            if (currentAge != 0 && level.getRandom().nextFloat() < properties.getChanceToAge())
+            if (currentAge == 0){
+                age = 1;
+            } else if (level.getRandom().nextFloat() < properties.getChanceToAge())
                 age = Math.min(age+1, properties.getMaxAge());
             level.setBlock(pos, getCapBlockStateForPlacement(level, pos, age == 0 ? 1 : age, capProp.getDynamicCapState(true), false), 2); // Removed Notify Neighbors Flag for performance.
-            generateCap(age, level, species, pos);
+            if (age != currentAge){
+                ageBranchUnderCap(level, pos, signal, currentAge);
+            }
+            generateCap(age, level, signal.getSpecies(), pos, previousPos, currentAge, signal.rootPos);
             return true;
         } else {
             final TreePart treePart = TreeHelper.getTreePart(level.getBlockState(pos));
@@ -224,38 +215,61 @@ public class DynamicCapCenterBlock extends Block implements TreePart {
         }
     }
 
-    protected void generateCap(int age, Level pLevel, Species species, BlockPos pPos){
+    protected void ageBranchUnderCap (Level level, BlockPos pos, GrowSignal signal, int currentAge){
+        Family family = signal.getSpecies().getFamily();
+        int thickness = family.getPrimaryThickness() + currentAge;
+
+        BlockPos branchPos = pos.offset(signal.dir.getOpposite().getNormal());
+        family.getBranchForPlacement(level, signal.getSpecies(), branchPos).ifPresent(branch ->
+                branch.setRadius(level, branchPos, Math.min(thickness, family.getMaxBranchRadius()), null)
+        );
+        signal.radius = Math.min(thickness+1, family.getMaxBranchRadius());
+    }
+
+    protected void generateCap(int newAge, Level pLevel, Species species, BlockPos newPos, BlockPos currentPos, int currentAge, BlockPos rootPos){
         DynamicCapBlock capBlock = properties.getDynamicCapBlock().orElse(null);
         if (capBlock == null) return;
-
-        for (BlockPos pos : BlockPos.withinManhattan(pPos, 8, 8, 8)){
-            BlockState posState = pLevel.getBlockState(pos);
-            if (posState.is(capBlock)){
-                pLevel.setBlock(pos, Blocks.AIR.defaultBlockState(), 2);
-            }
-        }
-
-        properties.mushroomShapeKit.generateMushroomCap(new MushroomCapContext(pLevel, pPos, species, age));
+        //only clear the cap if the position changed or if the age changed
+        if (currentPos != newPos || currentAge != newAge)
+            properties.mushroomShapeKit.clearMushroomCap(new MushroomCapContext(pLevel, currentPos, species, currentAge, this, rootPos));
+        properties.mushroomShapeKit.generateMushroomCap(new MushroomCapContext(pLevel, newPos, species, newAge, this, rootPos));
 
     }
 
-    public void placeRing (LevelAccessor level, BlockPos pos, int radius, int step){
-        MushroomCapDisc circle = new MushroomCapDisc(pos.getX(), pos.getZ(), radius);
+    public void clearRing (LevelAccessor level, BlockPos pos, int radius){
+        List<Vec2i> ring = MushroomCapDisc.getPrecomputedRing(radius);
 
-        for (int ix = -circle.radius; ix <= circle.radius; ix++) {
-            for (int iz = -circle.radius; iz <= circle.radius; iz++) {
-                int circleX = circle.x + ix;
-                int circleZ = circle.z + iz;
-                if (circle.isEdge(circleX, circleZ)) {
-                    level.setBlock(new BlockPos(circleX, pos.getY(), circleZ), getStateForAge(properties, step),2);
-                }
-            }
+        for (Vec2i vec : ring){
+            BlockPos ringPos = new BlockPos(pos.getX() + vec.x, pos.getY(), pos.getZ() + vec.z);
+            if (properties.isPartOfCap(level.getBlockState(ringPos)))
+                level.setBlock(ringPos, Blocks.AIR.defaultBlockState(), 2);
+        }
+    }
+
+    public void placeRing (LevelAccessor level, BlockPos pos, int radius, int step, boolean yMoved){
+        List<Vec2i> ring = MushroomCapDisc.getPrecomputedRing(radius);
+
+        for (Vec2i vec : ring){
+            BlockPos ringPos = new BlockPos(pos.getX() + vec.x, pos.getY(), pos.getZ() + vec.z);
+            if (level.getBlockState(ringPos).getMaterial().isReplaceable())
+                level.setBlock(ringPos, getStateForAge(properties, step, new Vec2i(-vec.x,-vec.z), yMoved),2);
         }
     }
 
     @Nonnull
-    private BlockState getStateForAge(CapProperties properties, int age){
-        return properties.getDynamicCapState(age);
+    private BlockState getStateForAge(CapProperties properties, int age, Vec2i centerDirection, boolean yMoved){
+        boolean[] dirs = {false, true, true, true, true, true};
+        if (yMoved){
+            for (Direction dir : Direction.Plane.HORIZONTAL){
+                float dot = dir.getNormal().getX() * centerDirection.x + dir.getNormal().getZ() * centerDirection.z;
+                if (dot > 0)
+                    dirs[dir.ordinal()] = false;
+            }
+        }
+        return properties.getDynamicCapState(age, dirs);
+
+
+
 //        return switch (age) {
 //            default -> Blocks.BLACK_CONCRETE.defaultBlockState();
 //            case 0 -> Blocks.LIGHT_BLUE_CONCRETE.defaultBlockState();

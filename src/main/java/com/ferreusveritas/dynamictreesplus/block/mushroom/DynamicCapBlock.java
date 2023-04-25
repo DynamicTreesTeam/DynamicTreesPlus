@@ -62,9 +62,10 @@ public class DynamicCapBlock extends HugeMushroomBlock implements TreePart {
         return from.getFamily() == getFamily(state, level, pos) ? 2 : 0;
     }
 
+    //Branches don't connect to the sides of the cap, only the center
     @Override
     public int getRadiusForConnection(BlockState state, BlockGetter level, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
-        return properties.getRadiusForConnection(state, level, pos, from, side, fromRadius);
+        return 0;
     }
 
     @Override
@@ -119,6 +120,16 @@ public class DynamicCapBlock extends HugeMushroomBlock implements TreePart {
     @Override
     public ItemStack getCloneItemStack(BlockState state, HitResult target, BlockGetter level, BlockPos pos, Player player) {
         return getProperties(state).getPrimitiveCapItemStack();
+    }
+
+    public static BlockState setDirectionValues (BlockState state, boolean[] directions){
+        return state
+                .setValue(DOWN,directions[0])
+                .setValue(UP,directions[1])
+                .setValue(NORTH,directions[2])
+                .setValue(SOUTH,directions[3])
+                .setValue(WEST,directions[4])
+                .setValue(EAST,directions[5]);
     }
 
     ///////////////////////////////////////////

@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictreesplus.resources;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.api.configuration.ConfigurationTemplateResourceLoader;
 import com.ferreusveritas.dynamictrees.api.resource.loading.preparation.JsonRegistryResourceLoader;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonHelper;
 import com.ferreusveritas.dynamictrees.deserialisation.ResourceLocationDeserialiser;
@@ -8,7 +9,7 @@ import com.ferreusveritas.dynamictrees.deserialisation.result.JsonResult;
 import com.ferreusveritas.dynamictrees.tree.family.Family;
 import com.ferreusveritas.dynamictreesplus.block.mushroom.CapProperties;
 import com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.MushroomShapeConfiguration;
-import com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.MushroomShapeKit;
+import com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.shapekits.MushroomShapeKit;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.resources.ResourceLocation;
@@ -17,7 +18,14 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class CapPropertiesResourceLoader extends JsonRegistryResourceLoader<CapProperties> {
+
     public static final CapPropertiesResourceLoader CAP_PROPERTIES_LOADER = new CapPropertiesResourceLoader();
+    public static ConfigurationTemplateResourceLoader<MushroomShapeConfiguration, MushroomShapeKit>
+            MUSHROOM_SHAPE_KIT_TEMPLATE_LOADER = new ConfigurationTemplateResourceLoader<>(
+            "mushroom_shape_kits/configurations",
+            MushroomShapeKit.REGISTRY,
+            MushroomShapeConfiguration.TEMPLATES
+    );
 
     public static final String CAP_PROPERTIES = "cap_properties";
 
@@ -48,7 +56,8 @@ public class CapPropertiesResourceLoader extends JsonRegistryResourceLoader<CapP
         this.reloadAppliers.register("fire_spread", Integer.class, CapProperties::setFireSpreadSpeed)
                 .register("flammability", Integer.class, CapProperties::setFlammability)
                 .register("mushroom_shape_kit", MushroomShapeConfiguration.class, CapProperties::setMushroomShapeConfiguration)
-                .register("age_zero_shape", VoxelShape.class, CapProperties::setAgeZeroShape);
+                .register("age_zero_shape", VoxelShape.class, CapProperties::setAgeZeroShape)
+                .register("chance_to_age", Float.class, CapProperties::setChanceToAge);
 
         super.registerAppliers();
     }

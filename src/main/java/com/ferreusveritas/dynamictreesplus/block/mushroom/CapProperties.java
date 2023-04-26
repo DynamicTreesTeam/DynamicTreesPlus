@@ -19,7 +19,7 @@ import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictrees.util.*;
 import com.ferreusveritas.dynamictreesplus.data.CapStateGenerator;
 import com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.MushroomShapeConfiguration;
-import com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.MushroomShapeKit;
+import com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.shapekits.MushroomShapeKit;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
@@ -86,7 +86,7 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
 
         @Override
         public MushroomShapeConfiguration getMushroomShapeKit() {
-            return MushroomShapeKit.DEFAULT.getDefaultConfiguration();
+            return MushroomShapeKit.NULL.getDefaultConfiguration();
         }
 
         @Override
@@ -117,7 +117,7 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
     }
 
     public CapProperties(@Nullable final BlockState primitiveCap, final ResourceLocation registryName) {
-        this(primitiveCap, MushroomShapeKit.DEFAULT.getDefaultConfiguration(), registryName);
+        this(primitiveCap, MushroomShapeKit.NULL.getDefaultConfiguration(), registryName);
     }
 
     public CapProperties(@Nullable final BlockState primitiveCap, final MushroomShapeConfiguration shapeKit, final ResourceLocation registryName) {
@@ -143,11 +143,11 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
      */
     protected MushroomShapeConfiguration mushroomShapeKit;
     protected Family family;
-    protected BlockState[] dynamicMushroomBlockDistanceStates = new BlockState[maxDistance + 1];
+    protected BlockState[] dynamicMushroomBlockDistanceStates = new BlockState[getMaxDistance() + 1];
     protected BlockState dynamicMushroomCenterBlock;
     protected int flammability = 0;// Mimic vanilla mushroom
     protected int fireSpreadSpeed = 0;// Mimic vanilla mushroom
-    protected float chanceToAge = 0.5f;
+    protected float chanceToAge = 0.75f;
     protected VoxelShape ageZeroShape = Shapes.block();
 
     ///////////////////////////////////////////
@@ -350,7 +350,7 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
         }
         //Cache all the blockStates to speed up worldgen
         dynamicMushroomBlockDistanceStates[0] = Blocks.AIR.defaultBlockState();
-        for (int i = 1; i <= maxDistance; i++) {
+        for (int i = 1; i <= getMaxDistance(); i++) {
             dynamicMushroomBlockDistanceStates[i] = state.setValue(DynamicCapBlock.DISTANCE, i);
         }
         return this;
@@ -362,7 +362,7 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
     }
 
     public BlockState getDynamicCapState(int distance) {
-        return Optional.ofNullable(dynamicMushroomBlockDistanceStates[Mth.clamp(distance, 0, maxDistance)])
+        return Optional.ofNullable(dynamicMushroomBlockDistanceStates[Mth.clamp(distance, 0, getMaxDistance())])
                 .orElse(Blocks.AIR.defaultBlockState());
     }
 

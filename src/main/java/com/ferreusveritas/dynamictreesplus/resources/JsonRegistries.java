@@ -11,7 +11,7 @@ import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictreesplus.DynamicTreesPlus;
 import com.ferreusveritas.dynamictreesplus.block.CactusBranchBlock;
 import com.ferreusveritas.dynamictreesplus.block.mushroom.CapProperties;
-import com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.MushroomShapeKit;
+import com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.shapekits.MushroomShapeKit;
 import com.ferreusveritas.dynamictreesplus.systems.thicknesslogic.CactusThicknessLogic;
 import com.ferreusveritas.dynamictreesplus.tree.CactusSpecies;
 import com.ferreusveritas.dynamictreesplus.tree.HugeMushroomFamily;

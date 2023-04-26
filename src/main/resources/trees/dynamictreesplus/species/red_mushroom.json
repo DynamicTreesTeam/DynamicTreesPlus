@@ -9,6 +9,7 @@
   "generate_sapling": true,
   "cap_properties": "dynamictreesplus:red_mushroom",
   "primitive_sapling": "red_mushroom",
+  "acceptable_soils": ["fungus_like"],
   "features" : [
     "bottom_flare"
   ]

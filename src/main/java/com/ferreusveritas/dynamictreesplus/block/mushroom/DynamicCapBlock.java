@@ -10,6 +10,8 @@ import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.tree.family.Family;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -22,8 +24,11 @@ import net.minecraft.world.level.block.PipeBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.HitResult;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Random;
 
 public class DynamicCapBlock extends HugeMushroomBlock implements TreePart {
 
@@ -139,6 +144,18 @@ public class DynamicCapBlock extends HugeMushroomBlock implements TreePart {
     // MUSHROOM BLOCK BEHAVIOUR
     ///////////////////////////////////////////
 
+    public BlockState getStateForPlacement(BlockPlaceContext pContext) {
+        BlockGetter blockgetter = pContext.getLevel();
+        BlockPos blockpos = pContext.getClickedPos();
+        return this.defaultBlockState()
+                .setValue(DOWN, !properties.isPartOfCap(blockgetter.getBlockState(blockpos.below())))
+                .setValue(UP, !properties.isPartOfCap(blockgetter.getBlockState(blockpos.above())))
+                .setValue(NORTH, !properties.isPartOfCap(blockgetter.getBlockState(blockpos.north())))
+                .setValue(EAST, !properties.isPartOfCap(blockgetter.getBlockState(blockpos.east())))
+                .setValue(SOUTH, !properties.isPartOfCap(blockgetter.getBlockState(blockpos.south())))
+                .setValue(WEST, !properties.isPartOfCap(blockgetter.getBlockState(blockpos.west())));
+    }
+
     @Override
     public BlockState updateShape(BlockState pState, Direction pFacing, BlockState pFacingState, LevelAccessor pLevel, BlockPos pCurrentPos, BlockPos pFacingPos) {
         return properties.isPartOfCap(pFacingState)
@@ -146,4 +163,58 @@ public class DynamicCapBlock extends HugeMushroomBlock implements TreePart {
                 : super.updateShape(pState, pFacing, pFacingState, pLevel, pCurrentPos, pFacingPos);
     }
 
+    @Override
+    public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
+        boolean destroyed = super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
+        //We update neighboring cap blocks in the corners as well
+        updateNeighborsSurround(level, pos);
+        return destroyed;
+    }
+
+    Vec3i[] cornersAndEdges = {
+            new Vec3i(1,1,1), new Vec3i(-1,1,1), new Vec3i(1,1,-1), new Vec3i(-1,1,-1),
+            new Vec3i(1,-1,1), new Vec3i(-1,-1,1), new Vec3i(1,-1,-1), new Vec3i(-1,-1,-1),
+            new Vec3i(0,1,1), new Vec3i(0,-1,1), new Vec3i(0,1,-1),new Vec3i(0,-1,-1),
+            new Vec3i(1,0,1), new Vec3i(-1,0,1), new Vec3i(1,0,-1), new Vec3i(-1,0,-1),
+            new Vec3i(1,1,0), new Vec3i(-1,1,0), new Vec3i(1,-1,0), new Vec3i(-1,-1,0),
+    };
+    protected void updateNeighborsSurround (Level level, BlockPos pos){
+        for (Vec3i corner : cornersAndEdges){
+            BlockPos offPos = pos.offset(corner);
+            Block offBlock = level.getBlockState(offPos).getBlock();
+            if (offBlock instanceof DynamicCapBlock)
+                level.neighborChanged(offPos, offBlock, pos);
+        }
+    }
+
+    @Override
+    public void neighborChanged(BlockState pState, Level level, BlockPos pos, Block pBlock, BlockPos pFromPos, boolean pIsMoving) {
+        level.scheduleTick(pos, pBlock, 0);
+        super.neighborChanged(pState, level, pos, pBlock, pFromPos, pIsMoving);
+    }
+
+    @Override
+    public void tick(BlockState pState, ServerLevel level, BlockPos pos, Random pRandom) {
+        if (level.getBlockState(pos).getBlock() != this) return;
+        int dist = pState.getValue(DISTANCE);
+        boolean supportFound = false;
+        for (BlockPos offPos : BlockPos.withinManhattan(pos, 1, 1, 1)){
+            if (offPos == pos) continue;
+            BlockState offsetState = level.getBlockState(offPos);
+            //If we find a cap block the previous age or the center block all is good
+            if ((offsetState.hasProperty(DISTANCE) && offsetState.getValue(DISTANCE) == dist - 1)
+                    || (dist == 1 && offsetState.getBlock() == properties.getDynamicCapCenterBlock().orElse(null))){
+                supportFound = true;
+                break;
+            }
+        }
+        if (!supportFound){
+            //Otherwise, destroy the block
+
+            level.destroyBlock(pos, true);
+            updateNeighborsSurround(level, pos);
+            return;
+        }
+        super.tick(pState, level, pos, pRandom);
+    }
 }

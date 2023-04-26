@@ -1,11 +1,7 @@
 package com.ferreusveritas.dynamictreesplus.init;
 
-import com.ferreusveritas.dynamictrees.api.cell.CellKit;
 import com.ferreusveritas.dynamictrees.api.registry.*;
 import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
-import com.ferreusveritas.dynamictrees.cell.CellKits;
-import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
-import com.ferreusveritas.dynamictrees.deserialisation.RegistryEntryDeserialiser;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
 import com.ferreusveritas.dynamictrees.resources.Resources;
 import com.ferreusveritas.dynamictrees.systems.fruit.Fruit;
@@ -17,12 +13,14 @@ import com.ferreusveritas.dynamictreesplus.DynamicTreesPlus;
 import com.ferreusveritas.dynamictreesplus.block.CactusFruit;
 import com.ferreusveritas.dynamictreesplus.block.mushroom.CapProperties;
 import com.ferreusveritas.dynamictreesplus.resources.CapPropertiesResourceLoader;
+import com.ferreusveritas.dynamictreesplus.resources.JsonDeserializers;
 import com.ferreusveritas.dynamictreesplus.systems.featuregen.DynamicTreesPlusGenFeatures;
 import com.ferreusveritas.dynamictreesplus.systems.growthlogic.StraightLogic;
 import com.ferreusveritas.dynamictreesplus.systems.growthlogic.MegaCactusLogic;
 import com.ferreusveritas.dynamictreesplus.systems.growthlogic.SaguaroCactusLogic;
-import com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.MushroomShapeKit;
-import com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.MushroomShapeKits;
+import com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.MushroomShapeConfiguration;
+import com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.shapekits.MushroomShapeKit;
+import com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.shapekits.MushroomShapeKits;
 import com.ferreusveritas.dynamictreesplus.systems.thicknesslogic.CactusThicknessLogic;
 import com.ferreusveritas.dynamictreesplus.systems.thicknesslogic.CactusThicknessLogicKits;
 import com.ferreusveritas.dynamictreesplus.tree.CactusFamily;
@@ -54,6 +52,7 @@ public class DTPRegistries {
 
     public static void setup() {
         Resources.MANAGER.addLoader(CapPropertiesResourceLoader.CAP_PROPERTIES_LOADER);
+        Resources.MANAGER.addLoader(CapPropertiesResourceLoader.MUSHROOM_SHAPE_KIT_TEMPLATE_LOADER);
 
         CommonVoxelShapes.SHAPES.put(DynamicTreesPlus.location("tall_cactus").toString(), TALL_CACTUS_SAPLING_SHAPE);
         CommonVoxelShapes.SHAPES.put(DynamicTreesPlus.location("medium_cactus").toString(), MEDIUM_CACTUS_SAPLING_SHAPE);
@@ -107,16 +106,17 @@ public class DTPRegistries {
 
     @SubscribeEvent
     public static void newRegistry(NewRegistryEvent event) {
-        CapProperties.REGISTRY.postRegistryEvent();
+        JsonDeserializers.register();
 
-        JsonDeserialisers.register(CapProperties.class,
-                new RegistryEntryDeserialiser<>(CapProperties.REGISTRY));
+        CapProperties.REGISTRY.postRegistryEvent();
+        //MushroomShapeKit.REGISTRY.postRegistryEvent();
     }
 
     @SubscribeEvent
     public static void onRegisterBlocks(net.minecraftforge.event.RegistryEvent.Register<Block> event) {
-        // Lock the cap registry
+        // Lock the registries
         CapProperties.REGISTRY.lock();
+        MushroomShapeKit.REGISTRY.lock();
     }
 
 }

@@ -69,6 +69,7 @@ public class HugeMushroomSpecies extends Species {
                 .envFactor(BiomeDictionary.Type.DRY, 0.25f)
                 .envFactor(BiomeDictionary.Type.HOT, 0.75f)
                 .envFactor(BiomeDictionary.Type.COLD, 1.05f)
+                .setCanSaplingGrowNaturally(false)
                 .setGrowthLogicKit(DTPRegistries.STRAIGHT_LOGIC);
     }
 
@@ -146,8 +147,8 @@ public class HugeMushroomSpecies extends Species {
 
     @Override
     public boolean isAcceptableSoil(LevelReader level, BlockPos pos, BlockState soilBlockState) {
-        if (level.getRawBrightness(pos, 0) > getMaxLightForPlanting()) return false;
-        return super.isAcceptableSoil(level, pos, soilBlockState);
+        return (SoilHelper.isSoilAcceptable(soilBlockState, soilTypeFlags) || level.getRawBrightness(pos.above(), 0) <= getMaxLightForPlanting())
+                && super.isAcceptableSoil(level, pos, soilBlockState);
     }
 
     @Override

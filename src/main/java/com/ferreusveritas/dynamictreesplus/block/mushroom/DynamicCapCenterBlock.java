@@ -253,13 +253,13 @@ public class DynamicCapCenterBlock extends Block implements TreePart {
         }
     }
 
-    public void placeRing (LevelAccessor level, BlockPos pos, int radius, int step, boolean yMoved){
+    public void placeRing (LevelAccessor level, BlockPos pos, int radius, int step, boolean yMoved, boolean negFactor){
         List<Vec2i> ring = MushroomCapDisc.getPrecomputedRing(radius);
 
         for (Vec2i vec : ring){
             BlockPos ringPos = new BlockPos(pos.getX() + vec.x, pos.getY(), pos.getZ() + vec.z);
             if (level.getBlockState(ringPos).getMaterial().isReplaceable())
-                level.setBlock(ringPos, getStateForAge(properties, step, new Vec2i(-vec.x,-vec.z), yMoved),2);
+                level.setBlock(ringPos, getStateForAge(properties, step, new Vec2i(-vec.x,-vec.z), yMoved, negFactor, properties.isPartOfCap(level.getBlockState(ringPos.above()))),2);
         }
     }
 
@@ -275,13 +275,13 @@ public class DynamicCapCenterBlock extends Block implements TreePart {
     }
 
     @Nonnull
-    private BlockState getStateForAge(CapProperties properties, int age, Vec2i centerDirection, boolean yMoved){
-        boolean[] dirs = {false, true, true, true, true, true};
-        if (yMoved){
+    private BlockState getStateForAge(CapProperties properties, int age, Vec2i centerDirection, boolean yMoved, boolean negativeFactor, boolean topIsCap){
+        boolean[] dirs = {false, !topIsCap, true, true, true, true};
+        if (yMoved || age == 1){
             for (Direction dir : Direction.Plane.HORIZONTAL){
                 float dot = dir.getNormal().getX() * centerDirection.x + dir.getNormal().getZ() * centerDirection.z;
                 if (dot > 0)
-                    dirs[dir.ordinal()] = false;
+                    dirs[negativeFactor ? dir.getOpposite().ordinal() : dir.ordinal()] = false;
             }
         }
         return properties.getDynamicCapState(age, dirs);

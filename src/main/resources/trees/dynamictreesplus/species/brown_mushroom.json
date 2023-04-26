@@ -10,6 +10,7 @@
   "cap_properties": "dynamictreesplus:brown_mushroom",
   "primitive_sapling": "brown_mushroom",
   "sapling_shape": "flat_mushroom",
+  "acceptable_soils": ["fungus_like"],
   "features" : [
     "bottom_flare"
   ]

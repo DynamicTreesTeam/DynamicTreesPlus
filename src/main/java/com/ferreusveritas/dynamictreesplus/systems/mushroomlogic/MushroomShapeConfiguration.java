@@ -3,6 +3,9 @@ package com.ferreusveritas.dynamictreesplus.systems.mushroomlogic;
 import com.ferreusveritas.dynamictrees.api.configuration.Configuration;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.context.MushroomCapContext;
+import net.minecraft.core.BlockPos;
+
+import java.util.List;
 
 public final class MushroomShapeConfiguration extends Configuration<MushroomShapeConfiguration, MushroomShapeKit> {
 
@@ -75,8 +78,8 @@ public final class MushroomShapeConfiguration extends Configuration<MushroomShap
         return this.configurable.getDefaultDistance();
     }
 
-    public SimpleVoxmap getShapeCluster (){
-        return this.configurable.getShapeCluster(this);
+    public List<BlockPos> getShapeCluster (MushroomCapContext context){
+        return this.configurable.getShapeCluster(this, context);
     }
 
     public void generateMushroomCap(MushroomCapContext context){

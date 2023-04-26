@@ -4,7 +4,6 @@ import com.ferreusveritas.dynamictrees.api.configuration.Configurable;
 import com.ferreusveritas.dynamictrees.api.configuration.ConfigurableRegistryEntry;
 import com.ferreusveritas.dynamictrees.api.configuration.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.api.registry.SimpleRegistry;
-import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictreesplus.DynamicTreesPlus;
@@ -12,11 +11,12 @@ import com.ferreusveritas.dynamictreesplus.block.mushroom.CapProperties;
 import com.ferreusveritas.dynamictreesplus.block.mushroom.DynamicCapCenterBlock;
 import com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.context.MushroomCapContext;
 import com.ferreusveritas.dynamictreesplus.tree.HugeMushroomSpecies;
-import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Random;
+import java.util.LinkedList;
+import java.util.List;
 
 public abstract class MushroomShapeKit extends ConfigurableRegistryEntry<MushroomShapeKit, MushroomShapeConfiguration> implements Configurable {
 
@@ -32,7 +32,6 @@ public abstract class MushroomShapeKit extends ConfigurableRegistryEntry<Mushroo
             ConfigurationProperty.floatProperty("max_age_curve_factor");
     public static final ConfigurationProperty<Float> CURVE_FACTOR_VARIATION =
             ConfigurationProperty.floatProperty("curve_factor_variation");
-
 
     public static final MushroomShapeKit DEFAULT = new MushroomShapeKit(DynamicTreesPlus.location("default")) {
         @Override @NotNull
@@ -51,26 +50,31 @@ public abstract class MushroomShapeKit extends ConfigurableRegistryEntry<Mushroo
             this.register(MAX_CAP_AGE, CURVE_POWER, CURVE_HEIGHT_OFFSET, MIN_AGE_CURVE_FACTOR, MAX_AGE_CURVE_FACTOR, CURVE_FACTOR_VARIATION);
         }
 
-        private float calculateFactor (MushroomShapeConfiguration configuration, MushroomCapContext context){
-            HugeMushroomSpecies species = (HugeMushroomSpecies) context.species();
-            CapProperties properties = species.getCapProperties();
-            int age = context.getCurrentAge();
-            if (age == 0) return 0;
-            float factorMin = configuration.get(MIN_AGE_CURVE_FACTOR);
-            float factorMax = configuration.get(MAX_AGE_CURVE_FACTOR);
-            float factorVariation = configuration.get(CURVE_FACTOR_VARIATION);
-
-            float rand = (CoordUtils.coordHashCode(context.getRootPos(), 2) / (float)0xFFFF);
-            float var = (rand*factorVariation*2) - factorVariation;
-
-            return (((float)age)/(properties.getMaxAge())) * (factorMax - factorMin) + factorMin + var;
+        @Override
+        public List<BlockPos> getShapeCluster(MushroomShapeConfiguration configuration, MushroomCapContext context){
+            return placeRing(configuration, context, context.getAge(), ringAction.GET);
         }
 
         @Override
         public void generateMushroomCap(MushroomShapeConfiguration configuration, MushroomCapContext context) {
-            DynamicCapCenterBlock centerBlock = context.getCenterBlock();
-            if (centerBlock == null) return;
-            int age = Math.min(context.getCurrentAge(), configuration.get(MAX_CAP_AGE));
+            placeRing(configuration, context, Math.min(context.getAge(), configuration.get(MAX_CAP_AGE)), ringAction.PLACE);
+        }
+
+        @Override
+        public void clearMushroomCap (MushroomShapeConfiguration configuration, MushroomCapContext context){
+            placeRing(configuration, context, context.getAge(),ringAction.CLEAR);
+        }
+
+        enum ringAction {
+            PLACE,
+            CLEAR,
+            GET
+        }
+
+        private List<BlockPos> placeRing (MushroomShapeConfiguration configuration, MushroomCapContext context, int age, ringAction action){
+            DynamicCapCenterBlock centerBlock = context.species().getCapProperties().getDynamicCapCenterBlock().orElse(null);
+            List<BlockPos> ringPositions = new LinkedList<>();
+            if (centerBlock == null) return ringPositions;
 
             float height_offset = configuration.get(CURVE_HEIGHT_OFFSET);
             int power = configuration.get(CURVE_POWER);
@@ -85,33 +89,33 @@ public abstract class MushroomShapeKit extends ConfigurableRegistryEntry<Mushroo
                 boolean moveY = nextY != y && i != 1;
                 if (moveY) y+= (int)Math.signum(fac);
 
-                centerBlock.placeRing(context.level(), context.pos().below(y), radius, i, moveY);
+                BlockPos pos = context.pos().below(y);
+                if (action == ringAction.CLEAR)
+                    centerBlock.clearRing(context.level(), pos, radius);
+                else if (action == ringAction.PLACE)
+                    centerBlock.placeRing(context.level(), pos, radius, i, moveY);
+                else if (action == ringAction.GET)
+                    ringPositions.addAll(centerBlock.getRing(context.level(), pos, radius));
 
                 if (i >= nextY) radius++;
             }
+            ringPositions.add(context.pos());
+            return ringPositions;
         }
 
-        public void clearMushroomCap (MushroomShapeConfiguration configuration, MushroomCapContext context){
-            DynamicCapCenterBlock centerBlock = context.getCenterBlock();
-            if (centerBlock == null) return;
-            int age = context.getCurrentAge();
+        private float calculateFactor (MushroomShapeConfiguration configuration, MushroomCapContext context){
+            HugeMushroomSpecies species = context.species();
+            CapProperties properties = species.getCapProperties();
+            int age = context.getAge();
+            if (age == 0) return 0;
+            float factorMin = configuration.get(MIN_AGE_CURVE_FACTOR);
+            float factorMax = configuration.get(MAX_AGE_CURVE_FACTOR);
+            float factorVariation = configuration.get(CURVE_FACTOR_VARIATION);
 
-            float height_offset = configuration.get(CURVE_HEIGHT_OFFSET);
-            int power = configuration.get(CURVE_POWER);
+            float rand = (CoordUtils.coordHashCode(new BlockPos(context.pos().getX(), 0, context.pos().getZ()), 2) / (float)0xFFFF);
+            float var = (rand*factorVariation*2) - factorVariation;
 
-            float fac = calculateFactor(configuration, context);
-
-            int y = 0;
-            int radius = 1;
-            for (int i=1; i<=age; i++){
-                int nextY = fac == 0 ? 0 : (int)Math.floor(Math.pow(fac * radius, power) - height_offset);
-
-                if (nextY != y && i != 1) y+= (int)Math.signum(fac);
-
-                centerBlock.clearRing(context.level(), context.pos().below(y), radius);
-
-                if (i >= nextY) radius++;
-            }
+            return (((float)age)/(properties.getMaxAge())) * (factorMax - factorMin) + factorMin + var;
         }
     };
 
@@ -131,11 +135,8 @@ public abstract class MushroomShapeKit extends ConfigurableRegistryEntry<Mushroo
 
     public int getDefaultDistance() { return 1; }
 
-    public SimpleVoxmap getShapeCluster(MushroomShapeConfiguration configuration){
-        return MushroomShapeClusters.NULL_MAP;
-    }
-
     public abstract void generateMushroomCap(MushroomShapeConfiguration configuration, MushroomCapContext context);
     public abstract void clearMushroomCap(MushroomShapeConfiguration configuration, MushroomCapContext context);
+    public abstract List<BlockPos> getShapeCluster(MushroomShapeConfiguration configuration, MushroomCapContext context);
 
 }

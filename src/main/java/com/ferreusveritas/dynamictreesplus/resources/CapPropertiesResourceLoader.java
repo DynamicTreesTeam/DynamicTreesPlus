@@ -14,6 +14,7 @@ import com.google.gson.JsonObject;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class CapPropertiesResourceLoader extends JsonRegistryResourceLoader<CapProperties> {
     public static final CapPropertiesResourceLoader CAP_PROPERTIES_LOADER = new CapPropertiesResourceLoader();
@@ -46,7 +47,8 @@ public class CapPropertiesResourceLoader extends JsonRegistryResourceLoader<CapP
 
         this.reloadAppliers.register("fire_spread", Integer.class, CapProperties::setFireSpreadSpeed)
                 .register("flammability", Integer.class, CapProperties::setFlammability)
-                .register("mushroom_shape_kit", MushroomShapeConfiguration.class, CapProperties::setMushroomShapeConfiguration);
+                .register("mushroom_shape_kit", MushroomShapeConfiguration.class, CapProperties::setMushroomShapeConfiguration)
+                .register("age_zero_shape", VoxelShape.class, CapProperties::setAgeZeroShape);
 
         super.registerAppliers();
     }

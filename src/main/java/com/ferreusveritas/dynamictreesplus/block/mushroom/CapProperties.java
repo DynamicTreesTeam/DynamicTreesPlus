@@ -41,6 +41,8 @@ import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.LootTables;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -146,6 +148,7 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
     protected int flammability = 0;// Mimic vanilla mushroom
     protected int fireSpreadSpeed = 0;// Mimic vanilla mushroom
     protected float chanceToAge = 0.5f;
+    protected VoxelShape ageZeroShape = Shapes.block();
 
     ///////////////////////////////////////////
     // PROPERTIES
@@ -252,6 +255,14 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
 
     public int getMaxDistance() {
         return maxDistance;
+    }
+
+    public void setAgeZeroShape(VoxelShape ageZeroShape) {
+        this.ageZeroShape = ageZeroShape;
+    }
+
+    public VoxelShape getAgeZeroShape() {
+        return ageZeroShape;
     }
 
     ///////////////////////////////////////////

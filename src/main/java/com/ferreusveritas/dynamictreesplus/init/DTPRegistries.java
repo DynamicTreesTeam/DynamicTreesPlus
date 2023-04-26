@@ -53,6 +53,8 @@ public class DTPRegistries {
 
 
     public static void setup() {
+        Resources.MANAGER.addLoader(CapPropertiesResourceLoader.CAP_PROPERTIES_LOADER);
+
         CommonVoxelShapes.SHAPES.put(DynamicTreesPlus.location("tall_cactus").toString(), TALL_CACTUS_SAPLING_SHAPE);
         CommonVoxelShapes.SHAPES.put(DynamicTreesPlus.location("medium_cactus").toString(), MEDIUM_CACTUS_SAPLING_SHAPE);
         CommonVoxelShapes.SHAPES.put(DynamicTreesPlus.location("short_cactus").toString(), SHORT_CACTUS_SAPLING_SHAPE);
@@ -109,9 +111,6 @@ public class DTPRegistries {
 
         JsonDeserialisers.register(CapProperties.class,
                 new RegistryEntryDeserialiser<>(CapProperties.REGISTRY));
-
-        Resources.MANAGER.addLoader(CapPropertiesResourceLoader.CAP_PROPERTIES_LOADER);
-
     }
 
     @SubscribeEvent

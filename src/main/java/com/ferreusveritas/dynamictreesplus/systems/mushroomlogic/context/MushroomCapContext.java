@@ -1,33 +1,28 @@
 package com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.context;
 
 import com.ferreusveritas.dynamictrees.growthlogic.context.PositionalSpeciesContext;
-import com.ferreusveritas.dynamictrees.tree.species.Species;
-import com.ferreusveritas.dynamictreesplus.block.mushroom.DynamicCapCenterBlock;
+import com.ferreusveritas.dynamictreesplus.tree.HugeMushroomSpecies;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 
 public class MushroomCapContext extends PositionalSpeciesContext {
 
-    private final int currentAge;
-    private final DynamicCapCenterBlock centerBlock;
-    private final BlockPos rootPos;
+    private final int age;
+    private final HugeMushroomSpecies mushySpecies;
 
-    public MushroomCapContext(Level level, BlockPos pos, Species species, int currentAge, DynamicCapCenterBlock centerBlock, BlockPos rootPos) {
+    public MushroomCapContext(Level level, BlockPos pos, HugeMushroomSpecies species, int age) {
         super(level, pos, species);
-        this.currentAge = currentAge;
-        this.centerBlock = centerBlock;
-        this.rootPos = rootPos;
+        this.age = age;
+        this.mushySpecies = species;
     }
 
-    public int getCurrentAge() {
-        return currentAge;
+    public int getAge() {
+        return age;
     }
 
-    public DynamicCapCenterBlock getCenterBlock() {
-        return centerBlock;
+    @Override
+    public HugeMushroomSpecies species() {
+        return mushySpecies;
     }
 
-    public BlockPos getRootPos() {
-        return rootPos;
-    }
 }

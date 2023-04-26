@@ -12,11 +12,13 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.HugeMushroomBlock;
+import net.minecraft.world.level.block.PipeBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
@@ -25,7 +27,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class DynamicCapBlock extends HugeMushroomBlock implements TreePart {
 
-    public static final IntegerProperty DISTANCE = IntegerProperty.create("distance", 1, 7);
+    public static final IntegerProperty DISTANCE = IntegerProperty.create("distance", 1, 8);
 
     public CapProperties properties = CapProperties.NULL;
 
@@ -113,10 +115,6 @@ public class DynamicCapBlock extends HugeMushroomBlock implements TreePart {
         return TreePartType.OTHER;
     }
 
-    public BlockState getCapBlockStateForPlacement(LevelAccessor level, BlockPos pos, BlockState capWithDistance, int oldHydro, boolean worldGen) {
-        return capWithDistance; //by default just pass the blockstate along
-    }
-
     @Override
     public ItemStack getCloneItemStack(BlockState state, HitResult target, BlockGetter level, BlockPos pos, Player player) {
         return getProperties(state).getPrimitiveCapItemStack();
@@ -132,13 +130,20 @@ public class DynamicCapBlock extends HugeMushroomBlock implements TreePart {
                 .setValue(EAST,directions[5]);
     }
 
-    ///////////////////////////////////////////
-    // GROWTH
-    ///////////////////////////////////////////
-
     @Override
     public GrowSignal growSignal(Level level, BlockPos pos, GrowSignal signal) {
         return signal;
+    }
+
+    ///////////////////////////////////////////
+    // MUSHROOM BLOCK BEHAVIOUR
+    ///////////////////////////////////////////
+
+    @Override
+    public BlockState updateShape(BlockState pState, Direction pFacing, BlockState pFacingState, LevelAccessor pLevel, BlockPos pCurrentPos, BlockPos pFacingPos) {
+        return properties.isPartOfCap(pFacingState)
+                ? pState.setValue(PipeBlock.PROPERTY_BY_DIRECTION.get(pFacing), false)
+                : super.updateShape(pState, pFacing, pFacingState, pLevel, pCurrentPos, pFacingPos);
     }
 
 }

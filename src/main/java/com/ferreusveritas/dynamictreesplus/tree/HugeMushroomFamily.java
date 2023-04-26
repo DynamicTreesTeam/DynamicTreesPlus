@@ -8,6 +8,7 @@ import com.ferreusveritas.dynamictrees.data.DTBlockTags;
 import com.ferreusveritas.dynamictrees.data.DTItemTags;
 import com.ferreusveritas.dynamictrees.tree.family.Family;
 import com.ferreusveritas.dynamictrees.tree.species.Species;
+import com.ferreusveritas.dynamictrees.util.BlockBounds;
 import com.ferreusveritas.dynamictreesplus.block.mushroom.CapProperties;
 import com.ferreusveritas.dynamictreesplus.block.mushroom.MushroomBranchBlock;
 import net.minecraft.core.BlockPos;
@@ -79,8 +80,13 @@ public class HugeMushroomFamily extends Family {
         textureConsumer.accept("rings", insideBranchTexture);
     }
 
-    public boolean isCompatibleCap (Species species, BlockState state, Level level, BlockPos pos){
-        return true;
+    public boolean isCompatibleCap (HugeMushroomSpecies species, BlockState state, Level level, BlockPos pos){
+        return species.getCapProperties().isPartOfCap(state);
+    }
+
+    @Override
+    public BlockBounds expandLeavesBlockBounds(BlockBounds bounds) {
+        return bounds.expand(8);
     }
 
     ///////////////////////////////////////////

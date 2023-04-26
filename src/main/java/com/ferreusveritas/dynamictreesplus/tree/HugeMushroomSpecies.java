@@ -107,11 +107,6 @@ public class HugeMushroomSpecies extends Species {
     // CAP
     ///////////////////////////////////////////
 
-    @Nullable
-    public HashMap<BlockPos, BlockState> getFellingLeavesClusters(final BranchDestructionData destructionData) {
-        return null; //To-Do
-    }
-
     public Species setCapProperties(CapProperties capProperties) {
         this.capProperties = capProperties;
         capProperties.setFamily(getFamily());
@@ -171,6 +166,21 @@ public class HugeMushroomSpecies extends Species {
         textureConsumer.accept("particle", capLocation);
         textureConsumer.accept("stem", capLocation);
         textureConsumer.accept("cap", capLocation);
+    }
+
+    ///////////////////////////////////////////
+    // RENDER
+    ///////////////////////////////////////////
+
+    @Nullable
+    public HashMap<BlockPos, BlockState> getFellingLeavesClusters(final BranchDestructionData destructionData) {
+        HashMap<BlockPos, BlockState> map = new HashMap<>();
+
+        for (int pos : destructionData.destroyedLeaves){
+
+        }
+
+        return map;
     }
 
 }

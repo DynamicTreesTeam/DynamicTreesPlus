@@ -2,7 +2,6 @@ package com.ferreusveritas.dynamictreesplus.block.mushroom;
 
 import com.ferreusveritas.dynamictrees.api.cell.Cell;
 import com.ferreusveritas.dynamictrees.api.cell.CellNull;
-import com.ferreusveritas.dynamictrees.block.branch.BranchBlock;
 import com.ferreusveritas.dynamictrees.block.branch.ThickBranchBlock;
 import com.ferreusveritas.dynamictrees.block.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
@@ -10,6 +9,7 @@ import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictrees.util.BlockBounds;
 import com.ferreusveritas.dynamictrees.util.BlockStates;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
+import com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.context.MushroomCapContext;
 import com.ferreusveritas.dynamictreesplus.tree.HugeMushroomFamily;
 import com.ferreusveritas.dynamictreesplus.tree.HugeMushroomSpecies;
 import net.minecraft.core.BlockPos;
@@ -19,6 +19,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,12 +34,13 @@ public class MushroomBranchBlock extends ThickBranchBlock {
         setFireSpreadSpeed(0);
     }
 
-    @Override
-    public Cell getHydrationCell(BlockGetter level, BlockPos pos, BlockState state, Direction dir, LeavesProperties leavesProperties) {
+    @Override @NotNull
+    public Cell getHydrationCell(@NotNull BlockGetter level, @NotNull BlockPos pos, @NotNull BlockState state, @NotNull Direction dir, @NotNull LeavesProperties leavesProperties) {
         return CellNull.NULL_CELL;
     }
 
-    public GrowSignal growIntoAir(Level level, BlockPos pos, GrowSignal signal, int fromRadius) {
+    @Override @NotNull
+    public GrowSignal growIntoAir(@NotNull Level level, @NotNull BlockPos pos, GrowSignal signal, int fromRadius) {
         if (!(signal.getSpecies() instanceof final HugeMushroomSpecies species)) return signal;
 
         final DynamicCapCenterBlock cap = species.getCapCenterBlock().orElse(null);
@@ -62,7 +64,7 @@ public class MushroomBranchBlock extends ThickBranchBlock {
     }
 
     //Method is called destroy leaves but this one is to destroy mushroom caps
-    public void destroyLeaves(final Level level, final BlockPos cutPos, final Species species, final ItemStack tool, final List<BlockPos> endPoints, final Map<BlockPos, BlockState> destroyedCapBlocks, final List<ItemStackPos> drops) {
+    public void destroyLeaves(final @NotNull Level level, final @NotNull BlockPos cutPos, final @NotNull Species species, final @NotNull ItemStack tool, final @NotNull List<BlockPos> endPoints, final @NotNull Map<BlockPos, BlockState> destroyedCapBlocks, final @NotNull List<ItemStackPos> drops) {
         if (!(species instanceof final HugeMushroomSpecies mushSpecies)) return;
         if (!(species.getFamily() instanceof final HugeMushroomFamily family)) return;
 
@@ -78,23 +80,15 @@ public class MushroomBranchBlock extends ThickBranchBlock {
 
         // For each of the endpoints add an expanded destruction volume around it.
         for (final BlockPos endPos : endPoints) {
-            for (final BlockPos leafPos : getFamily().expandLeavesBlockBounds(new BlockBounds(endPos))) {
-                capMap.setVoxel(leafPos, (byte) 1); // Flag this position for destruction.
-            }
-            capMap.setVoxel(endPos, (byte) 0); // We know that the endpoint does not have a leaves block in it because it was a branch.
-        }
-
-        final BranchBlock familyBranch = family.getBranch().get();
-        final int primaryThickness = family.getPrimaryThickness();
-
-        // Expand the volume yet again in all directions and search for other non-destroyed endpoints.
-        for (final BlockPos findPos : getFamily().expandLeavesBlockBounds(bounds)) {
-            final BlockState findState = level.getBlockState(findPos);
-            if (familyBranch.getRadius(findState) == primaryThickness) { // Search for endpoints of the same tree family.
-                final Iterable<BlockPos.MutableBlockPos> blocks = mushSpecies.getCapProperties().getMushroomShapeKit().getShapeCluster().getAllNonZero();
-                for (BlockPos.MutableBlockPos capPos : blocks) {
-                    capMap.setVoxel(findPos.getX() + capPos.getX(), findPos.getY() + capPos.getY(), findPos.getZ() + capPos.getZ(), (byte) 0);
+            int age = DynamicCapCenterBlock.getCapAge(level, endPos.above());
+            if (age > 0){
+                for (final BlockPos findPos : mushSpecies.getCapProperties().getMushroomShapeKit().getShapeCluster(new MushroomCapContext(level, endPos.above(), mushSpecies, age))) {
+                    final BlockState findState = level.getBlockState(findPos);
+                    if (family.isCompatibleCap(mushSpecies, findState, level, findPos)) { // Search for endpoints of the same tree family.
+                        capMap.setVoxel(findPos.getX(), findPos.getY(), findPos.getZ(), (byte) 1); // Flag this position for destruction.
+                    }
                 }
+                capMap.setVoxel(endPos, (byte) 0); // We know that the endpoint does not have a leaves block in it because it was a branch.
             }
         }
 
@@ -104,7 +98,7 @@ public class MushroomBranchBlock extends ThickBranchBlock {
         for (final SimpleVoxmap.Cell cell : capMap.getAllNonZeroCells()) {
             final BlockPos.MutableBlockPos pos = cell.getPos();
             final BlockState state = level.getBlockState(pos);
-            if (family.isCompatibleCap(species, state, level, pos)) {
+            if (family.isCompatibleCap(mushSpecies, state, level, pos)) {
                 dropList.clear();
                 CapProperties cap = getCapProperties(state);
                 dropList.addAll(cap.getDrops(level, pos, tool, species));

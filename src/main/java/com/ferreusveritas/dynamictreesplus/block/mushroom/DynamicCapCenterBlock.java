@@ -36,10 +36,14 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec2;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 public class DynamicCapCenterBlock extends Block implements TreePart {
@@ -143,13 +147,15 @@ public class DynamicCapCenterBlock extends Block implements TreePart {
         return getProperties(state).getPrimitiveCapItemStack();
     }
 
+    public static int getCapAge (Level level, BlockPos pos){
+        BlockState state = level.getBlockState(pos);
+        if (state.getBlock() instanceof DynamicCapCenterBlock) return state.getValue(AGE);
+        return 0;
+    }
+
     ///////////////////////////////////////////
     // GROWTH
     ///////////////////////////////////////////
-
-    public void updateCap (){
-
-    }
 
     @Override
     public GrowSignal growSignal(Level level, BlockPos pos, GrowSignal signal) {
@@ -207,7 +213,8 @@ public class DynamicCapCenterBlock extends Block implements TreePart {
             if (age != currentAge){
                 ageBranchUnderCap(level, pos, signal, currentAge);
             }
-            generateCap(age, level, signal.getSpecies(), pos, previousPos, currentAge, signal.rootPos);
+            if (!(signal.getSpecies() instanceof HugeMushroomSpecies)) return false;
+            generateCap(age, level, (HugeMushroomSpecies) signal.getSpecies(), pos, previousPos, currentAge, signal.rootPos);
             return true;
         } else {
             final TreePart treePart = TreeHelper.getTreePart(level.getBlockState(pos));
@@ -226,13 +233,13 @@ public class DynamicCapCenterBlock extends Block implements TreePart {
         signal.radius = Math.min(thickness+1, family.getMaxBranchRadius());
     }
 
-    protected void generateCap(int newAge, Level pLevel, Species species, BlockPos newPos, BlockPos currentPos, int currentAge, BlockPos rootPos){
+    protected void generateCap(int newAge, Level pLevel, HugeMushroomSpecies species, BlockPos newPos, BlockPos currentPos, int currentAge, BlockPos rootPos){
         DynamicCapBlock capBlock = properties.getDynamicCapBlock().orElse(null);
         if (capBlock == null) return;
         //only clear the cap if the position changed or if the age changed
         if (currentPos != newPos || currentAge != newAge)
-            properties.mushroomShapeKit.clearMushroomCap(new MushroomCapContext(pLevel, currentPos, species, currentAge, this, rootPos));
-        properties.mushroomShapeKit.generateMushroomCap(new MushroomCapContext(pLevel, newPos, species, newAge, this, rootPos));
+            properties.mushroomShapeKit.clearMushroomCap(new MushroomCapContext(pLevel, currentPos, species, currentAge));
+        properties.mushroomShapeKit.generateMushroomCap(new MushroomCapContext(pLevel, newPos, species, newAge));
 
     }
 
@@ -254,6 +261,17 @@ public class DynamicCapCenterBlock extends Block implements TreePart {
             if (level.getBlockState(ringPos).getMaterial().isReplaceable())
                 level.setBlock(ringPos, getStateForAge(properties, step, new Vec2i(-vec.x,-vec.z), yMoved),2);
         }
+    }
+
+    public List<BlockPos> getRing (LevelAccessor level, BlockPos pos, int radius){
+        List<Vec2i> ring = MushroomCapDisc.getPrecomputedRing(radius);
+        List<BlockPos> positions = new LinkedList<>();
+        for (Vec2i vec : ring){
+            BlockPos ringPos = new BlockPos(pos.getX() + vec.x, pos.getY(), pos.getZ() + vec.z);
+            if (properties.isPartOfCap(level.getBlockState(ringPos)))
+                positions.add(ringPos);
+        }
+        return positions;
     }
 
     @Nonnull
@@ -282,6 +300,17 @@ public class DynamicCapCenterBlock extends Block implements TreePart {
 //            case 7 -> Blocks.LIME_CONCRETE.defaultBlockState();
 //            case 8 -> Blocks.GREEN_CONCRETE.defaultBlockState();
 //        };
+    }
+
+    ///////////////////////////////////////////
+    // SHAPE
+    ///////////////////////////////////////////
+
+    @Override
+    public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
+        if (pState.is(this) && pState.getValue(AGE) == 0)
+            return properties.getAgeZeroShape();
+        return super.getShape(pState, pLevel, pPos, pContext);
     }
 
 }

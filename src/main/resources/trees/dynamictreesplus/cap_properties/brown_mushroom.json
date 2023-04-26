@@ -1,10 +1,14 @@
 {
   "primitive_cap": "brown_mushroom_block",
-  "mushroom_shape_kit": {
-    "name": "dynamictreesplus:mushroom_block",
-    "properties": {
-      "curve_factor": 0
+  "_disabled_for_now": {
+    "mushroom_shape_kit": {
+      "name": "dynamictreesplus:default",
+      "properties": {
+        "max_age_curve_factor": 0.05,
+        "min_age_curve_factor": 0.6
+      }
     }
   },
-  "material_color": "DIRT"
+  "material_color": "DIRT",
+  "age_zero_shape": "slab"
 }

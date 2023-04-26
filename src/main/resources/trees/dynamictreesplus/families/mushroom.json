@@ -6,5 +6,6 @@
   "outside_branch_texture": "block/mushroom_stem",
   "inside_branch_texture": "block/mushroom_block_inside",
   "stick": "air",
-  "generate_stripped_branch": false
+  "generate_stripped_branch": false,
+  "max_branch_radius": 16
 }

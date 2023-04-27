@@ -150,7 +150,7 @@ public class DynamicCapCenterBlock extends Block implements TreePart {
     public static int getCapAge (Level level, BlockPos pos){
         BlockState state = level.getBlockState(pos);
         if (state.getBlock() instanceof DynamicCapCenterBlock) return state.getValue(AGE);
-        return 0;
+        return -1;
     }
 
     ///////////////////////////////////////////

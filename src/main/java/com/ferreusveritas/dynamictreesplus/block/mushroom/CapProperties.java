@@ -40,6 +40,7 @@ import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.LootTables;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -108,7 +109,7 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
     public static final TypedRegistry<CapProperties> REGISTRY = new TypedRegistry<>(CapProperties.class, NULL, new TypedRegistry.EntryType<>(CODEC));
 
     private CapProperties() {
-//        this.blockLootTableSupplier = new LootTableSupplier("null/", DTTrees.NULL);
+        this.blockLootTableSupplier = new LootTableSupplier("null/", DTTrees.NULL);
         this.lootTableSupplier = new LootTableSupplier("null/", DTTrees.NULL);
     }
 
@@ -127,7 +128,7 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
         this.setRegistryName(registryName);
         this.centerBlockRegistryName = ResourceLocationUtils.suffix(registryName, this.getCenterBlockRegistryNameSuffix());
         this.blockRegistryName = ResourceLocationUtils.suffix(registryName, this.getBlockRegistryNameSuffix());
-//        this.blockLootTableSupplier = new LootTableSupplier("blocks/", blockRegistryName);
+        this.blockLootTableSupplier = new LootTableSupplier("blocks/", blockRegistryName);
         this.lootTableSupplier = new LootTableSupplier("trees/mushroom_caps/", registryName);
     }
 
@@ -398,6 +399,27 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
         }
     }
 
+    private final LootTableSupplier blockLootTableSupplier;
+
+    public ResourceLocation getBlockLootTableName() {
+        return blockLootTableSupplier.getName();
+    }
+
+    public LootTable getBlockLootTable(LootTables lootTables, Species species) {
+        return blockLootTableSupplier.get(lootTables, species);
+    }
+
+    public boolean shouldGenerateBlockDrops() {
+        return shouldGenerateDrops();
+    }
+
+    public LootTable.Builder createBlockDrops() {
+        if (mushroomDropChances != null && getPrimitiveCapBlock().isPresent()) {
+            return DTLootTableProvider.createLeavesBlockDrops(primitiveCap.getBlock(), mushroomDropChances);
+        }
+        return DTLootTableProvider.createLeavesDrops(mushroomDropChances, LootContextParamSets.BLOCK);
+    }
+
     private final LootTableSupplier lootTableSupplier;
 
     public ResourceLocation getLootTableName() {
@@ -406,6 +428,10 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
 
     public LootTable getLootTable(LootTables lootTables, Species species) {
         return lootTableSupplier.get(lootTables, species);
+    }
+
+    public boolean shouldGenerateDrops() {
+        return getPrimitiveCapBlock().isPresent();
     }
 
     public LootTable.Builder createDrops() {

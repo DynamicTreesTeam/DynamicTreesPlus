@@ -1,13 +1,20 @@
 package com.ferreusveritas.dynamictreesplus.block.mushroom;
 
+import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.cell.Cell;
 import com.ferreusveritas.dynamictrees.api.cell.CellNull;
+import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.block.branch.ThickBranchBlock;
 import com.ferreusveritas.dynamictrees.block.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
+import com.ferreusveritas.dynamictrees.systems.nodemapper.DestroyerNode;
+import com.ferreusveritas.dynamictrees.systems.nodemapper.NetVolumeNode;
+import com.ferreusveritas.dynamictrees.systems.nodemapper.SpeciesNode;
+import com.ferreusveritas.dynamictrees.systems.nodemapper.StateNode;
 import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictrees.util.BlockBounds;
 import com.ferreusveritas.dynamictrees.util.BlockStates;
+import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.context.MushroomCapContext;
 import com.ferreusveritas.dynamictreesplus.tree.HugeMushroomFamily;
@@ -15,16 +22,17 @@ import com.ferreusveritas.dynamictreesplus.tree.HugeMushroomSpecies;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import javax.annotation.Nullable;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class MushroomBranchBlock extends ThickBranchBlock {
 
@@ -63,8 +71,47 @@ public class MushroomBranchBlock extends ThickBranchBlock {
         return signal;
     }
 
+    public BranchDestructionData destroyBranchFromNode(Level level, BlockPos cutPos, Direction toolDir, boolean wholeTree, @Nullable final LivingEntity entity) {
+        final BlockState blockState = level.getBlockState(cutPos);
+        final SpeciesNode speciesNode = new SpeciesNode();
+        final MapSignal signal = analyse(blockState, level, cutPos, null, new MapSignal(speciesNode)); // Analyze entire tree network to find root node and species.
+        final Species species = speciesNode.getSpecies(); // Get the species from the root node.
+
+        // Analyze only part of the tree beyond the break point and map out the extended block states.
+        // We can't destroy the branches during this step since we need accurate extended block states that include connections.
+        StateNode stateMapper = new StateNode(cutPos);
+        this.analyse(blockState, level, cutPos, wholeTree ? null : signal.localRootDir, new MapSignal(stateMapper));
+
+        // Analyze only part of the tree beyond the break point and calculate it's volume, then destroy the branches.
+        final NetVolumeNode volumeSum = new NetVolumeNode();
+        final DestroyerNode destroyer = new DestroyerNode(species).setPlayer(entity instanceof Player ? (Player) entity : null);
+        destroyMode = DynamicTrees.DestroyMode.HARVEST;
+        this.analyse(blockState, level, cutPos, wholeTree ? null : signal.localRootDir, new MapSignal(volumeSum, destroyer));
+        destroyMode = DynamicTrees.DestroyMode.SLOPPY;
+
+        // Destroy all the leaves on the branch, store them in a map and convert endpoint coordinates from absolute to relative.
+        List<BlockPos> endPoints = destroyer.getEnds();
+        final Map<BlockPos, BlockState> destroyedLeaves = new HashMap<>();
+        final List<ItemStackPos> leavesDropsList = new ArrayList<>();
+        this.destroyMushroomCap(level, cutPos, species, entity == null ? ItemStack.EMPTY : entity.getMainHandItem(), endPoints, destroyedLeaves, leavesDropsList);
+        endPoints = endPoints.stream().map(p -> p.subtract(cutPos)).collect(Collectors.toList());
+
+        // Calculate main trunk height.
+        int trunkHeight = 1;
+        for (BlockPos iter = new BlockPos(0, 1, 0); stateMapper.getBranchConnectionMap().containsKey(iter); iter = iter.above()) {
+            trunkHeight++;
+        }
+
+        Direction cutDir = signal.localRootDir;
+        if (cutDir == null) {
+            cutDir = Direction.DOWN;
+        }
+
+        return new BranchDestructionData(species, stateMapper.getBranchConnectionMap(), destroyedLeaves, leavesDropsList, endPoints, volumeSum.getVolume(), cutPos, cutDir, toolDir, trunkHeight);
+    }
+
     //Method is called destroy leaves but this one is to destroy mushroom caps
-    public void destroyLeaves(final @NotNull Level level, final @NotNull BlockPos cutPos, final @NotNull Species species, final @NotNull ItemStack tool, final @NotNull List<BlockPos> endPoints, final @NotNull Map<BlockPos, BlockState> destroyedCapBlocks, final @NotNull List<ItemStackPos> drops) {
+    public void destroyMushroomCap(final @NotNull Level level, final @NotNull BlockPos cutPos, final @NotNull Species species, final @NotNull ItemStack tool, final @NotNull List<BlockPos> endPoints, final @NotNull Map<BlockPos, BlockState> destroyedCapBlocks, final @NotNull List<ItemStackPos> drops) {
         if (!(species instanceof final HugeMushroomSpecies mushSpecies)) return;
         if (!(species.getFamily() instanceof final HugeMushroomFamily family)) return;
 
@@ -81,7 +128,7 @@ public class MushroomBranchBlock extends ThickBranchBlock {
         // For each of the endpoints add an expanded destruction volume around it.
         for (final BlockPos endPos : endPoints) {
             int age = DynamicCapCenterBlock.getCapAge(level, endPos.above());
-            if (age > 0){
+            if (age >= 0){
                 for (final BlockPos findPos : mushSpecies.getCapProperties().getMushroomShapeKit().getShapeCluster(new MushroomCapContext(level, endPos.above(), mushSpecies, age))) {
                     final BlockState findState = level.getBlockState(findPos);
                     if (family.isCompatibleCap(mushSpecies, findState, level, findPos)) { // Search for endpoints of the same tree family.

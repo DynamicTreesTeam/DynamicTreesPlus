@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictreesplus.tree;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.block.entity.SpeciesBlockEntity;
+import com.ferreusveritas.dynamictrees.block.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.block.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.block.rooty.RootyBlock;
 import com.ferreusveritas.dynamictrees.block.rooty.SoilHelper;
@@ -173,12 +174,64 @@ public class HugeMushroomSpecies extends Species {
     // RENDER
     ///////////////////////////////////////////
 
+    @Override
+    public boolean leavesAreSolid (){
+        return true;
+    }
+
+    @Override
+    public boolean canEncodeLeavesBlocks (BlockPos pos, BlockState state, Block block, BranchDestructionData data){
+        return capProperties.isPartOfCap(state);
+    }
+
+    @Override
+    public int encodeLeavesPos(BlockPos pos, BlockState state, Block block, BranchDestructionData data) {
+        return (state.getBlock() instanceof DynamicCapCenterBlock ? 0 : state.getValue(DynamicCapBlock.DISTANCE) << 24) | BranchDestructionData.encodeRelBlockPos(pos);
+    }
+
+    @Override
+    public int encodeLeavesBlocks(BlockPos pos, BlockState state, Block block, BranchDestructionData data) {
+        //first bit will be 0 for cap blocks and 1 for the center cap block. The other bits encode direction or age, respectively.
+        if (block instanceof DynamicCapBlock){
+            boolean[] dirValues = DynamicCapBlock.getDirectionValues(state);
+            int code = 0x0;
+            for (int i=0; i<6; i++){
+                if (dirValues[i])
+                    code |= 0x1 << i + 1;
+            }
+            return code;
+        } else if (block instanceof DynamicCapCenterBlock){
+            int age = state.getValue(DynamicCapCenterBlock.AGE);
+            int code = 0x1;
+            code |= age << 1;
+            return code;
+        }
+        return 0;
+    }
+
     @Nullable
     public HashMap<BlockPos, BlockState> getFellingLeavesClusters(final BranchDestructionData destructionData) {
         HashMap<BlockPos, BlockState> map = new HashMap<>();
 
-        for (int pos : destructionData.destroyedLeaves){
+        for (int j=0; j<destructionData.getNumLeaves(); j++){
+            int posCoded = destructionData.destroyedLeaves[j];
+            int blockCoded = destructionData.destroyedLeavesBlockIndex[j];
 
+            boolean isCenter = (blockCoded & 0x1) == 1;
+            BlockState state = capProperties.getDynamicCapState(isCenter);
+            if (isCenter){
+                int age = blockCoded >> 0x1;
+                state = state.setValue(DynamicCapCenterBlock.AGE, age);
+            } else {
+                boolean[] sides = new boolean[6];
+                for (int i=0; i<6; i++){
+                    sides[i] = ((blockCoded >> i + 1) & 0x1) == 0x1;
+                }
+                state = DynamicCapBlock.setDirectionValues(state, sides);
+            }
+
+            BlockPos pos = BranchDestructionData.decodeRelPos(posCoded);
+            map.put(pos, state);
         }
 
         return map;

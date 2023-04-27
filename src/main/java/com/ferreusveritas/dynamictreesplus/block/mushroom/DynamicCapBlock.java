@@ -135,6 +135,19 @@ public class DynamicCapBlock extends HugeMushroomBlock implements TreePart {
                 .setValue(EAST,directions[5]);
     }
 
+    public static boolean[] getDirectionValues (BlockState state){
+        if (state.getBlock() instanceof HugeMushroomBlock)
+            return new boolean[]{
+                    state.getValue(DOWN),
+                    state.getValue(UP),
+                    state.getValue(NORTH),
+                    state.getValue(SOUTH),
+                    state.getValue(WEST),
+                    state.getValue(EAST)
+            };
+        return new boolean[6];
+    }
+
     @Override
     public GrowSignal growSignal(Level level, BlockPos pos, GrowSignal signal) {
         return signal;

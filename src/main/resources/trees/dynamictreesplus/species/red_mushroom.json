@@ -11,6 +11,12 @@
   "primitive_sapling": "red_mushroom",
   "acceptable_soils": ["fungus_like"],
   "features" : [
-    "bottom_flare"
+    "bottom_flare",
+    {
+      "name": "mushroom_rot",
+      "properties": {
+        "alternate_mushroom_chance": 1
+      }
+    }
   ]
 }

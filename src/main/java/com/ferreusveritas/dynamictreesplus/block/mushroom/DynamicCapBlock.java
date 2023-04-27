@@ -11,6 +11,7 @@ import com.ferreusveritas.dynamictrees.tree.family.Family;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -30,7 +31,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
 
-public class DynamicCapBlock extends HugeMushroomBlock implements TreePart {
+public class DynamicCapBlock extends HugeMushroomBlock implements TreePart, UpdatesSurroundNeighbors {
 
     public static final IntegerProperty DISTANCE = IntegerProperty.create("distance", 1, 8);
 
@@ -154,6 +155,18 @@ public class DynamicCapBlock extends HugeMushroomBlock implements TreePart {
     }
 
     ///////////////////////////////////////////
+    // PARTICLES
+    ///////////////////////////////////////////
+
+    public void animateTick(BlockState pState, Level pLevel, BlockPos pPos, Random pRand) {
+        super.animateTick(pState, pLevel, pPos, pRand);
+        if (pRand.nextInt(50) == 0 && pLevel.isEmptyBlock(pPos.below())) {
+            pLevel.addParticle(ParticleTypes.WHITE_ASH, (double)pPos.getX() + pRand.nextDouble(), (double)pPos.getY() - 0.1D, (double)pPos.getZ() + pRand.nextDouble(), 1.0D, 0.0D, 1.0D);
+        }
+
+    }
+
+    ///////////////////////////////////////////
     // MUSHROOM BLOCK BEHAVIOUR
     ///////////////////////////////////////////
 
@@ -180,24 +193,8 @@ public class DynamicCapBlock extends HugeMushroomBlock implements TreePart {
     public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
         boolean destroyed = super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
         //We update neighboring cap blocks in the corners as well
-        updateNeighborsSurround(level, pos);
+        updateNeighborsSurround(level, pos, DynamicCapBlock.class);
         return destroyed;
-    }
-
-    Vec3i[] cornersAndEdges = {
-            new Vec3i(1,1,1), new Vec3i(-1,1,1), new Vec3i(1,1,-1), new Vec3i(-1,1,-1),
-            new Vec3i(1,-1,1), new Vec3i(-1,-1,1), new Vec3i(1,-1,-1), new Vec3i(-1,-1,-1),
-            new Vec3i(0,1,1), new Vec3i(0,-1,1), new Vec3i(0,1,-1),new Vec3i(0,-1,-1),
-            new Vec3i(1,0,1), new Vec3i(-1,0,1), new Vec3i(1,0,-1), new Vec3i(-1,0,-1),
-            new Vec3i(1,1,0), new Vec3i(-1,1,0), new Vec3i(1,-1,0), new Vec3i(-1,-1,0),
-    };
-    protected void updateNeighborsSurround (Level level, BlockPos pos){
-        for (Vec3i corner : cornersAndEdges){
-            BlockPos offPos = pos.offset(corner);
-            Block offBlock = level.getBlockState(offPos).getBlock();
-            if (offBlock instanceof DynamicCapBlock)
-                level.neighborChanged(offPos, offBlock, pos);
-        }
     }
 
     @Override
@@ -225,7 +222,7 @@ public class DynamicCapBlock extends HugeMushroomBlock implements TreePart {
             //Otherwise, destroy the block
 
             level.destroyBlock(pos, true);
-            updateNeighborsSurround(level, pos);
+            updateNeighborsSurround(level, pos, DynamicCapBlock.class);
             return;
         }
         super.tick(pState, level, pos, pRandom);

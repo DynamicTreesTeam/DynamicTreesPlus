@@ -34,6 +34,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -46,7 +47,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
-public class DynamicCapCenterBlock extends Block implements TreePart {
+public class DynamicCapCenterBlock extends Block implements TreePart, UpdatesSurroundNeighbors {
 
     public static final IntegerProperty AGE = IntegerProperty.create("age", 0, 8);
 
@@ -286,20 +287,14 @@ public class DynamicCapCenterBlock extends Block implements TreePart {
         }
         return properties.getDynamicCapState(age, dirs);
 
+    }
 
-
-//        return switch (age) {
-//            default -> Blocks.BLACK_CONCRETE.defaultBlockState();
-//            case 0 -> Blocks.LIGHT_BLUE_CONCRETE.defaultBlockState();
-//            case 1 -> Blocks.BLUE_CONCRETE.defaultBlockState();
-//            case 2 -> Blocks.PURPLE_CONCRETE.defaultBlockState();
-//            case 3 -> Blocks.MAGENTA_CONCRETE.defaultBlockState();
-//            case 4 -> Blocks.RED_CONCRETE.defaultBlockState();
-//            case 5 -> Blocks.ORANGE_CONCRETE.defaultBlockState();
-//            case 6 -> Blocks.YELLOW_CONCRETE.defaultBlockState();
-//            case 7 -> Blocks.LIME_CONCRETE.defaultBlockState();
-//            case 8 -> Blocks.GREEN_CONCRETE.defaultBlockState();
-//        };
+    @Override
+    public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
+        boolean destroyed = super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
+        //We update neighboring cap blocks in the corners as well
+        updateNeighborsSurround(level, pos, DynamicCapBlock.class);
+        return destroyed;
     }
 
     ///////////////////////////////////////////

@@ -34,6 +34,7 @@ import java.util.Random;
 
 public class DynamicCapBlock extends HugeMushroomBlock implements TreePart, UpdatesSurroundNeighbors {
 
+    //For now the limit is 8 as rings are computed with 3 bits. Might increase later
     public static final IntegerProperty DISTANCE = IntegerProperty.create("distance", 1, 8);
 
     public CapProperties properties = CapProperties.NULL;

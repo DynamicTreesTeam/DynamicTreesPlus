@@ -7,6 +7,7 @@ import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.TreePart;
 import com.ferreusveritas.dynamictrees.block.branch.BranchBlock;
 import com.ferreusveritas.dynamictrees.block.leaves.LeavesProperties;
+import com.ferreusveritas.dynamictrees.data.DTBlockTags;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.poissondisc.Vec2i;
 import com.ferreusveritas.dynamictrees.tree.family.Family;
@@ -16,6 +17,7 @@ import com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.context.Mushroo
 import com.ferreusveritas.dynamictreesplus.tree.HugeMushroomSpecies;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
@@ -38,6 +40,7 @@ import java.util.List;
 
 public class DynamicCapCenterBlock extends Block implements TreePart, UpdatesSurroundNeighbors {
 
+    //For now the limit is 8 as rings are computed with 3 bits. Might increase later
     public static final IntegerProperty AGE = IntegerProperty.create("age", 0, 8);
 
     public CapProperties properties = CapProperties.NULL;
@@ -193,12 +196,13 @@ public class DynamicCapCenterBlock extends Block implements TreePart, UpdatesSur
     }
 
     public boolean tryGrowCap(Level level, CapProperties capProp, int currentAge, GrowSignal signal, BlockPos pos, BlockPos previousPos) {
+        if (!(signal.getSpecies() instanceof HugeMushroomSpecies species)) return false;
         if (level.isEmptyBlock(pos)) {
             int age = currentAge;
             if (currentAge == 0){
                 age = 1;
             } else if (level.getRandom().nextFloat() < properties.getChanceToAge())
-                age = Math.min(age+1, properties.getMaxAge());
+                age = Math.min(age+1, properties.getMaxAge(species));
             level.setBlock(pos, getCapBlockStateForPlacement(level, pos, age == 0 ? 1 : age, capProp.getDynamicCapState(true), false), 2); // Removed Notify Neighbors Flag for performance.
             if (age != currentAge){
                 ageBranchUnderCap(level, pos, signal, currentAge);
@@ -215,7 +219,7 @@ public class DynamicCapCenterBlock extends Block implements TreePart, UpdatesSur
     protected void ageBranchUnderCap (Level level, BlockPos pos, GrowSignal signal, int currentAge){
         Species species = signal.getSpecies();
         Family family = species.getFamily();
-        int thickness = MushroomBranchBlock.getPrimaryRadiusUnderCap(species, currentAge);
+        int thickness = Math.min(species.getFamily().getPrimaryThickness() + currentAge, species.getMaxBranchRadius());
 
         BlockPos branchPos = pos.offset(signal.dir.getOpposite().getNormal());
         family.getBranchForPlacement(level, signal.getSpecies(), branchPos).ifPresent(branch ->
@@ -229,8 +233,8 @@ public class DynamicCapCenterBlock extends Block implements TreePart, UpdatesSur
         if (capBlock == null) return;
         //only clear the cap if the position changed or if the age changed
         if (currentPos != newPos || currentAge != newAge)
-            properties.mushroomShapeKit.clearMushroomCap(new MushroomCapContext(pLevel, currentPos, species, currentAge));
-        properties.mushroomShapeKit.generateMushroomCap(new MushroomCapContext(pLevel, newPos, species, newAge));
+            species.getMushroomShapeKit().clearMushroomCap(new MushroomCapContext(pLevel, currentPos, species, currentAge));
+        species.getMushroomShapeKit().generateMushroomCap(new MushroomCapContext(pLevel, newPos, species, newAge));
 
     }
 
@@ -249,7 +253,9 @@ public class DynamicCapCenterBlock extends Block implements TreePart, UpdatesSur
 
         for (Vec2i vec : ring){
             BlockPos ringPos = new BlockPos(pos.getX() + vec.x, pos.getY(), pos.getZ() + vec.z);
-            if (level.getBlockState(ringPos).getMaterial().isReplaceable())
+            BlockState placeState = level.getBlockState(ringPos);
+            // Mushroom caps take precedence over leaves
+            if (placeState.getMaterial().isReplaceable() || placeState.is(DTBlockTags.FOLIAGE) || placeState.is(BlockTags.LEAVES))
                 level.setBlock(ringPos, getStateForAge(properties, step, new Vec2i(-vec.x,-vec.z), yMoved, negFactor, properties.isPartOfCap(level.getBlockState(ringPos.above()))),2);
         }
     }

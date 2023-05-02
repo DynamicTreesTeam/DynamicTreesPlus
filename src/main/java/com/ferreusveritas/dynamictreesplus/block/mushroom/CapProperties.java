@@ -1,6 +1,5 @@
 package com.ferreusveritas.dynamictreesplus.block.mushroom;
 
-import com.ferreusveritas.dynamictrees.api.cell.CellKit;
 import com.ferreusveritas.dynamictrees.api.data.Generator;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
@@ -18,8 +17,7 @@ import com.ferreusveritas.dynamictrees.tree.family.Family;
 import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictrees.util.*;
 import com.ferreusveritas.dynamictreesplus.data.CapStateGenerator;
-import com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.MushroomShapeConfiguration;
-import com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.shapekits.MushroomShapeKit;
+import com.ferreusveritas.dynamictreesplus.tree.HugeMushroomSpecies;
 import com.mojang.math.Vector3d;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -38,6 +36,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.level.storage.loot.LootContext;
@@ -56,6 +55,8 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
     public static final Codec<CapProperties> CODEC = RecordCodecBuilder.create(instance -> instance
             .group(ResourceLocation.CODEC.fieldOf(Resources.RESOURCE_LOCATION.toString()).forGetter(CapProperties::getRegistryName))
             .apply(instance, CapProperties::new));
+
+    private IntegerProperty ageProperty = IntegerProperty.create("age", 0, 8);
 
     public static final CapProperties NULL = new CapProperties() {
         @Override
@@ -89,11 +90,6 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
         }
 
         @Override
-        public MushroomShapeConfiguration getMushroomShapeKit() {
-            return MushroomShapeKit.NULL.getDefaultConfiguration();
-        }
-
-        @Override
         public int getFlammability() {
             return 0;
         }
@@ -121,33 +117,22 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
     }
 
     public CapProperties(@Nullable final BlockState primitiveCap, final ResourceLocation registryName) {
-        this(primitiveCap, MushroomShapeKit.NULL.getDefaultConfiguration(), registryName);
-    }
-
-    public CapProperties(@Nullable final BlockState primitiveCap, final MushroomShapeConfiguration shapeKit, final ResourceLocation registryName) {
         this.family = Family.NULL_FAMILY;
         this.primitiveCap = primitiveCap != null ? primitiveCap : BlockStates.AIR;
-        this.mushroomShapeKit = shapeKit;
         this.setRegistryName(registryName);
         this.centerBlockRegistryName = ResourceLocationUtils.suffix(registryName, this.getCenterBlockRegistryNameSuffix());
         this.blockRegistryName = ResourceLocationUtils.suffix(registryName, this.getBlockRegistryNameSuffix());
         this.blockLootTableSupplier = new LootTableSupplier("blocks/", blockRegistryName);
         this.lootTableSupplier = new LootTableSupplier("trees/mushroom_caps/", registryName);
     }
-
-    protected int maxDistance = 6;
     protected int maxAge = 6;
     /**
      * The primitive (vanilla) mushroom block is used for many purposes including rendering, drops, and some other basic
      * behavior.
      */
     protected BlockState primitiveCap;
-    /**
-     * The {@link MushroomShapeKit}, which is for leaves automata.
-     */
-    protected MushroomShapeConfiguration mushroomShapeKit;
     protected Family family;
-    protected BlockState[] dynamicMushroomBlockDistanceStates = new BlockState[getMaxDistance() + 1];
+    protected BlockState[] dynamicMushroomBlockDistanceStates = new BlockState[maxAge + 1];
     protected BlockState dynamicMushroomCenterBlock;
     protected int flammability = 0;// Mimic vanilla mushroom
     protected int fireSpreadSpeed = 0;// Mimic vanilla mushroom
@@ -214,19 +199,6 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
         this.fireSpreadSpeed = fireSpreadSpeed;
     }
 
-    /**
-     * Gets the {@link CellKit}, which is for leaves automata.
-     *
-     * @return The {@link CellKit} object.
-     */
-    public MushroomShapeConfiguration getMushroomShapeKit() {
-        return mushroomShapeKit;
-    }
-
-    public void setMushroomShapeConfiguration(MushroomShapeConfiguration mushroomShapeKit) {
-        this.mushroomShapeKit = mushroomShapeKit;
-    }
-
     public Material getDefaultMaterial() {
         return Material.WOOD;
     }
@@ -249,16 +221,8 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
         this.maxAge = maxAge;
     }
 
-    public int getMaxAge() {
-        return maxAge;
-    }
-
-    public void setMaxDistance(int maxDistance) {
-        this.maxDistance = maxDistance;
-    }
-
-    public int getMaxDistance() {
-        return maxDistance;
+    public int getMaxAge(HugeMushroomSpecies species) {
+        return Math.min(maxAge, species.getMushroomShapeKit().getMaxCapAge());
     }
 
     public void setAgeZeroShape(VoxelShape ageZeroShape) {
@@ -354,7 +318,7 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
         }
         //Cache all the blockStates to speed up worldgen
         dynamicMushroomBlockDistanceStates[0] = Blocks.AIR.defaultBlockState();
-        for (int i = 1; i <= getMaxDistance(); i++) {
+        for (int i = 1; i <= maxAge; i++) {
             dynamicMushroomBlockDistanceStates[i] = state.setValue(DynamicCapBlock.DISTANCE, i);
         }
         return this;
@@ -362,11 +326,11 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
 
     public BlockState getDynamicCapState(boolean center) {
         if (center) return dynamicMushroomCenterBlock;
-        return getDynamicCapState(getMushroomShapeKit().getDefaultDistance());
+        return getDynamicCapState(1);
     }
 
     public BlockState getDynamicCapState(int distance) {
-        return Optional.ofNullable(dynamicMushroomBlockDistanceStates[Mth.clamp(distance, 0, getMaxDistance())])
+        return Optional.ofNullable(dynamicMushroomBlockDistanceStates[Mth.clamp(distance, 0, maxAge)])
                 .orElse(Blocks.AIR.defaultBlockState());
     }
 

@@ -54,7 +54,7 @@ public class MushroomInflatorNode implements NodeInspector {
         if (dist.getX() * dist.getX() + dist.getY() * dist.getY() + dist.getZ() * dist.getZ() != 1) {//This is actually the equation for distance squared. 1 squared is 1. Yay math.
             if (level.getBlockState(pos.above()).getMaterial().isReplaceable()){
                 int capAge = CoordUtils.coordHashCode(new BlockPos(pos.getX(),0,pos.getZ()), 3)
-                        % Math.min(species.getCapProperties().getMaxAge(), generationRadius);
+                        % Math.min(species.getCapProperties().getMaxAge(species), generationRadius);
                 lastCapBranchRadius = Math.min(species.getFamily().getPrimaryThickness() + capAge, species.getMaxBranchRadius());
                 radius = lastCapBranchRadius;
                 capAges.add(new Pair<>(pos.above(), lastCapBranchRadius));

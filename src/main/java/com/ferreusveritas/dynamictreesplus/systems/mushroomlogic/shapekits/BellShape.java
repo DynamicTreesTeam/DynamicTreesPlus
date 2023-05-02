@@ -17,8 +17,6 @@ import java.util.List;
 
 public class BellShape extends MushroomShapeKit {
 
-    public static final ConfigurationProperty<Integer> MAX_CAP_AGE =
-            ConfigurationProperty.integer("max_cap_age");
     public static final ConfigurationProperty<Integer> CURVE_POWER =
             ConfigurationProperty.integer("curve_power");
     public static final ConfigurationProperty<Float> CURVE_HEIGHT_OFFSET =
@@ -53,6 +51,11 @@ public class BellShape extends MushroomShapeKit {
     @Override
     public List<BlockPos> getShapeCluster(MushroomShapeConfiguration configuration, MushroomCapContext context){
         return placeRing(configuration, context, context.age(), ringAction.GET);
+    }
+
+    @Override
+    public int getMaxCapAge(MushroomShapeConfiguration configuration) {
+        return configuration.get(MAX_CAP_AGE);
     }
 
     @Override
@@ -115,7 +118,7 @@ public class BellShape extends MushroomShapeKit {
         float rand = (CoordUtils.coordHashCode(new BlockPos(context.pos().getX(), 0, context.pos().getZ()), 2) / (float)0xFFFF);
         float var = (rand*factorVariation*2) - factorVariation;
 
-        return (((float)age)/(properties.getMaxAge())) * (factorMax - factorMin) + factorMin + var;
+        return (((float)age)/(properties.getMaxAge(species))) * (factorMax - factorMin) + factorMin + var;
     }
 
 }

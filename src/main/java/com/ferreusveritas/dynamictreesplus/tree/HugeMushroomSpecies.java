@@ -3,7 +3,6 @@ package com.ferreusveritas.dynamictreesplus.tree;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
-import com.ferreusveritas.dynamictrees.api.network.NodeInspector;
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.block.branch.BranchBlock;
 import com.ferreusveritas.dynamictrees.block.entity.SpeciesBlockEntity;
@@ -29,14 +28,16 @@ import com.ferreusveritas.dynamictreesplus.block.mushroom.CapProperties;
 import com.ferreusveritas.dynamictreesplus.block.mushroom.DynamicCapBlock;
 import com.ferreusveritas.dynamictreesplus.block.mushroom.DynamicCapCenterBlock;
 import com.ferreusveritas.dynamictreesplus.init.DTPRegistries;
+import com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.MushroomShapeConfiguration;
 import com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.context.MushroomCapContext;
+import com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.shapekits.MushroomShapeKit;
 import com.ferreusveritas.dynamictreesplus.systems.nodemapper.MushroomInflatorNode;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.BlockTags;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
@@ -67,12 +68,17 @@ public class HugeMushroomSpecies extends Species {
     public static final TypedRegistry.EntryType<Species> TYPE = TypedRegistry.newType(CODEC);
 
     protected CapProperties capProperties = CapProperties.NULL;
+    protected MushroomShapeConfiguration mushroomShapeKit;
     protected boolean acceptAnySoil = true;
     protected int maxLightForPlanting = 12;
 
     public HugeMushroomSpecies(ResourceLocation name, Family family, CapProperties capProperties) {
+        this(name, family, MushroomShapeConfiguration.getDefault(), capProperties);
+    }
+    public HugeMushroomSpecies(ResourceLocation name, Family family, final MushroomShapeConfiguration shapeKit, CapProperties capProperties) {
         super(name, family, LeavesProperties.NULL);
         this.setCapProperties(capProperties.isValid() ? capProperties : (family instanceof HugeMushroomFamily ? ((HugeMushroomFamily)family).getCommonCap() : CapProperties.NULL));
+        this.mushroomShapeKit = shapeKit;
     }
 
     @Override
@@ -130,6 +136,19 @@ public class HugeMushroomSpecies extends Species {
 
     public CapProperties getCapProperties() {
         return capProperties;
+    }
+
+    /**
+     * Gets the {@link MushroomShapeKit}, which is for leaves automata.
+     *
+     * @return The configured {@link MushroomShapeConfiguration} object.
+     */
+    public MushroomShapeConfiguration getMushroomShapeKit() {
+        return mushroomShapeKit;
+    }
+
+    public void setMushroomShapeConfiguration(MushroomShapeConfiguration mushroomShapeKit) {
+        this.mushroomShapeKit = mushroomShapeKit;
     }
 
     public Optional<DynamicCapCenterBlock> getCapCenterBlock() {
@@ -324,10 +343,9 @@ public class HugeMushroomSpecies extends Species {
 
             private void generateMushroomCap(GenerationContext context, HugeMushroomSpecies species, List<Pair<BlockPos, Integer>> capAges){
                 LevelAccessor level = context.level();
-                final CapProperties capProperties = species.getCapProperties();
 
                 for (Pair<BlockPos, Integer> capAge : capAges){
-                    capProperties.getMushroomShapeKit().generateMushroomCap(new MushroomCapContext(level, capAge.getA(), species, capAge.getB()));
+                    species.getMushroomShapeKit().generateMushroomCap(new MushroomCapContext(level, capAge.getA(), species, capAge.getB()));
                 }
             }
 
@@ -396,4 +414,23 @@ public class HugeMushroomSpecies extends Species {
         };
     }
 
+    ///////////////////////////////////////////
+    // SOUND EFFECTS
+    ///////////////////////////////////////////
+
+    public SoundEvent getFallingTreeStartSound (float treeVolume, boolean hasLeaves){
+        return DTRegistries.FALLING_TREE_FUNGUS_START.get();
+    }
+
+    public SoundEvent getFallingTreeEndSound (float treeVolume, boolean hasLeaves){
+        return DTRegistries.FALLING_TREE_FUNGUS_END.get();
+    }
+
+    public SoundEvent getFallingBranchEndSound (float treeVolume, boolean hasLeaves, boolean fellOnWater){
+        return  hasLeaves ? DTRegistries.FALLING_TREE_FUNGUS_SMALL_END.get() : DTRegistries.FALLING_TREE_SMALL_END_BARE.get();
+    }
+
+    public float getFallingTreePitch (float treeVolume){
+        return 2f/(1+treeVolume*0.1f);
+    }
 }

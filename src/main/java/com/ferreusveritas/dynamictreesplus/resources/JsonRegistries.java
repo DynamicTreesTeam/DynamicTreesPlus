@@ -11,6 +11,7 @@ import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictreesplus.DynamicTreesPlus;
 import com.ferreusveritas.dynamictreesplus.block.CactusBranchBlock;
 import com.ferreusveritas.dynamictreesplus.block.mushroom.CapProperties;
+import com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.MushroomShapeConfiguration;
 import com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.shapekits.MushroomShapeKit;
 import com.ferreusveritas.dynamictreesplus.systems.thicknesslogic.CactusThicknessLogic;
 import com.ferreusveritas.dynamictreesplus.tree.CactusSpecies;
@@ -95,6 +96,7 @@ public final class JsonRegistries {
     }
     public static void registerMushroomReloadApplier(PropertyAppliers<Species, JsonElement> appliers) {
         appliers.register("cap_properties", HugeMushroomSpecies.class, CapProperties.class, HugeMushroomSpecies::setCapProperties)
+                .register("mushroom_shape_kit", HugeMushroomSpecies.class, MushroomShapeConfiguration.class, HugeMushroomSpecies::setMushroomShapeConfiguration)
                 .register("accept_any_soil", HugeMushroomSpecies.class, Boolean.class, HugeMushroomSpecies::setAcceptAnySoil)
                 .register("max_light_for_planting", HugeMushroomSpecies.class, Integer.class, HugeMushroomSpecies::setMaxLightForPlanting);
     }

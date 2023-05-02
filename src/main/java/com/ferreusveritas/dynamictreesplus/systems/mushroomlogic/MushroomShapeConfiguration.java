@@ -31,8 +31,8 @@ public final class MushroomShapeConfiguration extends Configuration<MushroomShap
         return MushroomShapeKit.NULL.getDefaultConfiguration();
     }
 
-    public int getDefaultDistance (){
-        return this.configurable.getDefaultDistance();
+    public int getMaxCapAge(){
+        return this.configurable.getMaxCapAge(this);
     }
 
     public void generateMushroomCap(MushroomCapContext context){

@@ -120,7 +120,7 @@ public class MushroomBranchBlock extends ThickBranchBlock {
             return;
         }
 
-        // Make a bounding volume that holds all of the endpoints and expand the volume for the leaves radius.
+        // Make a bounding volume that holds all the endpoints and expand the volume for the leaves' radius.
         final BlockBounds bounds = getFamily().expandLeavesBlockBounds(new BlockBounds(endPoints));
 
         // Create a voxmap to store the leaf destruction map.
@@ -130,7 +130,7 @@ public class MushroomBranchBlock extends ThickBranchBlock {
         for (final BlockPos endPos : endPoints) {
             int age = DynamicCapCenterBlock.getCapAge(level, endPos.above());
             if (age >= 0){
-                for (final BlockPos findPos : mushSpecies.getCapProperties().getMushroomShapeKit().getShapeCluster(new MushroomCapContext(level, endPos.above(), mushSpecies, age))) {
+                for (final BlockPos findPos : mushSpecies.getMushroomShapeKit().getShapeCluster(new MushroomCapContext(level, endPos.above(), mushSpecies, age))) {
                     final BlockState findState = level.getBlockState(findPos);
                     if (family.isCompatibleCap(mushSpecies, findState, level, findPos)) { // Search for endpoints of the same tree family.
                         capMap.setVoxel(findPos.getX(), findPos.getY(), findPos.getZ(), (byte) 1); // Flag this position for destruction.

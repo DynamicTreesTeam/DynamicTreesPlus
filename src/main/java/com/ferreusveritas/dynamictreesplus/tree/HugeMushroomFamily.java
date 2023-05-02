@@ -80,9 +80,6 @@ public class HugeMushroomFamily extends Family {
         textureConsumer.accept("rings", insideBranchTexture);
     }
 
-    public boolean isCompatibleCap (HugeMushroomSpecies species, BlockState state, Level level, BlockPos pos){
-        return species.getCapProperties().isPartOfCap(state);
-    }
 
     @Override
     public BlockBounds expandLeavesBlockBounds(BlockBounds bounds) {
@@ -93,6 +90,9 @@ public class HugeMushroomFamily extends Family {
     // CAP GROWTH
     ///////////////////////////////////////////
 
+    public boolean isCompatibleCap (HugeMushroomSpecies species, BlockState state, Level level, BlockPos pos){
+        return species.getCapProperties().isPartOfCap(state);
+    }
 
     @Override
     protected BranchBlock createBranchBlock(ResourceLocation name) {

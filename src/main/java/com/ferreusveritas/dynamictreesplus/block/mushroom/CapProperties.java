@@ -20,10 +20,13 @@ import com.ferreusveritas.dynamictrees.util.*;
 import com.ferreusveritas.dynamictreesplus.data.CapStateGenerator;
 import com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.MushroomShapeConfiguration;
 import com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.shapekits.MushroomShapeKit;
+import com.mojang.math.Vector3d;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.Item;
@@ -376,6 +379,13 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
         DynamicCapCenterBlock capCenterBlock = getDynamicCapCenterBlock().orElse(null);
         if (capBlock == null || capCenterBlock == null) return false;
         return state.is(capBlock) || state.is(capCenterBlock);
+    }
+
+    public ParticleOptions sporeParticleType (BlockState pState, Level pLevel, BlockPos pPos, Random pRand){
+        return ParticleTypes.WHITE_ASH;
+    }
+    public Vector3d sporeParticleSpeed (BlockState pState, Level pLevel, BlockPos pPos, Random pRand){
+        return new Vector3d(1,0,1);
     }
 
     ///////////////////////////////////////////

@@ -8,20 +8,14 @@ import com.ferreusveritas.dynamictrees.api.treedata.TreePart;
 import com.ferreusveritas.dynamictrees.block.branch.BranchBlock;
 import com.ferreusveritas.dynamictrees.block.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
-import com.ferreusveritas.dynamictrees.systems.poissondisc.PoissonDisc;
 import com.ferreusveritas.dynamictrees.systems.poissondisc.Vec2i;
 import com.ferreusveritas.dynamictrees.tree.family.Family;
 import com.ferreusveritas.dynamictrees.tree.species.Species;
-import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.MushroomCapDisc;
 import com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.context.MushroomCapContext;
 import com.ferreusveritas.dynamictreesplus.tree.HugeMushroomSpecies;
-import com.mojang.math.Vector3f;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
@@ -31,12 +25,9 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
-import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.HitResult;
-import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
@@ -44,8 +35,6 @@ import org.jetbrains.annotations.Nullable;
 import javax.annotation.Nonnull;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
-import java.util.Random;
 
 public class DynamicCapCenterBlock extends Block implements TreePart, UpdatesSurroundNeighbors {
 
@@ -224,14 +213,15 @@ public class DynamicCapCenterBlock extends Block implements TreePart, UpdatesSur
     }
 
     protected void ageBranchUnderCap (Level level, BlockPos pos, GrowSignal signal, int currentAge){
-        Family family = signal.getSpecies().getFamily();
-        int thickness = family.getPrimaryThickness() + currentAge;
+        Species species = signal.getSpecies();
+        Family family = species.getFamily();
+        int thickness = MushroomBranchBlock.getPrimaryRadiusUnderCap(species, currentAge);
 
         BlockPos branchPos = pos.offset(signal.dir.getOpposite().getNormal());
         family.getBranchForPlacement(level, signal.getSpecies(), branchPos).ifPresent(branch ->
-                branch.setRadius(level, branchPos, Math.min(thickness, family.getMaxBranchRadius()), null)
+                branch.setRadius(level, branchPos, thickness, null)
         );
-        signal.radius = Math.min(thickness+1, family.getMaxBranchRadius());
+        signal.radius = Math.min(thickness+1, species.getMaxBranchRadius());
     }
 
     protected void generateCap(int newAge, Level pLevel, HugeMushroomSpecies species, BlockPos newPos, BlockPos currentPos, int currentAge, BlockPos rootPos){

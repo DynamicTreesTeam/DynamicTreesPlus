@@ -11,6 +11,7 @@ import com.ferreusveritas.dynamictrees.systems.nodemapper.DestroyerNode;
 import com.ferreusveritas.dynamictrees.systems.nodemapper.NetVolumeNode;
 import com.ferreusveritas.dynamictrees.systems.nodemapper.SpeciesNode;
 import com.ferreusveritas.dynamictrees.systems.nodemapper.StateNode;
+import com.ferreusveritas.dynamictrees.tree.family.Family;
 import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictrees.util.BlockBounds;
 import com.ferreusveritas.dynamictrees.util.BlockStates;

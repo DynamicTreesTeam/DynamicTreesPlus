@@ -52,17 +52,17 @@ public class BellShape extends MushroomShapeKit {
 
     @Override
     public List<BlockPos> getShapeCluster(MushroomShapeConfiguration configuration, MushroomCapContext context){
-        return placeRing(configuration, context, context.getAge(), ringAction.GET);
+        return placeRing(configuration, context, context.age(), ringAction.GET);
     }
 
     @Override
     public void generateMushroomCap(MushroomShapeConfiguration configuration, MushroomCapContext context) {
-        placeRing(configuration, context, Math.min(context.getAge(), configuration.get(MAX_CAP_AGE)), ringAction.PLACE);
+        placeRing(configuration, context, Math.min(context.age(), configuration.get(MAX_CAP_AGE)), ringAction.PLACE);
     }
 
     @Override
     public void clearMushroomCap (MushroomShapeConfiguration configuration, MushroomCapContext context){
-        placeRing(configuration, context, context.getAge(),ringAction.CLEAR);
+        placeRing(configuration, context, context.age(),ringAction.CLEAR);
     }
 
     enum ringAction {
@@ -106,7 +106,7 @@ public class BellShape extends MushroomShapeKit {
     private float calculateFactor (MushroomShapeConfiguration configuration, MushroomCapContext context){
         HugeMushroomSpecies species = context.species();
         CapProperties properties = species.getCapProperties();
-        int age = context.getAge();
+        int age = context.age();
         if (age == 0) return 0;
         float factorMin = configuration.get(MIN_AGE_CURVE_FACTOR);
         float factorMax = configuration.get(MAX_AGE_CURVE_FACTOR);

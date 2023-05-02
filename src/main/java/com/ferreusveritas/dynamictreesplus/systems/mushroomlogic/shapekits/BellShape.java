@@ -35,6 +35,7 @@ public class BellShape extends MushroomShapeKit {
     @Override @NotNull
     public MushroomShapeConfiguration getDefaultConfiguration() {
         return this.defaultConfiguration
+                .with(CHANCE_TO_AGE, 0.75f)
                 .with(MAX_CAP_AGE, 6)
                 .with(CURVE_POWER, 3)
                 .with(CURVE_HEIGHT_OFFSET, 0f)
@@ -45,7 +46,7 @@ public class BellShape extends MushroomShapeKit {
 
     @Override
     protected void registerProperties() {
-        this.register(MAX_CAP_AGE, CURVE_POWER, CURVE_HEIGHT_OFFSET, MIN_AGE_CURVE_FACTOR, MAX_AGE_CURVE_FACTOR, CURVE_FACTOR_VARIATION);
+        this.register(CHANCE_TO_AGE, MAX_CAP_AGE, CURVE_POWER, CURVE_HEIGHT_OFFSET, MIN_AGE_CURVE_FACTOR, MAX_AGE_CURVE_FACTOR, CURVE_FACTOR_VARIATION);
     }
 
     @Override
@@ -56,6 +57,11 @@ public class BellShape extends MushroomShapeKit {
     @Override
     public int getMaxCapAge(MushroomShapeConfiguration configuration) {
         return configuration.get(MAX_CAP_AGE);
+    }
+
+    @Override
+    public float getChanceToAge(MushroomShapeConfiguration configuration) {
+        return configuration.get(CHANCE_TO_AGE);
     }
 
     @Override
@@ -95,8 +101,10 @@ public class BellShape extends MushroomShapeKit {
             BlockPos pos = context.pos().below(y);
             if (action == ringAction.CLEAR)
                 centerBlock.clearRing(context.level(), pos, radius);
-            else if (action == ringAction.PLACE)
-                centerBlock.placeRing(context.level(), pos, radius, i, moveY, fac < 0 && i < age);
+            else if (action == ringAction.PLACE){
+                // if the ring failed to generate then don't bother with the next rings
+                if (!centerBlock.placeRing(context.level(), pos, radius, i, moveY, fac < 0 && i < age)) break;
+            }
             else if (action == ringAction.GET)
                 ringPositions.addAll(centerBlock.getRing(context.level(), pos, radius));
 

@@ -17,6 +17,8 @@ public abstract class MushroomShapeKit extends ConfigurableRegistryEntry<Mushroo
 
     public static final ConfigurationProperty<Integer> MAX_CAP_AGE =
             ConfigurationProperty.integer("max_cap_age");
+    public static final ConfigurationProperty<Float> CHANCE_TO_AGE =
+            ConfigurationProperty.floatProperty("chance_to_age");
 
     public static final MushroomShapeKit NULL = new MushroomShapeKit(DynamicTreesPlus.location("null")) {
         @Override
@@ -28,6 +30,11 @@ public abstract class MushroomShapeKit extends ConfigurableRegistryEntry<Mushroo
 
         @Override
         public int getMaxCapAge(MushroomShapeConfiguration configuration) {return 0;}
+
+        @Override
+        public float getChanceToAge(MushroomShapeConfiguration configuration) {
+            return 0;
+        }
     };
 
     public static final ConfigurableRegistry<MushroomShapeKit, MushroomShapeConfiguration> REGISTRY =
@@ -50,5 +57,5 @@ public abstract class MushroomShapeKit extends ConfigurableRegistryEntry<Mushroo
     public abstract List<BlockPos> getShapeCluster(MushroomShapeConfiguration configuration, MushroomCapContext context);
 
     public abstract int getMaxCapAge(MushroomShapeConfiguration configuration);
-
+    public abstract float getChanceToAge(MushroomShapeConfiguration configuration);
 }

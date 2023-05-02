@@ -14,9 +14,11 @@ import com.ferreusveritas.dynamictrees.cell.LeafClusters;
 import com.ferreusveritas.dynamictrees.data.DTBlockTags;
 import com.ferreusveritas.dynamictrees.data.DTItemTags;
 import com.ferreusveritas.dynamictrees.event.SpeciesPostGenerationEvent;
+import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.resources.Resources;
 import com.ferreusveritas.dynamictrees.systems.genfeature.context.PostGenerationContext;
+import com.ferreusveritas.dynamictrees.systems.genfeature.context.PostRotContext;
 import com.ferreusveritas.dynamictrees.systems.nodemapper.CollectorNode;
 import com.ferreusveritas.dynamictrees.systems.nodemapper.FindEndsNode;
 import com.ferreusveritas.dynamictrees.tree.family.Family;
@@ -185,12 +187,20 @@ public class HugeMushroomSpecies extends Species {
     }
 
     @Override
-    public boolean isAcceptableSoil(BlockState soilState) {
+    public boolean isAcceptableSoil(BlockState soilBlockState) {
         if (acceptAnySoil){
-            Block soilBlock = soilState.getBlock();
-            return soilBlock instanceof RootyBlock || SoilHelper.isSoilRegistered(soilBlock);
+            Block soilBlock = soilBlockState.getBlock();
+            return (soilBlock instanceof RootyBlock || SoilHelper.isSoilRegistered(soilBlock)) && !isWater(soilBlockState);
         }
-        return SoilHelper.isSoilAcceptable(soilState, soilTypeFlags);
+        return super.isAcceptableSoil(soilBlockState);
+    }
+
+    public boolean isAcceptableSoilForWorldgen(LevelAccessor level, BlockPos pos, BlockState soilBlockState) {
+        if (acceptAnySoil){
+            Block soilBlock = soilBlockState.getBlock();
+            return (soilBlock instanceof RootyBlock || SoilHelper.isSoilRegistered(soilBlock)) && !isWater(soilBlockState);
+        }
+        return super.isAcceptableSoilForWorldgen(level, pos, soilBlockState);
     }
 
     @Override
@@ -200,6 +210,10 @@ public class HugeMushroomSpecies extends Species {
         textureConsumer.accept("particle", capLocation);
         textureConsumer.accept("stem", capLocation);
         textureConsumer.accept("cap", capLocation);
+    }
+
+    public float getChanceToAge() {
+        return mushroomShapeKit.getChanceToAge();
     }
 
     ///////////////////////////////////////////
@@ -273,8 +287,8 @@ public class HugeMushroomSpecies extends Species {
     // GENERATION
     ///////////////////////////////////////////
 
-    public MushroomInflatorNode getNodeInflator(List<Pair<BlockPos, Integer>> capAges, int radius) {
-        return new MushroomInflatorNode(this, capAges, radius);
+    public MushroomInflatorNode getNodeInflator(List<Pair<BlockPos, Integer>> capAges, int radius, BlockPos rootPos) {
+        return new MushroomInflatorNode(this, capAges, radius, rootPos);
     }
 
     @Override
@@ -314,7 +328,7 @@ public class HugeMushroomSpecies extends Species {
                 // If a branch exists then the growth was successful.
 
                 List<Pair<BlockPos, Integer>> capAges = new LinkedList<>();
-                final MushroomInflatorNode inflator = species.getNodeInflator(capAges, radius); //This is responsible for gathering a list of branch end points.
+                final MushroomInflatorNode inflator = species.getNodeInflator(capAges, radius, rootPos); //This is responsible for gathering a list of branch end points.
                 final FindEndsNode endFinder = new FindEndsNode(); //
                 final MapSignal signal = new MapSignal(inflator, endFinder); // The inflator signal will "paint" a temporary voxmap of all of the leaves and branches.
                 signal.destroyLoopedNodes = this.careful;
@@ -343,8 +357,8 @@ public class HugeMushroomSpecies extends Species {
 
             private void generateMushroomCap(GenerationContext context, HugeMushroomSpecies species, List<Pair<BlockPos, Integer>> capAges){
                 LevelAccessor level = context.level();
-
                 for (Pair<BlockPos, Integer> capAge : capAges){
+                    level.setBlock(capAge.getA(), capProperties.getDynamicCapState(true, capAge.getB()), 2);
                     species.getMushroomShapeKit().generateMushroomCap(new MushroomCapContext(level, capAge.getA(), species, capAge.getB()));
                 }
             }
@@ -412,6 +426,19 @@ public class HugeMushroomSpecies extends Species {
  		}*/
             }
         };
+    }
+
+    public boolean rot(LevelAccessor level, BlockPos pos, int neighborCount, int radius, int fertility, Random random, boolean rapid, boolean growLeaves) {
+        if (rapid || (DTConfigs.MAX_BRANCH_ROT_RADIUS.get() != 0 && radius <= DTConfigs.MAX_BRANCH_ROT_RADIUS.get())) {
+            BranchBlock branch = TreeHelper.getBranch(level.getBlockState(pos));
+            if (branch != null) {
+                branch.rot(level, pos);
+            }
+            this.postRot(new PostRotContext(level, pos, this, radius, neighborCount, fertility, rapid));
+            return true;
+        }
+
+        return false;
     }
 
     ///////////////////////////////////////////

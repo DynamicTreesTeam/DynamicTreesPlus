@@ -5,6 +5,8 @@ import com.ferreusveritas.dynamictrees.api.network.NodeInspector;
 import com.ferreusveritas.dynamictrees.api.treedata.TreePart;
 import com.ferreusveritas.dynamictrees.block.branch.BranchBlock;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
+import com.ferreusveritas.dynamictreesplus.block.mushroom.DynamicCapCenterBlock;
+import com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.MushroomCapDisc;
 import com.ferreusveritas.dynamictreesplus.tree.HugeMushroomSpecies;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -16,21 +18,24 @@ import java.util.List;
 
 public class MushroomInflatorNode implements NodeInspector {
 
+    private static final int minRadiusHeightDivider = 3;
     private float radius;
     private BlockPos last;
     private BlockPos highestTrunkBlock;
     private final List<Pair<BlockPos, Integer>> capAges;
     private final int generationRadius;
     private int lastCapBranchRadius;
+    private final BlockPos rootPos;
 
     HugeMushroomSpecies species;
 
-    public MushroomInflatorNode(HugeMushroomSpecies species, List<Pair<BlockPos, Integer>> capAges, int genRadius) {
+    public MushroomInflatorNode(HugeMushroomSpecies species, List<Pair<BlockPos, Integer>> capAges, int genRadius, BlockPos root) {
         this.species = species;
         last = BlockPos.ZERO;
         highestTrunkBlock = null;
         this.capAges = capAges;
         this.generationRadius = genRadius;
+        this.rootPos = root;
     }
 
     @Override
@@ -52,12 +57,16 @@ public class MushroomInflatorNode implements NodeInspector {
     public boolean returnRun(BlockState state, LevelAccessor level, BlockPos pos, Direction fromDir) {
         BlockPos dist = pos.subtract(last);
         if (dist.getX() * dist.getX() + dist.getY() * dist.getY() + dist.getZ() * dist.getZ() != 1) {//This is actually the equation for distance squared. 1 squared is 1. Yay math.
-            if (level.getBlockState(pos.above()).getMaterial().isReplaceable()){
-                int capAge = CoordUtils.coordHashCode(new BlockPos(pos.getX(),0,pos.getZ()), 3)
-                        % Math.min(species.getCapProperties().getMaxAge(species), generationRadius);
+            if (DynamicCapCenterBlock.canCapReplace(level.getBlockState(pos.above()))){
+                int height = pos.subtract(rootPos).getY();
+                int maxAge = Math.min(
+                        Math.min(Math.min(species.getCapProperties().getMaxAge(species), MushroomCapDisc.MAX_RADIUS), height),
+                        generationRadius);
+                int minAge = Math.max(0, height/minRadiusHeightDivider);
+                int capAge = minAge + CoordUtils.coordHashCode(new BlockPos(pos.getX(),0,pos.getZ()), 3) % (maxAge == minAge ? maxAge : Math.abs(maxAge-minAge));
                 lastCapBranchRadius = Math.min(species.getFamily().getPrimaryThickness() + capAge, species.getMaxBranchRadius());
                 radius = lastCapBranchRadius;
-                capAges.add(new Pair<>(pos.above(), lastCapBranchRadius));
+                capAges.add(new Pair<>(pos.above(), capAge));
             }
         }
 
@@ -88,7 +97,10 @@ public class MushroomInflatorNode implements NodeInspector {
                 }
             }
 
-            if (!isTwig) {
+            if (isTwig){
+                branch.setRadius(level, pos, (int)radius, null);
+            }
+            else {
                 //The new branch should be the square root of all of the sums of the areas of the branches coming into it.
                 radius = (float) Math.sqrt(areaAccum) + (species.getTapering() * species.getWorldGenTaperingFactor());
 

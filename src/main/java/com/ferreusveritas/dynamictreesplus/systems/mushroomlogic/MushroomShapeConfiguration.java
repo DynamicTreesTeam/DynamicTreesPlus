@@ -34,6 +34,9 @@ public final class MushroomShapeConfiguration extends Configuration<MushroomShap
     public int getMaxCapAge(){
         return this.configurable.getMaxCapAge(this);
     }
+    public float getChanceToAge() {
+        return this.configurable.getChanceToAge(this);
+    }
 
     public void generateMushroomCap(MushroomCapContext context){
         this.configurable.generateMushroomCap(this, context);

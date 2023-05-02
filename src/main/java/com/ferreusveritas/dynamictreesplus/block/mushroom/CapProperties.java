@@ -17,6 +17,7 @@ import com.ferreusveritas.dynamictrees.tree.family.Family;
 import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictrees.util.*;
 import com.ferreusveritas.dynamictreesplus.data.CapStateGenerator;
+import com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.MushroomCapDisc;
 import com.ferreusveritas.dynamictreesplus.tree.HugeMushroomSpecies;
 import com.mojang.math.Vector3d;
 import com.mojang.serialization.Codec;
@@ -55,8 +56,6 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
     public static final Codec<CapProperties> CODEC = RecordCodecBuilder.create(instance -> instance
             .group(ResourceLocation.CODEC.fieldOf(Resources.RESOURCE_LOCATION.toString()).forGetter(CapProperties::getRegistryName))
             .apply(instance, CapProperties::new));
-
-    private IntegerProperty ageProperty = IntegerProperty.create("age", 0, 8);
 
     public static final CapProperties NULL = new CapProperties() {
         @Override
@@ -125,18 +124,17 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
         this.blockLootTableSupplier = new LootTableSupplier("blocks/", blockRegistryName);
         this.lootTableSupplier = new LootTableSupplier("trees/mushroom_caps/", registryName);
     }
-    protected int maxAge = 6;
+
     /**
      * The primitive (vanilla) mushroom block is used for many purposes including rendering, drops, and some other basic
      * behavior.
      */
     protected BlockState primitiveCap;
     protected Family family;
-    protected BlockState[] dynamicMushroomBlockDistanceStates = new BlockState[maxAge + 1];
+    protected BlockState[] dynamicMushroomBlockDistanceStates = new BlockState[MushroomCapDisc.MAX_RADIUS + 1];
     protected BlockState dynamicMushroomCenterBlock;
     protected int flammability = 0;// Mimic vanilla mushroom
     protected int fireSpreadSpeed = 0;// Mimic vanilla mushroom
-    protected float chanceToAge = 0.75f;
     protected VoxelShape ageZeroShape = Shapes.block();
 
     ///////////////////////////////////////////
@@ -209,20 +207,8 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
                 .sound(SoundType.WOOD);
     }
 
-    public float getChanceToAge() {
-        return chanceToAge;
-    }
-
-    public void setChanceToAge(float chanceToAge) {
-        this.chanceToAge = chanceToAge;
-    }
-
-    public void setMaxAge(int maxAge) {
-        this.maxAge = maxAge;
-    }
-
     public int getMaxAge(HugeMushroomSpecies species) {
-        return Math.min(maxAge, species.getMushroomShapeKit().getMaxCapAge());
+        return species.getMushroomShapeKit().getMaxCapAge();
     }
 
     public void setAgeZeroShape(VoxelShape ageZeroShape) {
@@ -318,19 +304,22 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
         }
         //Cache all the blockStates to speed up worldgen
         dynamicMushroomBlockDistanceStates[0] = Blocks.AIR.defaultBlockState();
-        for (int i = 1; i <= maxAge; i++) {
+        for (int i = 1; i <= MushroomCapDisc.MAX_RADIUS; i++) {
             dynamicMushroomBlockDistanceStates[i] = state.setValue(DynamicCapBlock.DISTANCE, i);
         }
         return this;
     }
 
     public BlockState getDynamicCapState(boolean center) {
-        if (center) return dynamicMushroomCenterBlock;
-        return getDynamicCapState(1);
+        return getDynamicCapState(center, 1);
+    }
+    public BlockState getDynamicCapState(boolean center, int prop) {
+        if (center) return dynamicMushroomCenterBlock.setValue(DynamicCapCenterBlock.AGE, prop);
+        return getDynamicCapState(prop);
     }
 
     public BlockState getDynamicCapState(int distance) {
-        return Optional.ofNullable(dynamicMushroomBlockDistanceStates[Mth.clamp(distance, 0, maxAge)])
+        return Optional.ofNullable(dynamicMushroomBlockDistanceStates[Mth.clamp(distance, 0, MushroomCapDisc.MAX_RADIUS)])
                 .orElse(Blocks.AIR.defaultBlockState());
     }
 

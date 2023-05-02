@@ -8,6 +8,7 @@ import com.ferreusveritas.dynamictrees.block.branch.BranchBlock;
 import com.ferreusveritas.dynamictrees.block.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.tree.family.Family;
+import com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.MushroomCapDisc;
 import com.mojang.math.Vector3d;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -35,7 +36,7 @@ import java.util.Random;
 public class DynamicCapBlock extends HugeMushroomBlock implements TreePart, UpdatesSurroundNeighbors {
 
     //For now the limit is 8 as rings are computed with 3 bits. Might increase later
-    public static final IntegerProperty DISTANCE = IntegerProperty.create("distance", 1, 8);
+    public static final IntegerProperty DISTANCE = IntegerProperty.create("distance", 1, MushroomCapDisc.MAX_RADIUS);
 
     public CapProperties properties = CapProperties.NULL;
 

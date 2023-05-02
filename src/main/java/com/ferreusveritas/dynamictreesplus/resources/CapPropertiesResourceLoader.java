@@ -55,9 +55,7 @@ public class CapPropertiesResourceLoader extends JsonRegistryResourceLoader<CapP
 
         this.reloadAppliers.register("fire_spread", Integer.class, CapProperties::setFireSpreadSpeed)
                 .register("flammability", Integer.class, CapProperties::setFlammability)
-                .register("age_zero_shape", VoxelShape.class, CapProperties::setAgeZeroShape)
-                .register("chance_to_age", Float.class, CapProperties::setChanceToAge)
-                .register("max_age", Integer.class, CapProperties::setMaxAge);
+                .register("age_zero_shape", VoxelShape.class, CapProperties::setAgeZeroShape);
 
         super.registerAppliers();
     }

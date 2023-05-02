@@ -41,7 +41,7 @@ import java.util.List;
 public class DynamicCapCenterBlock extends Block implements TreePart, UpdatesSurroundNeighbors {
 
     //For now the limit is 8 as rings are computed with 3 bits. Might increase later
-    public static final IntegerProperty AGE = IntegerProperty.create("age", 0, 8);
+    public static final IntegerProperty AGE = IntegerProperty.create("age", 0, MushroomCapDisc.MAX_RADIUS);
 
     public CapProperties properties = CapProperties.NULL;
 
@@ -152,12 +152,13 @@ public class DynamicCapCenterBlock extends Block implements TreePart, UpdatesSur
 
     @Override
     public GrowSignal growSignal(Level level, BlockPos pos, GrowSignal signal) {
+        if (!(signal.getSpecies() instanceof HugeMushroomSpecies species)) return signal;
         if (signal.step()) // This is always placed at the beginning of every growSignal function.
         {
             BlockState thisState = level.getBlockState(pos);
             int age = thisState.hasProperty(AGE) ? thisState.getValue(AGE) : 0;
-            if (age != 0 && level.getRandom().nextFloat() < properties.getChanceToAge()){
-                tryGrowCap(level, properties, age, signal, pos, pos);
+            if (age != 0 && level.getRandom().nextFloat() < species.getChanceToAge()){
+                tryGrowCap(level, properties, age, signal, pos, pos, true);
             } else {
                 this.branchOut(level, pos, signal, age); // When a growth signal hits a cap block it attempts to become a tree branch.
             }
@@ -174,7 +175,7 @@ public class DynamicCapCenterBlock extends Block implements TreePart, UpdatesSur
             return signal;
         }
 
-        boolean couldGrow = tryGrowCap(level, capProperties, age, signal, pos.relative(signal.dir), pos);
+        boolean couldGrow = tryGrowCap(level, capProperties, age, signal, pos.relative(signal.dir), pos, false);
 
         if (couldGrow) {
             Family family = species.getFamily();
@@ -195,13 +196,13 @@ public class DynamicCapCenterBlock extends Block implements TreePart, UpdatesSur
         return signal;
     }
 
-    public boolean tryGrowCap(Level level, CapProperties capProp, int currentAge, GrowSignal signal, BlockPos pos, BlockPos previousPos) {
+    public boolean tryGrowCap(Level level, CapProperties capProp, int currentAge, GrowSignal signal, BlockPos pos, BlockPos previousPos, boolean forceAge) {
         if (!(signal.getSpecies() instanceof HugeMushroomSpecies species)) return false;
         if (level.isEmptyBlock(pos)) {
             int age = currentAge;
             if (currentAge == 0){
                 age = 1;
-            } else if (level.getRandom().nextFloat() < properties.getChanceToAge())
+            } else if (forceAge || level.getRandom().nextFloat() < species.getChanceToAge())
                 age = Math.min(age+1, properties.getMaxAge(species));
             level.setBlock(pos, getCapBlockStateForPlacement(level, pos, age == 0 ? 1 : age, capProp.getDynamicCapState(true), false), 2); // Removed Notify Neighbors Flag for performance.
             if (age != currentAge){
@@ -248,16 +249,19 @@ public class DynamicCapCenterBlock extends Block implements TreePart, UpdatesSur
         }
     }
 
-    public void placeRing (LevelAccessor level, BlockPos pos, int radius, int step, boolean yMoved, boolean negFactor){
+    public boolean placeRing (LevelAccessor level, BlockPos pos, int radius, int step, boolean yMoved, boolean negFactor){
         List<Vec2i> ring = MushroomCapDisc.getPrecomputedRing(radius);
-
+        int placed = 0;
+        int notPlaced = 0;
         for (Vec2i vec : ring){
             BlockPos ringPos = new BlockPos(pos.getX() + vec.x, pos.getY(), pos.getZ() + vec.z);
-            BlockState placeState = level.getBlockState(ringPos);
-            // Mushroom caps take precedence over leaves
-            if (placeState.getMaterial().isReplaceable() || placeState.is(DTBlockTags.FOLIAGE) || placeState.is(BlockTags.LEAVES))
+            if (canCapReplace(level.getBlockState(ringPos))){
                 level.setBlock(ringPos, getStateForAge(properties, step, new Vec2i(-vec.x,-vec.z), yMoved, negFactor, properties.isPartOfCap(level.getBlockState(ringPos.above()))),2);
+                placed++;
+            } else notPlaced ++;
         }
+        //if more than half of the blocks failed then theres not enough support for the next rings
+        return placed >= notPlaced;
     }
 
     public List<BlockPos> getRing (LevelAccessor level, BlockPos pos, int radius){
@@ -271,13 +275,18 @@ public class DynamicCapCenterBlock extends Block implements TreePart, UpdatesSur
         return positions;
     }
 
+    public static boolean canCapReplace(BlockState state){
+        // Mushroom caps take precedence over leaves
+        return state.getMaterial().isReplaceable() || state.is(DTBlockTags.FOLIAGE) || state.is(BlockTags.LEAVES);
+    }
+
     @Nonnull
     private BlockState getStateForAge(CapProperties properties, int age, Vec2i centerDirection, boolean yMoved, boolean negativeFactor, boolean topIsCap){
         boolean[] dirs = {false, !topIsCap, true, true, true, true};
         if (yMoved || age == 1){
             for (Direction dir : Direction.Plane.HORIZONTAL){
                 float dot = dir.getNormal().getX() * centerDirection.x + dir.getNormal().getZ() * centerDirection.z;
-                if (dot > 0)
+                if (dot >= 0)
                     dirs[negativeFactor ? dir.getOpposite().ordinal() : dir.ordinal()] = false;
             }
         }

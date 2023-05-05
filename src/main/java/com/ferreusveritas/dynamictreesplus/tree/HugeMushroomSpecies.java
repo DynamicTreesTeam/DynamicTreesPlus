@@ -21,6 +21,7 @@ import com.ferreusveritas.dynamictrees.systems.genfeature.context.PostGeneration
 import com.ferreusveritas.dynamictrees.systems.genfeature.context.PostRotContext;
 import com.ferreusveritas.dynamictrees.systems.nodemapper.CollectorNode;
 import com.ferreusveritas.dynamictrees.systems.nodemapper.FindEndsNode;
+import com.ferreusveritas.dynamictrees.systems.nodemapper.NetVolumeNode;
 import com.ferreusveritas.dynamictrees.tree.family.Family;
 import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictrees.util.*;
@@ -124,6 +125,13 @@ public class HugeMushroomSpecies extends Species {
         }
 
         return true;
+    }
+
+    @Override
+    public LogsAndSticks getLogsAndSticks(NetVolumeNode.Volume volume, boolean silkTouch, int fortuneLevel) {
+        if (silkTouch)
+            return super.getLogsAndSticks(volume, true, fortuneLevel);
+        return new LogsAndSticks(new LinkedList<>(), 0);
     }
 
     ///////////////////////////////////////////

@@ -1,4 +1,4 @@
-# Dynamic Trees + [![](http://cf.way2muchnoise.eu/versions/dynamictreesplus.svg) ![](http://cf.way2muchnoise.eu/full_dynamictreesplus_downloads.svg)](https://www.curseforge.com/minecraft/mc-mods/dynamictreesplus/)
+# Dynamic Trees + [![](http://cf.way2muchnoise.eu/versions/478155.svg) ![](http://cf.way2muchnoise.eu/full_478155_downloads.svg)](https://www.curseforge.com/minecraft/mc-mods/dynamictreesplus/)
 
 Official extension of [Dynamic Trees](https://github.com/ferreusveritas/DynamicTrees/); expands on the scope of DT by adding dynamic foliage that is not a tree.
 

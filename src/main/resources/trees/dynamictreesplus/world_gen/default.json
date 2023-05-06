@@ -34,5 +34,34 @@
       },
       "chance": 0.9
     }
+  },
+
+  {
+    "select": { "name": "minecraft:mushroom_fields" },
+    "apply": {
+      "species": {
+        "random": {
+          "dynamictreesplus:red_mushroom": 8,
+          "dynamictreesplus:brown_mushroom": 6,
+          "dynamictreesplus:mega_red_mushroom": 2,
+          "dynamictreesplus:mega_brown_mushroom": 1
+        }
+      },
+      "chance": 0.75
+    }
+  },
+  {
+    "select": { "type": "spooky", "name": "minecraft:.*" },
+    "apply": {
+      "species": {
+        "random": {
+          "dark_oak": 24,
+          "dynamictreesplus:red_mushroom": 2,
+          "dynamictreesplus:brown_mushroom": 1
+        }
+      },
+      "density" : { "math": { "div" : [ "noise", 3.0 ] } },
+      "multipass" : true
+    }
   }
 ]

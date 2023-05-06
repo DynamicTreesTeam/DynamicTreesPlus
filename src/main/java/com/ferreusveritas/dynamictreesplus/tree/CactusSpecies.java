@@ -7,17 +7,13 @@ import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.block.branch.BranchBlock;
 import com.ferreusveritas.dynamictrees.block.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.block.rooty.SoilHelper;
-import com.ferreusveritas.dynamictrees.compat.season.SeasonHelper;
 import com.ferreusveritas.dynamictrees.event.SpeciesPostGenerationEvent;
-import com.ferreusveritas.dynamictrees.growthlogic.context.PositionalSpeciesContext;
 import com.ferreusveritas.dynamictrees.item.Seed;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.genfeature.context.PostGenerationContext;
 import com.ferreusveritas.dynamictrees.systems.nodemapper.FindEndsNode;
 import com.ferreusveritas.dynamictrees.tree.family.Family;
 import com.ferreusveritas.dynamictrees.tree.species.Species;
-import com.ferreusveritas.dynamictrees.util.CoordUtils;
-import com.ferreusveritas.dynamictrees.util.LevelContext;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.worldgen.GenerationContext;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
@@ -70,7 +66,7 @@ public class CactusSpecies extends Species {
                 .envFactor(BiomeDictionary.Type.SNOWY, 0.25f)
                 .envFactor(BiomeDictionary.Type.COLD, 0.5f)
                 .envFactor(BiomeDictionary.Type.SANDY, 1.05f)
-                .setGrowthLogicKit(DTPRegistries.CACTUS_LOGIC);
+                .setGrowthLogicKit(DTPRegistries.STRAIGHT_LOGIC);
     }
 
     @Override
@@ -193,16 +189,6 @@ public class CactusSpecies extends Species {
             return true;
         }
 
-    }
-
-    public static float getEnergy(PositionalSpeciesContext context, int mod) {
-        long day = context.level().getGameTime() / 24000L;
-        int month = (int) day / 30; //Change the hashs every in-game month
-
-        // Vary the height energy by a psuedorandom hash function
-        return context.species().getSignalEnergy() *
-                context.species().biomeSuitability(context.level(), context.pos()) +
-                (CoordUtils.coordHashCode(context.pos().above(month), 2) % mod);
     }
 
     @Override

@@ -1,0 +1,33 @@
+{
+  "type": "dynamictreesplus:mushroom",
+  "family": "dynamictreesplus:mushroom",
+  "tapering": 0,
+  "signal_energy": 12,
+  "growth_rate": 1.2,
+  "soil_longevity": 3,
+  "max_branch_radius": 24,
+  "cap_properties": "dynamictreesplus:red_mushroom",
+  "mushroom_shape_kit": {
+    "name": "dynamictreesplus:bell",
+    "properties": {
+      "max_cap_age": 8,
+      "max_age_curve_factor": 0.4
+    }
+  },
+  "acceptable_soils": ["fungus_like"],
+  "features" : [
+    "bottom_flare",
+    {
+      "name": "mushroom_rot",
+      "properties": {
+        "alternate_mushroom_chance": 1
+      }
+    },
+    {
+      "name": "mound",
+      "properties": {
+        "mound_cutoff_radius": 999
+      }
+    }
+  ]
+}

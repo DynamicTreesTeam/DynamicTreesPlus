@@ -9,9 +9,9 @@
   "growth_rate": 1,
   "soil_longevity": 1,
   "growth_logic_kit": {
-    "name": "dynamictreesplus:cactus",
+    "name": "dynamictreesplus:straight",
     "properties": {
-      "mod": 3
+      "height_variation": 3
     }
   },
   "cactus_thickness_logic": "dynamictreesplus:pipe",

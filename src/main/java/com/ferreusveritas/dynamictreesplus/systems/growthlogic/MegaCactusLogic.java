@@ -11,7 +11,7 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 
-public final class MegaCactusLogic extends CactusLogic {
+public final class MegaCactusLogic extends StraightLogic {
 
     private static final ConfigurationProperty<Integer> STOP_BRANCHING_HEIGHT = ConfigurationProperty.integer("stop_branching_height");
     private static final ConfigurationProperty<Integer> MAX_HEIGHT = ConfigurationProperty.integer("max_height");

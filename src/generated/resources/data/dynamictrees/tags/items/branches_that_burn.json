@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "dynamictreesplus:cactus_branch"
+    "dynamictreesplus:cactus_branch",
+    "dynamictreesplus:mushroom_branch"
   ]
 }

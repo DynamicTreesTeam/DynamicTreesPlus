@@ -1,0 +1,38 @@
+{
+  "type": "dynamictreesplus:mushroom",
+  "family": "dynamictreesplus:mushroom",
+  "always_show_on_waila": true,
+  "tapering": 0,
+  "signal_energy": 8,
+  "growth_rate": 1.2,
+  "soil_longevity": 3,
+  "generate_seed": true,
+  "generate_sapling": true,
+  "cap_properties": "dynamictreesplus:brown_mushroom",
+  "mushroom_shape_kit": {
+    "name": "dynamictreesplus:bell",
+    "properties": {
+      "max_age_curve_factor": 0.1,
+      "min_age_curve_factor": 0.2
+    }
+  },
+  "primitive_sapling": "brown_mushroom",
+  "sapling_shape": "flat_mushroom",
+  "acceptable_soils": ["fungus_like"],
+  "mega_species": "dynamictreesplus:mega_brown_mushroom",
+  "features" : [
+    "bottom_flare",
+    {
+      "name": "mushroom_rot",
+      "properties": {
+        "alternate_mushroom_chance": 0
+      }
+    },
+    {
+      "name": "mound",
+      "properties": {
+        "mound_cutoff_radius": 999
+      }
+    }
+  ]
+}

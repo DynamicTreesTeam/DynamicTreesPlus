@@ -7,7 +7,6 @@ import com.ferreusveritas.dynamictreesplus.block.mushroom.DynamicCapCenterBlock;
 import com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.MushroomShapeConfiguration;
 import com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.context.MushroomCapContext;
 import com.ferreusveritas.dynamictreesplus.tree.HugeMushroomSpecies;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
@@ -27,6 +26,8 @@ public class BellShape extends MushroomShapeKit {
             ConfigurationProperty.floatProperty("max_age_curve_factor");
     public static final ConfigurationProperty<Float> CURVE_FACTOR_VARIATION =
             ConfigurationProperty.floatProperty("curve_factor_variation");
+    public static final ConfigurationProperty<Integer> POINTED_TIP_AGE =
+            ConfigurationProperty.integer("pointed_tip_max_age");
 
     public BellShape(ResourceLocation registryName) {
         super(registryName);
@@ -41,12 +42,13 @@ public class BellShape extends MushroomShapeKit {
                 .with(CURVE_HEIGHT_OFFSET, 0f)
                 .with(MIN_AGE_CURVE_FACTOR, 2f)
                 .with(MAX_AGE_CURVE_FACTOR, 0.5f)
-                .with(CURVE_FACTOR_VARIATION, 0.1f);
+                .with(CURVE_FACTOR_VARIATION, 0.1f)
+                .with(POINTED_TIP_AGE, 0);
     }
 
     @Override
     protected void registerProperties() {
-        this.register(CHANCE_TO_AGE, MAX_CAP_AGE, CURVE_POWER, CURVE_HEIGHT_OFFSET, MIN_AGE_CURVE_FACTOR, MAX_AGE_CURVE_FACTOR, CURVE_FACTOR_VARIATION);
+        this.register(CHANCE_TO_AGE, MAX_CAP_AGE, CURVE_POWER, CURVE_HEIGHT_OFFSET, MIN_AGE_CURVE_FACTOR, MAX_AGE_CURVE_FACTOR, CURVE_FACTOR_VARIATION, POINTED_TIP_AGE);
     }
 
     @Override
@@ -95,7 +97,7 @@ public class BellShape extends MushroomShapeKit {
         for (int i=1; i<=age; i++){
             int nextY = fac == 0 ? 0 : (int)Math.floor(Math.pow(fac * radius, power) - height_offset);
 
-            boolean moveY = nextY != y && i != 1;
+            boolean moveY = i == 1 ? (age <= configuration.get(POINTED_TIP_AGE)) : nextY != y;
             if (moveY) y+= (int)Math.signum(fac);
 
             BlockPos pos = context.pos().below(y);

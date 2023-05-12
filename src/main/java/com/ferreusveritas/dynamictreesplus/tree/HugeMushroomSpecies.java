@@ -113,7 +113,7 @@ public class HugeMushroomSpecies extends Species {
         // Set to a single branch with 1 radius.
         family.getBranch().ifPresent(branch -> branch.setRadius(level, pos, family.getPrimaryThickness(), null));
         // Place a single leaf block on top.
-        level.setBlockAndUpdate(pos.above(), getCapProperties().getDynamicCapState(true));
+        level.setBlockAndUpdate(pos.above(), getCapProperties().getDynamicCapState(true, 0));
         // Set to fully fertilized rooty dirt underneath.
         placeRootyDirtBlock(level, pos.below(), 15);
 

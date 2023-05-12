@@ -105,8 +105,7 @@ public class CapPropertiesResourceLoader extends JsonRegistryResourceLoader<CapP
                 warning -> this.logWarning(capProperties.getRegistryName(), warning)
         );
 
-        capProperties.generateDynamicCap(blockProperties);
-        capProperties.generateDynamicCapCenter(blockProperties);
+        capProperties.generateDynamicCapBlocks(blockProperties);
     }
 
 }

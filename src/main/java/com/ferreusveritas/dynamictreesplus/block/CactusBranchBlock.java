@@ -231,6 +231,7 @@ public class CactusBranchBlock extends BranchBlock {
             return signal;
         }
 
+        if (originDir == Direction.UP) originDir = Direction.DOWN;
         signal.success = world.setBlock(pos, this.stateDefinition.any().setValue(TRUNK_TYPE, trunk).setValue(ORIGIN, originDir), 2);
         signal.radius = getCactusRadius(trunk);
         return signal;

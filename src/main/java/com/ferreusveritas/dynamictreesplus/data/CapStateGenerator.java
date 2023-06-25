@@ -5,6 +5,7 @@ import com.ferreusveritas.dynamictrees.data.provider.DTBlockStateProvider;
 import com.ferreusveritas.dynamictreesplus.block.mushroom.CapProperties;
 import com.ferreusveritas.dynamictreesplus.block.mushroom.DynamicCapBlock;
 import net.minecraft.world.level.block.Block;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class CapStateGenerator implements Generator<DTBlockStateProvider, CapProperties> {
 
@@ -14,7 +15,7 @@ public class CapStateGenerator implements Generator<DTBlockStateProvider, CapPro
     @Override
     public void generate(DTBlockStateProvider provider, CapProperties input, Dependencies dependencies) {
         provider.simpleBlock(dependencies.get(CAP), provider.models().getExistingFile(
-                provider.block(dependencies.get(PRIMITIVE_CAP).getRegistryName())
+                provider.block(ForgeRegistries.BLOCKS.getKey(dependencies.get(PRIMITIVE_CAP)))
         ));
     }
 

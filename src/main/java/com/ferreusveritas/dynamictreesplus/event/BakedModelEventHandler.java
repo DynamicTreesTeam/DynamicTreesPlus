@@ -4,8 +4,7 @@ import com.ferreusveritas.dynamictreesplus.DynamicTreesPlus;
 import com.ferreusveritas.dynamictreesplus.model.loader.CactusBlockModelLoader;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.ModelRegistryEvent;
-import net.minecraftforge.client.model.ModelLoaderRegistry;
+import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -18,9 +17,8 @@ public final class BakedModelEventHandler {
     public static final ResourceLocation CACTUS = DynamicTreesPlus.location("cactus");
 
     @SubscribeEvent
-    public static void onModelRegistryEvent(ModelRegistryEvent event) {
-        // Register model loaders for baked models.
-        ModelLoaderRegistry.registerLoader(CACTUS, new CactusBlockModelLoader());
+    public static void onModelRegistryEvent(ModelEvent.RegisterGeometryLoaders event) {
+        event.register(CACTUS.getPath(), new CactusBlockModelLoader());
     }
 
 }

@@ -59,11 +59,9 @@ public class MushroomInflatorNode implements NodeInspector {
         if (dist.getX() * dist.getX() + dist.getY() * dist.getY() + dist.getZ() * dist.getZ() != 1) {//This is actually the equation for distance squared. 1 squared is 1. Yay math.
             if (DynamicCapCenterBlock.canCapReplace(level.getBlockState(pos.above()))){
                 int height = pos.subtract(rootPos).getY();
-                int maxAge = Math.min(
-                        Math.min(Math.min(species.getCapProperties().getMaxAge(species), MushroomCapDisc.MAX_RADIUS), height),
-                        generationRadius);
-                int minAge = Math.max(0, height/minRadiusHeightDivider);
-                int capAge = minAge + CoordUtils.coordHashCode(new BlockPos(pos.getX(),0,pos.getZ()), 3) % ((maxAge == minAge ? maxAge : Math.abs(maxAge-minAge))+1);
+                int maxAge = Math.min(Math.min(Math.min(species.getCapProperties().getMaxAge(species), MushroomCapDisc.MAX_RADIUS), height), generationRadius);
+                int minAge = Math.max(0, height / minRadiusHeightDivider);
+                int capAge = minAge + CoordUtils.coordHashCode(new BlockPos(pos.getX(), 0, pos.getZ()),  3) % ((maxAge == minAge ? 0 : Math.abs(maxAge-minAge))+1);
                 lastCapBranchRadius = Math.min(species.getFamily().getPrimaryThickness() + capAge, species.getMaxBranchRadius());
                 radius = lastCapBranchRadius;
                 capAges.add(new Pair<>(pos.above(), capAge));

@@ -13,7 +13,7 @@
     }
   },
   {
-    "select": { "category": "mesa", "names": ["minecraft:.*", "!minecraft:wooded_badlands"] },
+    "select": { "tag": "#minecraft:is_badlands", "name": "!minecraft:wooded_badlands" },
     "apply": {
       "species": "dynamictreesplus:saguaro_cactus",
       "density": { "math": { "add": [ { "mul": [ "noise", 0.6 ] }, 0.4 ] } },
@@ -26,9 +26,8 @@
     "select": { "name": "minecraft:wooded_badlands" },
     "apply": {
       "species": {
-        "method": "splice_before",
         "random": {
-          "...": 2,
+          "oak": 2,
           "dynamictreesplus:saguaro_cactus": 1
         }
       },
@@ -51,7 +50,7 @@
     }
   },
   {
-    "select": { "type": "spooky", "name": "minecraft:.*" },
+    "select": { "name": "minecraft:dark_forest" },
     "apply": {
       "species": {
         "random": {

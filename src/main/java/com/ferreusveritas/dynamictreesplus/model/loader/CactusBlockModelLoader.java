@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictreesplus.model.loader;
 
-import com.ferreusveritas.dynamictrees.model.geometry.BranchBlockModelGeometry;
-import com.ferreusveritas.dynamictrees.model.loader.BranchBlockModelLoader;
+import com.ferreusveritas.dynamictrees.models.geometry.BranchBlockModelGeometry;
+import com.ferreusveritas.dynamictrees.models.loader.BranchBlockModelLoader;
 import com.ferreusveritas.dynamictreesplus.model.geometry.CactusBranchBlockModelGeometry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;

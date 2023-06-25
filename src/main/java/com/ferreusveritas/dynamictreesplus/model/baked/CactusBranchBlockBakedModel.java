@@ -2,14 +2,12 @@ package com.ferreusveritas.dynamictreesplus.model.baked;
 
 import com.ferreusveritas.dynamictrees.block.branch.BranchBlock;
 import com.ferreusveritas.dynamictrees.client.ModelUtils;
-import com.ferreusveritas.dynamictrees.model.baked.BranchBlockBakedModel;
-import com.ferreusveritas.dynamictrees.model.data.ModelConnections;
+import com.ferreusveritas.dynamictrees.models.baked.BranchBlockBakedModel;
+import com.ferreusveritas.dynamictrees.models.modeldata.ModelConnections;
 import com.ferreusveritas.dynamictreesplus.block.CactusBranchBlock;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.VertexFormatElement;
 import com.mojang.math.Vector3f;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
@@ -20,18 +18,21 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.Direction.AxisDirection;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.model.data.IModelData;
-import net.minecraftforge.client.model.pipeline.BakedQuadBuilder;
+import net.minecraftforge.client.model.data.ModelData;
+import net.minecraftforge.client.model.pipeline.QuadBakingVertexConsumer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 @OnlyIn(Dist.CLIENT)
 public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
@@ -75,53 +76,26 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
         }
     }
 
-    private void putVertex(BakedQuadBuilder builder, Vec3 normal, double x, double y, double z, float u, float v, TextureAtlasSprite sprite, float r, float g, float b) {
-
-        final ImmutableList<VertexFormatElement> elements = DefaultVertexFormat.BLOCK.getElements().asList();
-        for (int j = 0; j < elements.size(); j++) {
-            VertexFormatElement e = elements.get(j);
-            switch (e.getUsage()) {
-                case POSITION:
-                    builder.put(j, (float) x, (float) y, (float) z, 1.0f);
-                    break;
-                case COLOR:
-                    builder.put(j, r, g, b, 1.0f);
-                    break;
-                case UV:
-                    switch (e.getIndex()) {
-                        case 0:
-                            float iu = sprite.getU(u);
-                            float iv = sprite.getV(v);
-                            builder.put(j, iu, iv);
-                            break;
-                        case 2:
-                            builder.put(j, (short) 0, (short) 0);
-                            break;
-                        default:
-                            builder.put(j);
-                            break;
-                    }
-                    break;
-                case NORMAL:
-                    builder.put(j, (float) normal.x, (float) normal.y, (float) normal.z);
-                    break;
-                default:
-                    builder.put(j);
-                    break;
-            }
-        }
+    private void putVertex(QuadBakingVertexConsumer builder, Vec3 normal, double x, double y, double z, float u, float v, TextureAtlasSprite sprite, float r, float g, float b, Direction face) {
+        builder.vertex(x, y, z);
+        builder.normal((float) normal.x, (float) normal.y, (float) normal.z);
+        builder.color(r, g, b, 1.0F);
+        builder.uv(sprite.getU(u), sprite.getV(v));
+        builder.setSprite(sprite);
+        builder.setDirection(face);
+        builder.endVertex();
     }
 
     private BakedQuad createQuad(Vec3 v1, float v1u, float v1v, Vec3 v2, float v2u, float v2v, Vec3 v3, float v3u, float v3v, Vec3 v4, float v4u, float v4v, TextureAtlasSprite sprite) {
         Vec3 normal = v3.subtract(v2).cross(v1.subtract(v2)).normalize();
 
-        BakedQuadBuilder builder = new BakedQuadBuilder(sprite);
-        builder.setQuadOrientation(Direction.getNearest(normal.x, normal.y, normal.z));
-        putVertex(builder, normal, v1.x, v1.y, v1.z, v1u, v1v, sprite, 1.0f, 1.0f, 1.0f);
-        putVertex(builder, normal, v2.x, v2.y, v2.z, v2u, v2v, sprite, 1.0f, 1.0f, 1.0f);
-        putVertex(builder, normal, v3.x, v3.y, v3.z, v3u, v3v, sprite, 1.0f, 1.0f, 1.0f);
-        putVertex(builder, normal, v4.x, v4.y, v4.z, v4u, v4v, sprite, 1.0f, 1.0f, 1.0f);
-        return builder.build();
+        QuadBakingVertexConsumer.Buffered builder = new QuadBakingVertexConsumer.Buffered();
+        Direction face = Direction.getNearest(normal.x, normal.y, normal.z);
+        putVertex(builder, normal, v1.x, v1.y, v1.z, v1u, v1v, sprite, 1.0f, 1.0f, 1.0f, face);
+        putVertex(builder, normal, v2.x, v2.y, v2.z, v2u, v2v, sprite, 1.0f, 1.0f, 1.0f, face);
+        putVertex(builder, normal, v3.x, v3.y, v3.z, v3u, v3v, sprite, 1.0f, 1.0f, 1.0f, face);
+        putVertex(builder, normal, v4.x, v4.y, v4.z, v4u, v4v, sprite, 1.0f, 1.0f, 1.0f, face);
+        return builder.getQuad();
     }
 
     public BakedModel bakeSleeve(int radius, Direction dir, TextureAtlasSprite bark, TextureAtlasSprite top) {
@@ -163,7 +137,7 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
         }
 
         BlockElement part = new BlockElement(posFrom, posTo, mapFacesIn, null, true);
-        SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(blockModel.customData, ItemOverrides.EMPTY).particle(bark);
+        SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(blockModel, ItemOverrides.EMPTY, false).particle(bark);
 
         for (Map.Entry<Direction, BlockElementFace> e : part.faces.entrySet()) {
             Direction face = e.getKey();
@@ -326,7 +300,7 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
         }
 
         BlockElement part = new BlockElement(posFrom, posTo, mapFacesIn, null, true);
-        SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(blockModel.customData, ItemOverrides.EMPTY).particle(icon);
+        SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(blockModel, ItemOverrides.EMPTY, false).particle(icon);
 
         for (Map.Entry<Direction, BlockElementFace> e : part.faces.entrySet()) {
             Direction face = e.getKey();
@@ -343,7 +317,7 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
         Vector3f posFrom = new Vector3f(8 - radius, 8 - radius, 8 - radius);
         Vector3f posTo = new Vector3f(8 + radius, 8 + radius, 8 + radius);
 
-        SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(blockModel.customData, ItemOverrides.EMPTY).particle(bark);
+        SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(blockModel, ItemOverrides.EMPTY, false).particle(bark);
 
         // X
         builder.addCulledFace(Direction.UP, this.createQuad(
@@ -485,7 +459,7 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
         Vector3f posFrom = new Vector3f(4, 16, 4);
         Vector3f posTo = new Vector3f(12, 16, 12);
 
-        SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(blockModel.customData, ItemOverrides.EMPTY).particle(bark);
+        SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(blockModel, ItemOverrides.EMPTY, false).particle(bark);
 
 
         builder.addCulledFace(Direction.UP, this.createQuad(
@@ -576,7 +550,7 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
     }
 
     @Override
-    public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, Random rand, IModelData extraData) {
+    public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @Nonnull RandomSource random, @Nonnull ModelData extraData, @Nullable RenderType renderType) {
 
         if (side == null && state != null) {
             List<BakedQuad> quadsList = new ArrayList<>(12);
@@ -585,11 +559,11 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
 
             int[] connections = new int[]{0, 0, 0, 0, 0, 0};
             Direction forceRingDir = null;
-            if (extraData instanceof ModelConnections) {
-                connections = ((ModelConnections) extraData).getAllRadii();
-                forceRingDir = ((ModelConnections) extraData).getRingOnly();
+            ModelConnections connectionsData = extraData.get(ModelConnections.CONNECTIONS_PROPERTY);
+            if (connectionsData != null) {
+                connections = connectionsData.getAllRadii();
+                forceRingDir = connectionsData.getRingOnly();
             }
-
 
             //Count number of connections
             int numConnections = 0;
@@ -598,7 +572,7 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
             }
 
             if (numConnections == 0 && forceRingDir != null) {
-                quadsList.addAll(rings[getRadiusIndex(coreRadius)].getQuads(state, forceRingDir, rand, extraData));
+                quadsList.addAll(rings[getRadiusIndex(coreRadius)].getQuads(state, forceRingDir, random, extraData, renderType));
             } else {
                 boolean extraUpSleeve = false;
                 if (coreRadius == radii[0] && numConnections == 1 && state.getValue(CactusBranchBlock.ORIGIN).getAxis().isHorizontal()) {
@@ -620,16 +594,16 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
                     //Get quads for core model
                     if (coreRadius != connections[face.get3DDataValue()]) {
                         if (coreRingDir == null || coreRingDir != face) {
-                            quadsList.addAll(cores[coreDir][getRadiusIndex(coreRadius)].getQuads(state, face, rand, extraData));
+                            quadsList.addAll(cores[coreDir][getRadiusIndex(coreRadius)].getQuads(state, face, random, extraData, renderType));
                         } else {
-                            quadsList.addAll(rings[getRadiusIndex(coreRadius)].getQuads(state, face, rand, extraData));
+                            quadsList.addAll(rings[getRadiusIndex(coreRadius)].getQuads(state, face, random, extraData, renderType));
                         }
                     }
 
                     // Get quads for core spikes
                     for (Direction dir : Direction.values()) {
                         if (coreRadius > connections[dir.get3DDataValue()]) {
-                            for (BakedQuad quad : coreSpikes[getRadiusIndex(coreRadius)].getQuads(state, dir, rand, extraData)) {
+                            for (BakedQuad quad : coreSpikes[getRadiusIndex(coreRadius)].getQuads(state, dir, random, extraData, renderType)) {
                                 if (coreRadius > connections[quad.getDirection().get3DDataValue()]) {
                                     quadsList.add(quad);
                                 }
@@ -643,13 +617,13 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
                         int connRadius = connections[idx];
                         // If the connection side matches the quadpull side then cull the sleeve face.  Don't cull radius 1 connections for leaves(which are partly transparent).
                         if (connRadius >= radii[0] && ((connDir == Direction.UP && connRadius == radii[0] && extraUpSleeve) || face != connDir || connDir == Direction.DOWN)) {
-                            quadsList.addAll(sleeves[idx][getRadiusIndex(connRadius)].getQuads(state, face, rand, extraData));
+                            quadsList.addAll(sleeves[idx][getRadiusIndex(connRadius)].getQuads(state, face, random, extraData, renderType));
                         }
                     }
                 }
 
                 if (extraUpSleeve) {
-                    quadsList.addAll(sleeveTopSpikes.getQuads(state, Direction.UP, rand, extraData));
+                    quadsList.addAll(sleeveTopSpikes.getQuads(state, Direction.UP, random, extraData, renderType));
                 }
             }
 
@@ -663,9 +637,14 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
      * Checks all neighboring tree parts to determine the connection radius for each side of this branch block.
      */
     @Override
-    public IModelData getModelData(BlockAndTintGetter world, BlockPos pos, BlockState state, IModelData tileData) {
-        Block block = state.getBlock();
-        return block instanceof BranchBlock ? new ModelConnections(((BranchBlock) block).getConnectionData(world, pos, state)) : new ModelConnections();
+    public ModelData getModelData(@Nonnull BlockAndTintGetter level, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull ModelData extraData) {
+        ModelConnections modelConnections;
+        if (state.getBlock() instanceof BranchBlock branchBlock) {
+            modelConnections = new ModelConnections(branchBlock.getConnectionData(level, pos, state)).setFamily(branchBlock.getFamily());
+        } else {
+            modelConnections = new ModelConnections();
+        }
+        return modelConnections.toModelData(extraData);
     }
 
     /**
@@ -714,9 +693,8 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
         return true;
     }
 
-
     @Override
-    public TextureAtlasSprite getParticleIcon(IModelData data) {
+    public TextureAtlasSprite getParticleIcon(@Nullable ModelData extraData) {
         return getParticleIcon();
     }
 
@@ -739,11 +717,6 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
     @Override
     public ItemOverrides getOverrides() {
         return ItemOverrides.EMPTY;
-    }
-
-    @Override
-    public boolean doesHandlePerspectives() {
-        return false;
     }
 
     @Override

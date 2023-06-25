@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictreesplus.model.geometry;
 
-import com.ferreusveritas.dynamictrees.model.geometry.BranchBlockModelGeometry;
+import com.ferreusveritas.dynamictrees.models.geometry.BranchBlockModelGeometry;
 import com.ferreusveritas.dynamictreesplus.model.baked.CactusBranchBlockBakedModel;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -11,7 +11,7 @@ import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.model.IModelConfiguration;
+import net.minecraftforge.client.model.geometry.IGeometryBakingContext;
 
 import java.util.function.Function;
 
@@ -27,8 +27,8 @@ public class CactusBranchBlockModelGeometry extends BranchBlockModelGeometry {
 
 
     @Override
-    public BakedModel bake(IModelConfiguration owner, ModelBakery bakery, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation) {
-        return new CactusBranchBlockBakedModel(modelLocation, this.barkTextureName, this.ringsTextureName);
+    public BakedModel bake(IGeometryBakingContext owner, ModelBakery bakery, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation) {
+        return new CactusBranchBlockBakedModel(modelLocation, this.barkResLoc, this.ringsResLoc);
     }
 
 }

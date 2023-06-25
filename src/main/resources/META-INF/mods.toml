@@ -1,6 +1,6 @@
 license="MIT"
 modLoader="javafml"
-loaderVersion="[40,41)"
+loaderVersion="[43,44)"
 issueTrackerURL="https://github.com/supermassimo/DynamicTreesPlus/issues"
 
 [[mods]]
@@ -18,20 +18,20 @@ Vanilla addon for Dynamic Trees'''
 [[dependencies.dynamictreesplus]]
     modId="forge"
     mandatory=true
-    versionRange="[40.1.51,41)"
+    versionRange="[43.2.0,44)"
     ordering="NONE"
     side="BOTH"
 
 [[dependencies.dynamictreesplus]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.18.2,1.19)"
+    versionRange="[1.19.2,1.19.3)"
     ordering="NONE"
     side="BOTH"
 
 [[dependencies.dynamictreesplus]]
     modId="dynamictrees"
     mandatory=true
-    versionRange="[0.11.0,)"
+    versionRange="[1.1.0-BETA1,)"
     ordering="AFTER"
     side="BOTH"

@@ -25,8 +25,7 @@ import com.ferreusveritas.dynamictreesplus.items.FoodSeed;
 import com.ferreusveritas.dynamictreesplus.systems.thicknesslogic.CactusThicknessLogic;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceKey;
+import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
@@ -36,11 +35,10 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.Tags;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
@@ -63,9 +61,9 @@ public class CactusSpecies extends Species {
         return this.setSaplingShape(DTPRegistries.MEDIUM_CACTUS_SAPLING_SHAPE)
                 .setSaplingSound(SoundType.WOOL)
                 .setDefaultGrowingParameters()
-                .envFactor(BiomeDictionary.Type.SNOWY, 0.25f)
-                .envFactor(BiomeDictionary.Type.COLD, 0.5f)
-                .envFactor(BiomeDictionary.Type.SANDY, 1.05f)
+                .envFactor(Tags.Biomes.IS_SNOWY, 0.25f)
+                .envFactor(Tags.Biomes.IS_COLD, 0.5f)
+                .envFactor(Tags.Biomes.IS_SANDY, 1.05f)
                 .setGrowthLogicKit(DTPRegistries.STRAIGHT_LOGIC);
     }
 
@@ -104,11 +102,9 @@ public class CactusSpecies extends Species {
     }
 
     @Override
-    public boolean isBiomePerfect(Biome biome) {
-        ResourceKey<Biome> key = ResourceKey.create(Registry.BIOME_REGISTRY, Objects.requireNonNull(biome.getRegistryName()));
+    public boolean isBiomePerfect(Holder<Biome> biome) {
         return this.perfectBiomes.size() > 0 ? super.isBiomePerfect(biome) :
-                BiomeDictionary.hasType(key, BiomeDictionary.Type.DRY)
-                        && BiomeDictionary.hasType(key, BiomeDictionary.Type.SANDY);
+                biome.is(Tags.Biomes.IS_DRY) && biome.is(Tags.Biomes.IS_SANDY);
     }
 
     @Override

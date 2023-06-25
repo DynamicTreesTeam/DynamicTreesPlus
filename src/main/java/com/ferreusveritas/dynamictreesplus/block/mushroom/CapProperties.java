@@ -28,6 +28,7 @@ import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
@@ -37,7 +38,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.level.storage.loot.LootContext;
@@ -101,7 +101,7 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
 
     /**
      * Central registry for all {@link CapProperties} objects.
-     *
+     * <p>
      * TO-DO: make it work with the RegistryCommand
      */
     public static final TypedRegistry<CapProperties> REGISTRY = new TypedRegistry<>(CapProperties.class, NULL, new TypedRegistry.EntryType<>(CODEC));
@@ -140,6 +140,7 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
     ///////////////////////////////////////////
     // PROPERTIES
     ///////////////////////////////////////////
+
     /**
      * Gets the primitive (vanilla) leaves for these {@link LeavesProperties}.
      *
@@ -238,6 +239,7 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
     public ResourceLocation getBlockRegistryName() {
         return this.blockRegistryName;
     }
+
     public ResourceLocation getCenterBlockRegistryName() {
         return this.centerBlockRegistryName;
     }
@@ -253,6 +255,7 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
         this.blockRegistryName = blockRegistryName;
         return this;
     }
+
     public CapProperties setCenterBlockRegistryName(ResourceLocation blockRegistryName) {
         this.centerBlockRegistryName = blockRegistryName;
         return this;
@@ -267,6 +270,7 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
     protected String getBlockRegistryNameSuffix() {
         return "_cap";
     }
+
     protected String getCenterBlockRegistryNameSuffix() {
         return "_cap_center";
     }
@@ -296,7 +300,7 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
     }
 
     public CapProperties setDynamicCapState(BlockState state, boolean center) {
-        if (center){
+        if (center) {
             dynamicMushroomCenterBlock = state;
             return this;
         }
@@ -311,6 +315,7 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
     public BlockState getDynamicCapState(boolean center) {
         return getDynamicCapState(center, 1);
     }
+
     public BlockState getDynamicCapState(boolean center, int prop) {
         if (center) return dynamicMushroomCenterBlock.setValue(DynamicCapCenterBlock.AGE, prop);
         return getDynamicCapState(prop);
@@ -321,22 +326,23 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
                 .orElse(Blocks.AIR.defaultBlockState());
     }
 
-    public BlockState getDynamicCapState(int distance, boolean[] directions){
+    public BlockState getDynamicCapState(int distance, boolean[] directions) {
         return DynamicCapBlock.setDirectionValues(getDynamicCapState(distance), directions);
     }
 
-    public boolean isPartOfCap(BlockState state){
+    public boolean isPartOfCap(BlockState state) {
         DynamicCapBlock capBlock = getDynamicCapBlock().orElse(null);
         DynamicCapCenterBlock capCenterBlock = getDynamicCapCenterBlock().orElse(null);
         if (capBlock == null || capCenterBlock == null) return false;
         return state.is(capBlock) || state.is(capCenterBlock);
     }
 
-    public ParticleOptions sporeParticleType (BlockState pState, Level pLevel, BlockPos pPos, Random pRand){
+    public ParticleOptions sporeParticleType(BlockState state, Level level, BlockPos pos, RandomSource random) {
         return ParticleTypes.WHITE_ASH;
     }
-    public Vector3d sporeParticleSpeed (BlockState pState, Level pLevel, BlockPos pPos, Random pRand){
-        return new Vector3d(1,0,1);
+
+    public Vector3d sporeParticleSpeed(BlockState state, Level level, BlockPos pos, RandomSource random) {
+        return new Vector3d(1, 0, 1);
     }
 
     ///////////////////////////////////////////

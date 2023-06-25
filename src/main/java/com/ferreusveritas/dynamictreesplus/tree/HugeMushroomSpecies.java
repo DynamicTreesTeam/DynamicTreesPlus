@@ -48,8 +48,8 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.Tags;
 import oshi.util.tuples.Pair;
 
 import javax.annotation.Nullable;
@@ -89,9 +89,9 @@ public class HugeMushroomSpecies extends Species {
         this.setTransformable(false);
         return this.setSaplingShape(CommonVoxelShapes.ROUND_MUSHROOM)
                 .setDefaultGrowingParameters()
-                .envFactor(BiomeDictionary.Type.DRY, 0.25f)
-                .envFactor(BiomeDictionary.Type.HOT, 0.75f)
-                .envFactor(BiomeDictionary.Type.COLD, 1.05f)
+                .envFactor(Tags.Biomes.IS_DRY, 0.25f)
+                .envFactor(Tags.Biomes.IS_HOT, 0.75f)
+                .envFactor(Tags.Biomes.IS_COLD, 1.05f)
                 .setCanSaplingGrowNaturally(false)
                 .setGrowthLogicKit(DTPRegistries.STRAIGHT_LOGIC);
     }

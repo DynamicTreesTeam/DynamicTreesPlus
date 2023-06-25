@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictreesplus.init;
 
-import com.ferreusveritas.dynamictrees.api.registry.*;
+import com.ferreusveritas.dynamictrees.api.registry.RegistryEvent;
+import com.ferreusveritas.dynamictrees.api.registry.TypeRegistryEvent;
 import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
 import com.ferreusveritas.dynamictrees.resources.Resources;
@@ -15,10 +16,9 @@ import com.ferreusveritas.dynamictreesplus.block.mushroom.CapProperties;
 import com.ferreusveritas.dynamictreesplus.resources.CapPropertiesResourceLoader;
 import com.ferreusveritas.dynamictreesplus.resources.JsonDeserializers;
 import com.ferreusveritas.dynamictreesplus.systems.featuregen.DynamicTreesPlusGenFeatures;
-import com.ferreusveritas.dynamictreesplus.systems.growthlogic.StraightLogic;
 import com.ferreusveritas.dynamictreesplus.systems.growthlogic.MegaCactusLogic;
 import com.ferreusveritas.dynamictreesplus.systems.growthlogic.SaguaroCactusLogic;
-import com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.MushroomShapeConfiguration;
+import com.ferreusveritas.dynamictreesplus.systems.growthlogic.StraightLogic;
 import com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.shapekits.MushroomShapeKit;
 import com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.shapekits.MushroomShapeKits;
 import com.ferreusveritas.dynamictreesplus.systems.thicknesslogic.CactusThicknessLogic;
@@ -29,14 +29,15 @@ import com.ferreusveritas.dynamictreesplus.tree.HugeMushroomFamily;
 import com.ferreusveritas.dynamictreesplus.tree.HugeMushroomSpecies;
 import com.ferreusveritas.dynamictreesplus.worldgen.canceller.CactusFeatureCanceller;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.CactusBlock;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.NewRegistryEvent;
+import net.minecraftforge.registries.RegisterEvent;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class DTPRegistries {
@@ -113,10 +114,12 @@ public class DTPRegistries {
     }
 
     @SubscribeEvent
-    public static void onRegisterBlocks(net.minecraftforge.event.RegistryEvent.Register<Block> event) {
-        // Lock the registries
-        CapProperties.REGISTRY.lock();
-        MushroomShapeKit.REGISTRY.lock();
+    public static void onRegisterEvent(RegisterEvent event) {
+        if (event.getRegistryKey() == ForgeRegistries.Keys.BLOCKS) {
+            // Lock the registries
+            CapProperties.REGISTRY.lock();
+            MushroomShapeKit.REGISTRY.lock();
+        }
     }
 
 }

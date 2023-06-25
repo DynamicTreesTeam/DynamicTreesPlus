@@ -2,7 +2,7 @@
   "name": "Cacti",
   "icon": "dynamictreesplus:pillar_cactus_seed",
   "category": "dynamictrees:trees",
-  "sortnum": "5",
+  "sortnum": 5,
   "pages": [
 	{
       "type": "text",

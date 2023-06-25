@@ -87,7 +87,7 @@ public class CactusClonesGenFeature extends GenFeature {
 
                 if (worldgen) {
                     if (level instanceof WorldGenRegion) {
-                        species.generate(new GenerationContext(levelContext, species, offsetRootPos, offsetRootPos.mutable(), level.getNoiseBiome(offsetRootPos.getX(), offsetRootPos.getY(), offsetRootPos.getZ()).value(), CoordUtils.getRandomDir(level.getRandom()), 2, safeBounds));
+                        species.generate(new GenerationContext(levelContext, species, offsetRootPos, offsetRootPos.mutable(), level.getNoiseBiome(offsetRootPos.getX(), offsetRootPos.getY(), offsetRootPos.getZ()), CoordUtils.getRandomDir(level.getRandom()), 2, safeBounds));
                     }
                 } else if (level instanceof Level) {
                     species.transitionToTree((Level) level, offsetRootPos.above());

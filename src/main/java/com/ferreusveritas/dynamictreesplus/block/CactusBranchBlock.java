@@ -25,6 +25,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -42,7 +43,6 @@ import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
-import net.minecraft.world.level.storage.loot.entries.LootPoolSingletonContainer;
 import net.minecraft.world.level.storage.loot.functions.ApplyExplosionDecay;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraft.world.phys.AABB;
@@ -54,7 +54,6 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Objects;
-import java.util.Random;
 
 @SuppressWarnings("deprecation")
 public class CactusBranchBlock extends BranchBlock {
@@ -135,8 +134,8 @@ public class CactusBranchBlock extends BranchBlock {
     ///////////////////////////////////////////
 
     @Override
-    public boolean checkForRot(LevelAccessor world, BlockPos pos, Species species, int radius, int fertility, Random rand, float chance, boolean rapid) {
-        return false;//Do nothing.  Cacti don't rot
+    public boolean checkForRot(LevelAccessor level, BlockPos pos, Species species, int fertility, int radius, RandomSource rand, float chance, boolean rapid) {
+        return false; // Do nothing. Cacti don't rot.
     }
 
     ///////////////////////////////////////////

@@ -5,6 +5,7 @@ import java.time.Instant
 import java.time.format.DateTimeFormatter
 
 fun property(key: String) = project.findProperty(key).toString()
+fun optionalProperty(key: String) = project.findProperty(key)?.toString()
 
 plugins {
     id("java")
@@ -13,8 +14,10 @@ plugins {
     id("idea")
     id("maven-publish")
     id("com.matthewprenger.cursegradle") version "1.4.0"
+    id("com.modrinth.minotaur") version "2.+"
     id("com.harleyoconnor.autoupdatetool") version "1.0.0"
 }
+
 apply {
     from("https://raw.githubusercontent.com/SizableShrimp/Forge-Class-Remapper/main/classremapper.gradle")
     from("https://gist.githubusercontent.com/Harleyoc1/4d23d4e991e868d98d548ac55832381e/raw/applesiliconfg.gradle")
@@ -36,6 +39,7 @@ val modName = property("modName")
 val modId = property("modId")
 val modVersion = property("modVersion")
 val mcVersion = property("mcVersion")
+val dtVersion = property("dynamicTreesVersion")
 
 version = "$mcVersion-$modVersion"
 group = property("group")
@@ -87,7 +91,7 @@ dependencies {
 
     runtimeOnly(fg.deobf("mezz.jei:jei-$mcVersion-forge:${property("jeiVersion")}"))
 
-    implementation(fg.deobf("com.ferreusveritas.dynamictrees:DynamicTrees-${mcVersion}:${property("dynamicTreesVersion")}"))
+    implementation(fg.deobf("com.ferreusveritas.dynamictrees:DynamicTrees-${mcVersion}:$dtVersion"))
 
     runtimeOnly(fg.deobf("vazkii.patchouli:Patchouli:$mcVersion-${property("patchouliVersion")}"))
     runtimeOnly(fg.deobf("org.squiddev:cc-tweaked-$mcVersion:${property("ccVersion")}"))
@@ -119,30 +123,49 @@ java {
     }
 }
 
+val changelogFile = file("build/changelog.txt")
+
 curseforge {
-    if (project.hasProperty("curseApiKey") && project.hasProperty("curseFileType")) {
-        apiKey = property("curseApiKey")
+    if (!project.hasProperty("curseApiKey")) {
+        project.logger.warn("API Key for CurseForge not detected; uploading will be disabled.")
+        return@curseforge
+    }
+    apiKey = property("curseApiKey")
 
-        project {
-            id = "478155"
+    project {
+        id = "478155"
 
-            addGameVersion(mcVersion)
+        addGameVersion(mcVersion)
 
-            changelog = file("build/changelog.txt")
-            changelogType = "markdown"
-            releaseType = property("curseFileType")
+        changelog = changelogFile
+        changelogType = "markdown"
+        releaseType = optionalProperty("versionType") ?: "release"
 
-            addArtifact(tasks.findByName("sourcesJar"))
+        addArtifact(tasks.findByName("sourcesJar"))
 
-            mainArtifact(tasks.findByName("jar")) {
-                relations {
-                    requiredDependency("dynamictrees")
-                    optionalDependency("chunk-saving-fix")
-                }
+        mainArtifact(tasks.findByName("jar")) {
+            relations {
+                requiredDependency("dynamictrees")
             }
         }
-    } else {
-        project.logger.log(LogLevel.WARN, "API Key and file type for CurseForge not detected; uploading will be disabled.")
+    }
+}
+
+modrinth {
+    if (!project.hasProperty("modrinthToken")) {
+        project.logger.warn("Token for Modrinth not detected; uploading will be disabled.")
+        return@modrinth
+    }
+
+    token.set(property("modrinthToken"))
+    projectId.set(modId)
+    versionNumber.set("$mcVersion-$modVersion")
+    versionType.set(optionalProperty("versionType") ?: "release")
+    uploadFile.set(tasks.jar.get())
+    gameVersions.add(mcVersion)
+    changelog.set(changelogFile.readText())
+    dependencies {
+        required.version("vdjF5PL5", "$mcVersion-$dtVersion")
     }
 }
 

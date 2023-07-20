@@ -21,14 +21,14 @@ import java.util.function.Function;
 @OnlyIn(Dist.CLIENT)
 public class CactusBranchBlockModelGeometry extends BranchBlockModelGeometry {
 
-    public CactusBranchBlockModelGeometry(ResourceLocation barkResLoc, ResourceLocation ringsResLoc) {
-        super(barkResLoc, ringsResLoc, null, false);
+    public CactusBranchBlockModelGeometry(ResourceLocation barkTextureLocation, ResourceLocation ringsTextureLocation) {
+        super(barkTextureLocation, ringsTextureLocation, null, false);
     }
 
 
     @Override
     public BakedModel bake(IGeometryBakingContext owner, ModelBakery bakery, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation) {
-        return new CactusBranchBlockBakedModel(modelLocation, this.barkResLoc, this.ringsResLoc);
+        return new CactusBranchBlockBakedModel(modelLocation, this.barkTextureLocation, this.ringsTextureLocation, spriteGetter);
     }
 
 }

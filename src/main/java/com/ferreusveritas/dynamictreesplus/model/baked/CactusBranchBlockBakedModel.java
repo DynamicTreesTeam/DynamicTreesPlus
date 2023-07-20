@@ -2,7 +2,6 @@ package com.ferreusveritas.dynamictreesplus.model.baked;
 
 import com.ferreusveritas.dynamictrees.block.branch.BranchBlock;
 import com.ferreusveritas.dynamictrees.client.ModelUtils;
-import com.ferreusveritas.dynamictrees.models.baked.BranchBlockBakedModel;
 import com.ferreusveritas.dynamictrees.models.modeldata.ModelConnections;
 import com.ferreusveritas.dynamictreesplus.block.CactusBranchBlock;
 import com.google.common.collect.Maps;
@@ -12,6 +11,7 @@ import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.BlockModelRotation;
+import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.resources.model.SimpleBakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -19,26 +19,28 @@ import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.Direction.AxisDirection;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.model.IDynamicBakedModel;
 import net.minecraftforge.client.model.data.ModelData;
 import net.minecraftforge.client.model.pipeline.QuadBakingVertexConsumer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Function;
 
 @OnlyIn(Dist.CLIENT)
-public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
+public class CactusBranchBlockBakedModel implements IDynamicBakedModel {
 
+    private final BlockModel blockModel;
+    private final ResourceLocation modelLocation;
 
-    private TextureAtlasSprite barkTexture;
+    private final TextureAtlasSprite barkTexture;
 
     // Not as many baked models as normal branches, although each model has more quads. Still less quads in total, though.
     private final BakedModel[][] sleeves = new BakedModel[6][3];
@@ -49,15 +51,16 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
 
     int[] radii = {4, 5, 7};
 
-    public CactusBranchBlockBakedModel(ResourceLocation modelResLoc, ResourceLocation barkResLoc, ResourceLocation ringsResLoc) {
-        super(modelResLoc, barkResLoc, ringsResLoc);
+    public CactusBranchBlockBakedModel(ResourceLocation modelLocation, ResourceLocation barkTextureLocation, ResourceLocation ringsTextureLocation,
+                                       Function<Material, TextureAtlasSprite> spriteGetter) {
+        this.blockModel = new BlockModel(null, new ArrayList<>(), new HashMap<>(), false, BlockModel.GuiLight.FRONT,
+                ItemTransforms.NO_TRANSFORMS, new ArrayList<>());
+        this.modelLocation = modelLocation;
+        this.barkTexture = spriteGetter.apply(new Material(InventoryMenu.BLOCK_ATLAS, barkTextureLocation));
+        initModels(spriteGetter.apply(new Material(InventoryMenu.BLOCK_ATLAS, ringsTextureLocation)));
     }
 
-    @Override
-    public void setupModels() {
-        this.barkTexture = ModelUtils.getTexture(this.barkResLoc);
-        TextureAtlasSprite ringsTexture = ModelUtils.getTexture(this.ringsResLoc);
-
+    public void initModels(TextureAtlasSprite ringsTexture) {
         for (int i = 0; i < 3; i++) {
             int radius = radii[i];
 
@@ -141,7 +144,7 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
 
         for (Map.Entry<Direction, BlockElementFace> e : part.faces.entrySet()) {
             Direction face = e.getKey();
-            builder.addCulledFace(face, ModelUtils.makeBakedQuad(part, e.getValue(), (dir == face) ? top : bark, face, BlockModelRotation.X0_Y0, this.modelResLoc));
+            builder.addCulledFace(face, ModelUtils.makeBakedQuad(part, e.getValue(), (dir == face) ? top : bark, face, BlockModelRotation.X0_Y0, this.modelLocation));
         }
         float minV = negative ? 16 - halfSize : 0;
         float maxV = negative ? 16 : halfSize;
@@ -304,7 +307,7 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
 
         for (Map.Entry<Direction, BlockElementFace> e : part.faces.entrySet()) {
             Direction face = e.getKey();
-            builder.addCulledFace(face, ModelUtils.makeBakedQuad(part, e.getValue(), icon, face, BlockModelRotation.X0_Y0, this.modelResLoc));
+            builder.addCulledFace(face, ModelUtils.makeBakedQuad(part, e.getValue(), icon, face, BlockModelRotation.X0_Y0, this.modelLocation));
         }
 
         return builder.build();

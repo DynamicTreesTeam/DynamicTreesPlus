@@ -15,7 +15,7 @@ plugins {
     id("maven-publish")
     id("com.matthewprenger.cursegradle") version "1.4.0"
     id("com.modrinth.minotaur") version "2.+"
-    id("com.harleyoconnor.autoupdatetool") version "1.0.0"
+    id("com.harleyoconnor.autoupdatetool") version "1.0.5"
 }
 
 apply {
@@ -241,15 +241,21 @@ publishing {
     }
 }
 
+val minecraftVersion = mcVersion
+
 autoUpdateTool {
-    this.mcVersion.set(mcVersion)
-    this.version.set(modVersion)
-    this.versionRecommended.set(property("versionRecommended") == "true")
-    this.updateCheckerFile.set(file(property("dynamictrees.version_info_repo.path") + File.separatorChar + property("updateCheckerPath")))
+    mcVersion.set(minecraftVersion)
+    version.set(modVersion)
+    versionRecommended.set(property("versionRecommended") == "true")
+    changelogOutputFile.set(changelogFile)
+    updateCheckerFile.set(file(property("dynamictrees.version_info_repo.path") + File.separatorChar + property("updateCheckerPath")))
 }
 
 tasks.autoUpdate {
-    finalizedBy("publishMavenJavaPublicationToHarleyOConnorRepository", "curseforge")
+    doLast {
+        modrinth.changelog.set(changelogFile.readText())
+    }
+    finalizedBy("publishMavenJavaPublicationToHarleyOConnorRepository", "curseforge", "modrinth")
 }
 
 fun net.minecraftforge.gradle.common.util.RunConfig.applyDefaultConfiguration(runDirectory: String = "run") {

@@ -312,7 +312,7 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
         return getDynamicCapState(center, 1);
     }
     public BlockState getDynamicCapState(boolean center, int prop) {
-        if (center) return dynamicMushroomCenterBlock.setValue(DynamicCapCenterBlock.AGE, prop);
+        if (center) return dynamicMushroomCenterBlock.setValue(DynamicCapCenterBlock.AGE, Math.min(prop, MushroomCapDisc.MAX_RADIUS));
         return getDynamicCapState(prop);
     }
 

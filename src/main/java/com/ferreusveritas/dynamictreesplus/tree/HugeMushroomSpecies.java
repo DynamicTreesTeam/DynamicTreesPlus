@@ -35,6 +35,7 @@ import com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.MushroomShapeCo
 import com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.context.MushroomCapContext;
 import com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.shapekits.MushroomShapeKit;
 import com.ferreusveritas.dynamictreesplus.systems.nodemapper.MushroomInflatorNode;
+import com.mojang.datafixers.util.Function3;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
@@ -60,24 +61,35 @@ import static com.ferreusveritas.dynamictrees.util.ResourceLocationUtils.surroun
 
 public class HugeMushroomSpecies extends Species {
 
-    public static final Codec<Species> CODEC = RecordCodecBuilder.create(instance -> instance
-            .group(ResourceLocation.CODEC.fieldOf(Resources.RESOURCE_LOCATION.toString())
-                            .forGetter(Species::getRegistryName),
-                    Family.REGISTRY.getGetterCodec().fieldOf("family").forGetter(Species::getFamily),
-                    CapProperties.REGISTRY.getGetterCodec().optionalFieldOf("cap_properties",
-                            CapProperties.NULL).forGetter(species -> species instanceof HugeMushroomSpecies ? ((HugeMushroomSpecies)species).getCapProperties() : CapProperties.NULL))
-            .apply(instance, HugeMushroomSpecies::new));
+    public static final TypedRegistry.EntryType<Species> TYPE = createDefaultMushroomType(HugeMushroomSpecies::new);
 
-    public static final TypedRegistry.EntryType<Species> TYPE = TypedRegistry.newType(CODEC);
+    public static TypedRegistry.EntryType<Species> createDefaultMushroomType(final Function3<ResourceLocation, Family, CapProperties, Species> constructor) {
+        return TypedRegistry.newType(createDefaultMushroomCodec(constructor));
+    }
+
+    public static Codec<Species> createDefaultMushroomCodec(final Function3<ResourceLocation, Family, CapProperties, Species> constructor) {
+        return RecordCodecBuilder.create(instance -> instance
+                .group(
+                        ResourceLocation.CODEC.fieldOf(Resources.RESOURCE_LOCATION.toString())
+                                .forGetter(Species::getRegistryName),
+                        Family.REGISTRY.getGetterCodec().fieldOf("family")
+                                .forGetter(Species::getFamily),
+                        CapProperties.REGISTRY.getGetterCodec().optionalFieldOf("cap_properties", CapProperties.NULL)
+                                .forGetter(species -> species instanceof HugeMushroomSpecies ? ((HugeMushroomSpecies)species).getCapProperties() : CapProperties.NULL)
+                )
+                .apply(instance, constructor));
+    }
 
     protected CapProperties capProperties = CapProperties.NULL;
     protected MushroomShapeConfiguration mushroomShapeKit;
     protected boolean acceptAnySoil = true;
+
     protected int maxLightForPlanting = 12;
 
     public HugeMushroomSpecies(ResourceLocation name, Family family, CapProperties capProperties) {
         this(name, family, MushroomShapeConfiguration.getDefault(), capProperties);
     }
+
     public HugeMushroomSpecies(ResourceLocation name, Family family, final MushroomShapeConfiguration shapeKit, CapProperties capProperties) {
         super(name, family, LeavesProperties.NULL);
         this.setCapProperties(capProperties.isValid() ? capProperties : (family instanceof HugeMushroomFamily ? ((HugeMushroomFamily)family).getCommonCap() : CapProperties.NULL));
@@ -129,8 +141,9 @@ public class HugeMushroomSpecies extends Species {
 
     @Override
     public LogsAndSticks getLogsAndSticks(NetVolumeNode.Volume volume, boolean silkTouch, int fortuneLevel) {
-        if (silkTouch)
+        if (silkTouch) {
             return super.getLogsAndSticks(volume, true, fortuneLevel);
+        }
         return new LogsAndSticks(new LinkedList<>(), 0);
     }
 

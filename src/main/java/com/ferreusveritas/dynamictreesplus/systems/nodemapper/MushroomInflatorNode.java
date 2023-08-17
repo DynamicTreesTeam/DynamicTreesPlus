@@ -61,7 +61,7 @@ public class MushroomInflatorNode implements NodeInspector {
                 int height = pos.subtract(rootPos).getY();
                 int maxAge = Math.min(Math.min(Math.min(species.getCapProperties().getMaxAge(species), MushroomCapDisc.MAX_RADIUS), height), generationRadius);
                 int minAge = Math.max(0, height / minRadiusHeightDivider);
-                int capAge = minAge + CoordUtils.coordHashCode(new BlockPos(pos.getX(), 0, pos.getZ()),  3) % ((maxAge == minAge ? 0 : Math.abs(maxAge-minAge))+1);
+                int capAge = minAge + CoordUtils.coordHashCode(new BlockPos(pos.getX(), 0, pos.getZ()), 3) % (Math.abs(maxAge - minAge) + 1);
                 lastCapBranchRadius = Math.min(species.getFamily().getPrimaryThickness() + capAge, species.getMaxBranchRadius());
                 radius = lastCapBranchRadius;
                 capAges.add(new Pair<>(pos.above(), capAge));

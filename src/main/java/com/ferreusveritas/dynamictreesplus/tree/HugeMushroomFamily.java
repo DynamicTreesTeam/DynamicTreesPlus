@@ -28,8 +28,6 @@ public class HugeMushroomFamily extends Family {
     public static final TypedRegistry.EntryType<Family> TYPE = TypedRegistry.newType(HugeMushroomFamily::new);
 
     protected CapProperties commonCap = CapProperties.NULL;
-    protected ResourceLocation insideBranchTexture;
-    protected ResourceLocation outsideBranchTexture;
 
     public HugeMushroomFamily(ResourceLocation name) {
         super(name);
@@ -65,21 +63,6 @@ public class HugeMushroomFamily extends Family {
     public List<TagKey<Block>> defaultStrippedBranchTags() {
         return Collections.singletonList(DTBlockTags.STRIPPED_FUNGUS_BRANCHES);
     }
-
-    public void setInsideBranchTexture(ResourceLocation insideBranchTexture) {
-        this.insideBranchTexture = insideBranchTexture;
-    }
-
-    public void setOutsideBranchTexture(ResourceLocation outsideBranchTexture) {
-        this.outsideBranchTexture = outsideBranchTexture;
-    }
-
-    @Override
-    public void addBranchTextures(BiConsumer<String, ResourceLocation> textureConsumer, ResourceLocation primitiveLogLocation) {
-        textureConsumer.accept("bark", outsideBranchTexture);
-        textureConsumer.accept("rings", insideBranchTexture);
-    }
-
 
     @Override
     public BlockBounds expandLeavesBlockBounds(BlockBounds bounds) {

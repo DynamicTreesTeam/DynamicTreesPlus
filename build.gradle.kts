@@ -33,6 +33,9 @@ repositories {
     }
     maven("https://harleyoconnor.com/maven")
     maven("https://squiddev.cc/maven/")
+    flatDir {
+        dir("libs")
+    }
 }
 
 val modName = property("modName")
@@ -91,7 +94,8 @@ dependencies {
 
     runtimeOnly(fg.deobf("mezz.jei:jei-$mcVersion-forge:${property("jeiVersion")}"))
 
-    implementation(fg.deobf("com.ferreusveritas.dynamictrees:DynamicTrees-${mcVersion}:$dtVersion"))
+    implementation(fg.deobf("libs:DynamicTrees:1.19.2-1.2.0-BETA2"))
+    //implementation(fg.deobf("com.ferreusveritas.dynamictrees:DynamicTrees-$mcVersion:${property("dynamicTreesVersion")}"))
 
     runtimeOnly(fg.deobf("vazkii.patchouli:Patchouli:$mcVersion-${property("patchouliVersion")}"))
     runtimeOnly(fg.deobf("org.squiddev:cc-tweaked-$mcVersion:${property("ccVersion")}"))

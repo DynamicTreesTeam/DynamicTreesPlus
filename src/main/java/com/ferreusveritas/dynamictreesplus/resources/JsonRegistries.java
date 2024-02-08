@@ -48,10 +48,7 @@ public final class JsonRegistries {
     public static void registerFamilyCommonAppliers(final ApplierRegistryEvent.Common<Family, JsonElement> event) {
         registerMushroomCommonApplier(event.getAppliers());
     }
-    @SubscribeEvent
-    public static void registerFamilyDataAppliers(final ApplierRegistryEvent.GatherData<Family, JsonElement> event) {
-        registerMushroomDataApplier(event.getAppliers());
-    }
+
     public static void registerMushroomCommonApplier(PropertyAppliers<Family, JsonElement> appliers) {
         appliers.register("common_cap", HugeMushroomFamily.class, ResourceLocation.class,
                 (family, registryName) -> {
@@ -64,12 +61,6 @@ public final class JsonRegistries {
                                             + "\" as cap \"" + processedRegName + "\" was not found.", Family.REGISTRY.getName())
                     ));
                 });
-    }
-    public static void registerMushroomDataApplier(PropertyAppliers<Family, JsonElement> appliers) {
-        appliers.register("outside_branch_texture", HugeMushroomFamily.class, ResourceLocation.class,
-                HugeMushroomFamily::setOutsideBranchTexture)
-                .register("inside_branch_texture", HugeMushroomFamily.class, ResourceLocation.class,
-                HugeMushroomFamily::setInsideBranchTexture);
     }
 
     ///////////////////////////////////////////

@@ -55,10 +55,6 @@ public class CactusFamily extends Family {
         return (parent, existingFileHelper) -> new BranchLoaderBuilder(BakedModelEventHandler.CACTUS, parent, existingFileHelper);
     }
 
-    @Override
-    public void addBranchTextures(BiConsumer<String, ResourceLocation> textureConsumer, ResourceLocation primitiveLogLocation) {
-        textureConsumer.accept("bark", suffix(primitiveLogLocation, "_side"));
-        textureConsumer.accept("rings", suffix(primitiveLogLocation, "_top"));
-    }
+    public static final String BRANCH_BOTTOM = "branch_bottom";
 
 }

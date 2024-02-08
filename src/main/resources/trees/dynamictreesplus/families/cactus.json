@@ -4,5 +4,10 @@
   "common_species": "dynamictreesplus:pipe_cactus",
   "primitive_log": "cactus",
   "stick": "air",
-  "generate_stripped_branch": false
+  "generate_stripped_branch": false,
+  "texture_overrides": {
+    "branch": "block/cactus_side",
+    "branch_top": "block/cactus_top",
+    "branch_bottom": "block/cactus_bottom"
+  }
 }

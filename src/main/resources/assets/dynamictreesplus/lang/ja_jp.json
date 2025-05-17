@@ -1,0 +1,20 @@
+{
+  "block.dynamictreesplus.cactus_branch": "サボテン",
+  "block.dynamictreesplus.mushroom_branch": "キノコ",
+
+  "species.dynamictreesplus.saguaro_cactus": "サワロサボテン",
+  "species.dynamictreesplus.pillar_cactus": "柱サボテン",
+  "species.dynamictreesplus.pipe_cactus": "パイプサボテン",
+  "species.dynamictreesplus.mega_cactus": "巨大サボテン",
+  "species.dynamictreesplus.red_mushroom": "赤色のキノコ",
+  "species.dynamictreesplus.brown_mushroom": "茶色のキノコ",
+  "species.dynamictreesplus.mega_red_mushroom": "赤色の巨大キノコ",
+  "species.dynamictreesplus.mega_brown_mushroom": "茶色の巨大キノコ",
+
+  "item.dynamictreesplus.saguaro_cactus_seed": "サワロサボテンの果実",
+  "item.dynamictreesplus.pillar_cactus_seed": "柱サボテンの種子",
+  "item.dynamictreesplus.pipe_cactus_seed": "パイプサボテンの種子",
+  "item.dynamictreesplus.brown_mushroom_seed": "茶色のキノコのかさ",
+  "item.dynamictreesplus.red_mushroom_seed": "赤色のキノコのかさ",
+  "item.dynamictreesplus.chorus_seed": "コーラスの種子"
+}

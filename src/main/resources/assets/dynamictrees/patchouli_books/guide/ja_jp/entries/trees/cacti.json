@@ -1,0 +1,19 @@
+{
+  "name": "サボテン",
+  "icon": "dynamictreesplus:pillar_cactus_seed",
+  "category": "dynamictrees:trees",
+  "sortnum": 5,
+  "pages": [
+    {
+      "type": "text",
+      "title": "サボテン",
+      "text": "様々な種類のサボテンが乾燥したバイオームで生成されます。このトゲトゲした植物は伐採してサボテンブロックを入手でき、十分に成熟していればさらに種子も手に入れることができます。$(br2)砂漠ではパイプ型や柱型など、多くのサボテンを見つけることができます。一方荒地ではクラシックなサワロサボテンを見つけることができます。"
+    },
+    {
+      "type": "image",
+      "images": ["dynamictreesplus:textures/patchouli/images/cacti_1.png","dynamictreesplus:textures/patchouli/images/cacti_2.png"],
+      "text": "サボテンの例",
+      "border": true
+    }
+  ]
+}

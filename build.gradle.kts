@@ -97,7 +97,8 @@ dependencies {
     runtimeOnly(fg.deobf("curse.maven:jade-324717:${property("jadeFileId")}"))
 
     runtimeOnly(fg.deobf("mezz.jei:jei-$mcVersion-forge:${property("jeiVersion")}"))
-    runtimeOnly(fg.deobf("curse.maven:SereneSeasons-291874:${property("ssFileId")}"))
+    runtimeOnly(fg.deobf("curse.maven:glitchcore-955399:${property("gcFileId")}"))
+    runtimeOnly(fg.deobf("curse.maven:sereneseasons-291874:${property("ssFileId")}"))
     runtimeOnly(fg.deobf("vazkii.patchouli:Patchouli:${property("patchouliVersion")}"))
     runtimeOnly(fg.deobf("cc.tweaked:cc-tweaked-$mcVersion-core:${property("ccVersion")}"))
     runtimeOnly(fg.deobf("cc.tweaked:cc-tweaked-$mcVersion-forge:${property("ccVersion")}"))

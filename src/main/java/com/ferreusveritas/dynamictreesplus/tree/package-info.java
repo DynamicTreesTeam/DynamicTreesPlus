@@ -1,6 +1,0 @@
-@MethodsReturnNonnullByDefault @ParametersAreNonnullByDefault
-package com.ferreusveritas.dynamictreesplus.tree;
-
-import net.minecraft.MethodsReturnNonnullByDefault;
-
-import javax.annotation.ParametersAreNonnullByDefault;

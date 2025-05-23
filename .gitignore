@@ -20,8 +20,7 @@ build
 # other
 eclipse
 run
-libs
-/src/main/java/META-INF/MANIFEST.MF
-/src/main/META-INF/MANIFEST.MF
-/src/main/resources/META-INF/MANIFEST.MF
-/mcmodsrepo
+runs
+run-data
+
+repo

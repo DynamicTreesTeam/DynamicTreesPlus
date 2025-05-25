@@ -1,13 +1,14 @@
 package com.dtteam.dynamictreesplus.resources;
 
-import com.dtteam.dynamictrees.api.TreeRegistry;
-import com.dtteam.dynamictrees.api.applier.ApplierRegistryEvent;
-import com.dtteam.dynamictrees.deserialisation.EnumDeserialiser;
-import com.dtteam.dynamictrees.deserialisation.JsonDeserialisers;
-import com.dtteam.dynamictrees.deserialisation.PropertyAppliers;
-import com.dtteam.dynamictrees.deserialisation.RegistryEntryDeserialiser;
+import com.dtteam.dynamictrees.deserialization.JsonDeserializers;
+import com.dtteam.dynamictrees.deserialization.PropertyAppliers;
+import com.dtteam.dynamictrees.deserialization.deserializer.EnumDeserializer;
+import com.dtteam.dynamictrees.deserialization.deserializer.RegistryEntryDeserializer;
+import com.dtteam.dynamictrees.event.ApplierRegistryEvent;
+import com.dtteam.dynamictrees.event.JsonDeserializerRegistryEvent;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.species.Species;
+import com.dtteam.dynamictrees.utility.ResourceLocationUtils;
 import com.dtteam.dynamictreesplus.DynamicTreesPlus;
 import com.dtteam.dynamictreesplus.block.CactusBranchBlock;
 import com.dtteam.dynamictreesplus.block.mushroom.CapProperties;
@@ -19,15 +20,15 @@ import com.dtteam.dynamictreesplus.tree.HugeMushroomFamily;
 import com.dtteam.dynamictreesplus.tree.HugeMushroomSpecies;
 import com.google.gson.JsonElement;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
  * @author Harley O'Connor
  */
-@Mod.EventBusSubscriber(modid = DynamicTreesPlus.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = DynamicTreesPlus.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
 public final class JsonRegistries {
 
     private static final Logger LOGGER = LogManager.getLogger();
@@ -52,7 +53,7 @@ public final class JsonRegistries {
     public static void registerMushroomCommonApplier(PropertyAppliers<Family, JsonElement> appliers) {
         appliers.register("common_cap", HugeMushroomFamily.class, ResourceLocation.class,
                 (family, registryName) -> {
-                    final ResourceLocation processedRegName = TreeRegistry.processResLoc(registryName);
+                    final ResourceLocation processedRegName = ResourceLocationUtils.parseDTLocation(registryName);
                     CapProperties.REGISTRY.runOnNextLock(CapProperties.REGISTRY.generateIfValidRunnable(
                             processedRegName,
                             family::setCommonCap,
@@ -100,7 +101,7 @@ public final class JsonRegistries {
     ///////////////////////////////////////////
 
     @SubscribeEvent
-    public static void registerJsonDeserializers(final JsonDeserialisers.RegistryEvent event) {
+    public static void registerJsonDeserializers(final JsonDeserializerRegistryEvent event) {
         // Register cactus thickness logic kits and lock it.
         CactusThicknessLogic.REGISTRY.postRegistryEvent();
         MushroomShapeKit.REGISTRY.postRegistryEvent();
@@ -108,14 +109,14 @@ public final class JsonRegistries {
         MushroomShapeKit.REGISTRY.lock();
 
         // Register getter for cactus thickness logic and mushroom shape logic.
-        JsonDeserialisers.register(CactusThicknessLogic.class,
-                new RegistryEntryDeserialiser<>(CactusThicknessLogic.REGISTRY));
-        JsonDeserialisers.register(MushroomShapeKit.class,
-                new RegistryEntryDeserialiser<>(MushroomShapeKit.REGISTRY));
+        JsonDeserializers.register(CactusThicknessLogic.class,
+                new RegistryEntryDeserializer<>(CactusThicknessLogic.REGISTRY));
+        JsonDeserializers.register(MushroomShapeKit.class,
+                new RegistryEntryDeserializer<>(MushroomShapeKit.REGISTRY));
 
         // Register getter for cactus thickness enum.
-        JsonDeserialisers.register(CactusBranchBlock.CactusThickness.class,
-                new EnumDeserialiser<>(CactusBranchBlock.CactusThickness.class));
+        JsonDeserializers.register(CactusBranchBlock.CactusThickness.class,
+                new EnumDeserializer<>(CactusBranchBlock.CactusThickness.class));
     }
 
 }

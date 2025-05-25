@@ -1,10 +1,10 @@
 package com.dtteam.dynamictreesplus.systems.growthlogic;
 
-import com.dtteam.dynamictrees.growthlogic.GrowthLogicKit;
-import com.dtteam.dynamictrees.growthlogic.GrowthLogicKitConfiguration;
-import com.dtteam.dynamictrees.growthlogic.context.DirectionManipulationContext;
-import com.dtteam.dynamictrees.growthlogic.context.PositionalSpeciesContext;
-import com.dtteam.dynamictrees.util.CoordUtils;
+import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKit;
+import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKitConfiguration;
+import com.dtteam.dynamictrees.systems.growthlogic.context.DirectionManipulationContext;
+import com.dtteam.dynamictrees.systems.growthlogic.context.PositionalSpeciesContext;
+import com.dtteam.dynamictrees.utility.CoordUtils;
 import net.minecraft.resources.ResourceLocation;
 
 public class StraightLogic extends GrowthLogicKit {

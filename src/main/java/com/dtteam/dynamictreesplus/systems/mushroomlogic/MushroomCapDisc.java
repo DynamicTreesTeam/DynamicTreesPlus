@@ -1,8 +1,8 @@
 package com.dtteam.dynamictreesplus.systems.mushroomlogic;
 
 import com.dtteam.dynamictrees.systems.poissondisc.PoissonDisc;
+import com.dtteam.dynamictrees.systems.poissondisc.SimpleBitmap;
 import com.dtteam.dynamictrees.systems.poissondisc.Vec2i;
-import com.dtteam.dynamictrees.util.SimpleBitmap;
 
 import java.util.LinkedList;
 import java.util.List;

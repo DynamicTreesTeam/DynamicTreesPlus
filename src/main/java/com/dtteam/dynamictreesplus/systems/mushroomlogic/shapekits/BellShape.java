@@ -1,7 +1,7 @@
 package com.dtteam.dynamictreesplus.systems.mushroomlogic.shapekits;
 
 import com.dtteam.dynamictrees.api.configuration.ConfigurationProperty;
-import com.dtteam.dynamictrees.util.CoordUtils;
+import com.dtteam.dynamictrees.utility.CoordUtils;
 import com.dtteam.dynamictreesplus.block.mushroom.CapProperties;
 import com.dtteam.dynamictreesplus.block.mushroom.DynamicCapCenterBlock;
 import com.dtteam.dynamictreesplus.systems.mushroomlogic.MushroomShapeConfiguration;

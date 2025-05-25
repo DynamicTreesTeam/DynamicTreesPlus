@@ -1,6 +1,6 @@
 package com.dtteam.dynamictreesplus.systems.mushroomlogic;
 
-import com.dtteam.dynamictrees.util.SimpleVoxmap;
+import com.dtteam.dynamictrees.api.voxmap.SimpleVoxmap;
 
 public class MushroomShapeClusters {
 

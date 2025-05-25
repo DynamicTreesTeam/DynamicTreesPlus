@@ -1,21 +1,21 @@
 package com.dtteam.dynamictreesplus.tree;
 
-import com.dtteam.dynamictrees.api.TreeHelper;
 import com.dtteam.dynamictrees.api.network.MapSignal;
 import com.dtteam.dynamictrees.api.registry.RegistryHandler;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
-import com.dtteam.dynamictrees.block.rooty.SoilHelper;
-import com.dtteam.dynamictrees.event.SpeciesPostGenerationEvent;
+import com.dtteam.dynamictrees.block.soil.SoilHelper;
 import com.dtteam.dynamictrees.item.Seed;
+import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.systems.GrowSignal;
 import com.dtteam.dynamictrees.systems.genfeature.context.PostGenerationContext;
 import com.dtteam.dynamictrees.systems.nodemapper.FindEndsNode;
+import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.util.SafeChunkBounds;
-import com.dtteam.dynamictrees.worldgen.GenerationContext;
+import com.dtteam.dynamictrees.utility.ResourceLocationUtils;
+import com.dtteam.dynamictrees.worldgen.DynamicTreeGenerationContext;
 import com.dtteam.dynamictrees.worldgen.JoCode;
 import com.dtteam.dynamictreesplus.DynamicTreesPlus;
 import com.dtteam.dynamictreesplus.block.CactusBranchBlock;
@@ -35,16 +35,11 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.Tags;
-
-import static com.dtteam.dynamictrees.util.ResourceLocationUtils.surround;
+import net.neoforged.neoforge.common.Tags;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
-
-import static com.dtteam.dynamictrees.util.ResourceLocationUtils.suffix;
 
 public class CactusSpecies extends Species {
 
@@ -59,7 +54,6 @@ public class CactusSpecies extends Species {
 
     @Override
     public Species setPreReloadDefaults() {
-        this.setTransformable(false);
         return this.setSaplingShape(DTPRegistries.MEDIUM_CACTUS_SAPLING_SHAPE)
                 .setSaplingSound(SoundType.WOOL)
                 .setDefaultGrowingParameters()
@@ -110,8 +104,7 @@ public class CactusSpecies extends Species {
     }
 
     @Override
-    public boolean handleRot(LevelAccessor level, List<BlockPos> ends, BlockPos rootPos, BlockPos treePos, int soilLife,
-                             SafeChunkBounds safeBounds) {
+    public boolean handleRot(LevelAccessor level, List<BlockPos> ends, BlockPos rootPos, BlockPos treePos, int fertility, boolean worldGen) {
         return false;
     }
 
@@ -136,7 +129,7 @@ public class CactusSpecies extends Species {
         }
 
         @Override
-        public void generate(GenerationContext context) {
+        public void generate(DynamicTreeGenerationContext context) {
             LevelAccessor level = context.level();
             BlockPos.MutableBlockPos rootPos = context.rootPos();
             BlockState initialDirtState = level.getBlockState(rootPos); // Save the initial state of the dirt in case this fails
@@ -159,8 +152,9 @@ public class CactusSpecies extends Species {
                 List<BlockPos> endPoints = endFinder.getEnds();
 
                 // Allow for special decorations by the tree itself
-                context.species().postGeneration(new PostGenerationContext(context, endPoints, initialDirtState));
-                MinecraftForge.EVENT_BUS.post(new SpeciesPostGenerationEvent(level, context.species(), rootPos, endPoints, context.safeBounds(), initialDirtState));
+                PostGenerationContext pgContext = new PostGenerationContext(context, endPoints, initialDirtState);
+                context.species().postGeneration(pgContext);
+                Services.EVENT.postSpeciesPostGenerationEvent(pgContext);
             } else { // The growth failed.. turn the soil back to what it was
                 level.setBlock(rootPos, initialDirtState, careful ? 3 : 2);
             }
@@ -197,9 +191,9 @@ public class CactusSpecies extends Species {
     @Override
     public void addSaplingTextures(BiConsumer<String, ResourceLocation> textureConsumer,
                                    ResourceLocation leavesTextureLocation, ResourceLocation barkTextureLocation) {
-        ResourceLocation sideLoc = this.getFamily().getTexturePath(Family.BRANCH).orElse(suffix(barkTextureLocation, "_side"));
-        ResourceLocation topLoc = this.getFamily().getTexturePath(Family.BRANCH_TOP).orElse(suffix(barkTextureLocation, "_top"));
-        ResourceLocation botLoc = this.getFamily().getTexturePath(CactusFamily.BRANCH_BOTTOM).orElse(suffix(barkTextureLocation, "_bottom"));
+        ResourceLocation sideLoc = this.getFamily().getTexturePath(Family.BRANCH).orElse(ResourceLocationUtils.suffix(barkTextureLocation, "_side"));
+        ResourceLocation topLoc = this.getFamily().getTexturePath(Family.BRANCH_TOP).orElse(ResourceLocationUtils.suffix(barkTextureLocation, "_top"));
+        ResourceLocation botLoc = this.getFamily().getTexturePath(CactusFamily.BRANCH_BOTTOM).orElse(ResourceLocationUtils.suffix(barkTextureLocation, "_bottom"));
         textureConsumer.accept("side", sideLoc);
         textureConsumer.accept("top", topLoc);
         textureConsumer.accept("bottom", botLoc);

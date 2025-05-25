@@ -1,11 +1,10 @@
 package com.dtteam.dynamictreesplus.model.baked;
 
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
-import com.dtteam.dynamictrees.client.ModelUtils;
-import com.dtteam.dynamictrees.models.modeldata.ModelConnections;
+import com.dtteam.dynamictrees.model.ModelHelper;
+import com.dtteam.dynamictrees.model.modeldata.ModelConnections;
 import com.dtteam.dynamictreesplus.block.CactusBranchBlock;
 import com.google.common.collect.Maps;
-import org.joml.Vector3f;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -23,11 +22,15 @@ import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.model.IDynamicBakedModel;
-import net.minecraftforge.client.model.data.ModelData;
-import net.minecraftforge.client.model.pipeline.QuadBakingVertexConsumer;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.client.ChunkRenderTypeSet;
+import net.neoforged.neoforge.client.NamedRenderTypeManager;
+import net.neoforged.neoforge.client.model.IDynamicBakedModel;
+import net.neoforged.neoforge.client.model.data.ModelData;
+import net.neoforged.neoforge.client.model.pipeline.QuadBakingVertexConsumer;
+import org.jetbrains.annotations.NotNull;
+import org.joml.Vector3f;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -38,7 +41,6 @@ import java.util.function.Function;
 public class CactusBranchBlockBakedModel implements IDynamicBakedModel {
 
     private final BlockModel blockModel;
-    private final ResourceLocation modelLocation;
 
     private final TextureAtlasSprite barkTexture;
 
@@ -51,11 +53,10 @@ public class CactusBranchBlockBakedModel implements IDynamicBakedModel {
 
     int[] radii = {4, 5, 7};
 
-    public CactusBranchBlockBakedModel(ResourceLocation modelLocation, ResourceLocation barkTextureLocation, ResourceLocation ringsTextureLocation,
+    public CactusBranchBlockBakedModel(ResourceLocation barkTextureLocation, ResourceLocation ringsTextureLocation,
                                        Function<Material, TextureAtlasSprite> spriteGetter) {
         this.blockModel = new BlockModel(null, new ArrayList<>(), new HashMap<>(), false, BlockModel.GuiLight.FRONT,
                 ItemTransforms.NO_TRANSFORMS, new ArrayList<>());
-        this.modelLocation = modelLocation;
         this.barkTexture = spriteGetter.apply(new Material(InventoryMenu.BLOCK_ATLAS, barkTextureLocation));
         initModels(spriteGetter.apply(new Material(InventoryMenu.BLOCK_ATLAS, ringsTextureLocation)));
     }
@@ -80,25 +81,24 @@ public class CactusBranchBlockBakedModel implements IDynamicBakedModel {
     }
 
     private void putVertex(QuadBakingVertexConsumer builder, Vec3 normal, double x, double y, double z, float u, float v, TextureAtlasSprite sprite, float r, float g, float b, Direction face) {
-        builder.vertex(x, y, z);
-        builder.normal((float) normal.x, (float) normal.y, (float) normal.z);
-        builder.color(r, g, b, 1.0F);
-        builder.uv(sprite.getU(u), sprite.getV(v));
+        builder.addVertex((float)x, (float)y, (float)z);
+        builder.setNormal((float) normal.x, (float) normal.y, (float) normal.z);
+        builder.setColor(r, g, b, 1.0F);
+        builder.setUv(sprite.getU(u), sprite.getV(v));
         builder.setSprite(sprite);
         builder.setDirection(face);
-        builder.endVertex();
     }
 
     private BakedQuad createQuad(Vec3 v1, float v1u, float v1v, Vec3 v2, float v2u, float v2v, Vec3 v3, float v3u, float v3v, Vec3 v4, float v4u, float v4v, TextureAtlasSprite sprite) {
         Vec3 normal = v3.subtract(v2).cross(v1.subtract(v2)).normalize();
 
-        QuadBakingVertexConsumer.Buffered builder = new QuadBakingVertexConsumer.Buffered();
+        QuadBakingVertexConsumer builder = new QuadBakingVertexConsumer();
         Direction face = Direction.getNearest(normal.x, normal.y, normal.z);
         putVertex(builder, normal, v1.x, v1.y, v1.z, v1u, v1v, sprite, 1.0f, 1.0f, 1.0f, face);
         putVertex(builder, normal, v2.x, v2.y, v2.z, v2u, v2v, sprite, 1.0f, 1.0f, 1.0f, face);
         putVertex(builder, normal, v3.x, v3.y, v3.z, v3u, v3v, sprite, 1.0f, 1.0f, 1.0f, face);
         putVertex(builder, normal, v4.x, v4.y, v4.z, v4u, v4v, sprite, 1.0f, 1.0f, 1.0f, face);
-        return builder.getQuad();
+        return builder.bakeQuad();
     }
 
     public BakedModel bakeSleeve(int radius, Direction dir, TextureAtlasSprite bark, TextureAtlasSprite top) {
@@ -144,7 +144,7 @@ public class CactusBranchBlockBakedModel implements IDynamicBakedModel {
 
         for (Map.Entry<Direction, BlockElementFace> e : part.faces.entrySet()) {
             Direction face = e.getKey();
-            builder.addCulledFace(face, ModelUtils.makeBakedQuad(part, e.getValue(), (dir == face) ? top : bark, face, BlockModelRotation.X0_Y0, this.modelLocation));
+            builder.addCulledFace(face, ModelHelper.makeBakedQuad(part, e.getValue(), (dir == face) ? top : bark, face, BlockModelRotation.X0_Y0));
         }
         float minV = negative ? 16 - halfSize : 0;
         float maxV = negative ? 16 : halfSize;
@@ -307,7 +307,7 @@ public class CactusBranchBlockBakedModel implements IDynamicBakedModel {
 
         for (Map.Entry<Direction, BlockElementFace> e : part.faces.entrySet()) {
             Direction face = e.getKey();
-            builder.addCulledFace(face, ModelUtils.makeBakedQuad(part, e.getValue(), icon, face, BlockModelRotation.X0_Y0, this.modelLocation));
+            builder.addCulledFace(face, ModelHelper.makeBakedQuad(part, e.getValue(), icon, face, BlockModelRotation.X0_Y0));
         }
 
         return builder.build();
@@ -725,6 +725,15 @@ public class CactusBranchBlockBakedModel implements IDynamicBakedModel {
     @Override
     public boolean usesBlockLight() {
         return false;
+    }
+
+    public ChunkRenderTypeSet getRenderTypes(@NotNull BlockState state, @NotNull RandomSource rand, @NotNull ModelData data) {
+        return ChunkRenderTypeSet.of(this.getRenderType());
+    }
+
+    public RenderType getRenderType() {
+        ResourceLocation renderTypeHint = this.blockModel.customData.getRenderTypeHint();
+        return renderTypeHint == null ? RenderType.cutoutMipped() : NamedRenderTypeManager.get(renderTypeHint).block();
     }
 
 }

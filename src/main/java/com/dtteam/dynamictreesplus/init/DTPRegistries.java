@@ -1,20 +1,20 @@
 package com.dtteam.dynamictreesplus.init;
 
-import com.dtteam.dynamictrees.api.registry.RegistryEvent;
-import com.dtteam.dynamictrees.api.registry.TypeRegistryEvent;
 import com.dtteam.dynamictrees.api.worldgen.FeatureCanceller;
-import com.dtteam.dynamictrees.growthlogic.GrowthLogicKit;
-import com.dtteam.dynamictrees.resources.Resources;
-import com.dtteam.dynamictrees.systems.fruit.Fruit;
+import com.dtteam.dynamictrees.block.CommonVoxelShapes;
+import com.dtteam.dynamictrees.block.fruit.Fruit;
+import com.dtteam.dynamictrees.event.RegistryEvent;
+import com.dtteam.dynamictrees.event.TypeRegistryEvent;
 import com.dtteam.dynamictrees.systems.genfeature.GenFeature;
+import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKit;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.util.CommonVoxelShapes;
+import com.dtteam.dynamictrees.treepack.Resources;
 import com.dtteam.dynamictreesplus.DynamicTreesPlus;
 import com.dtteam.dynamictreesplus.block.CactusFruit;
 import com.dtteam.dynamictreesplus.block.mushroom.CapProperties;
 import com.dtteam.dynamictreesplus.resources.CapPropertiesResourceLoader;
-import com.dtteam.dynamictreesplus.resources.JsonDeserializers;
+import com.dtteam.dynamictreesplus.resources.DTPJsonDeserializers;
 import com.dtteam.dynamictreesplus.systems.featuregen.DynamicTreesPlusGenFeatures;
 import com.dtteam.dynamictreesplus.systems.growthlogic.MegaCactusLogic;
 import com.dtteam.dynamictreesplus.systems.growthlogic.SaguaroCactusLogic;
@@ -28,18 +28,17 @@ import com.dtteam.dynamictreesplus.tree.CactusSpecies;
 import com.dtteam.dynamictreesplus.tree.HugeMushroomFamily;
 import com.dtteam.dynamictreesplus.tree.HugeMushroomSpecies;
 import com.dtteam.dynamictreesplus.worldgen.canceller.CactusFeatureCanceller;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.CactusBlock;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.NewRegistryEvent;
-import net.minecraftforge.registries.RegisterEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.registries.NewRegistryEvent;
+import net.neoforged.neoforge.registries.RegisterEvent;
 
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
 public class DTPRegistries {
 
     public static final StraightLogic STRAIGHT_LOGIC = new StraightLogic(DynamicTreesPlus.location("straight"));
@@ -63,59 +62,72 @@ public class DTPRegistries {
 
     @SubscribeEvent
     public static void registerGrowthLogic(final RegistryEvent<GrowthLogicKit> event) {
-        event.getRegistry().registerAll(STRAIGHT_LOGIC, SAGUARO_CACTUS_LOGIC, MEGA_CACTUS_LOGIC);
+        if (event.isEntryOfType(GrowthLogicKit.class)){
+            event.getRegistry().registerAll(STRAIGHT_LOGIC, SAGUARO_CACTUS_LOGIC, MEGA_CACTUS_LOGIC);
+        }
     }
 
     @SubscribeEvent
     public static void registerCactusThicknessLogic(final RegistryEvent<CactusThicknessLogic> event) {
-        event.getRegistry().registerAll(CactusThicknessLogicKits.PILLAR, CactusThicknessLogicKits.PIPE, CactusThicknessLogicKits.SAGUARO, CactusThicknessLogicKits.MEGA);
+        if (event.isEntryOfType(CactusThicknessLogic.class)){
+            event.getRegistry().registerAll(CactusThicknessLogicKits.PILLAR, CactusThicknessLogicKits.PIPE, CactusThicknessLogicKits.SAGUARO, CactusThicknessLogicKits.MEGA);
+        }
     }
 
     @SubscribeEvent
     public static void registerGenFeature(final RegistryEvent<GenFeature> event) {
-        DynamicTreesPlusGenFeatures.registerGenFeatures(event);
+        if (event.isEntryOfType(GenFeature.class)){
+            DynamicTreesPlusGenFeatures.registerGenFeatures(event);
+        }
     }
     @SubscribeEvent
     public static void registerFruitType(final TypeRegistryEvent<Fruit> event) {
-        event.registerType(DynamicTreesPlus.location("cactus_fruit"), CactusFruit.TYPE);
+        if (event.isEntryOfType(Fruit.class)){
+            event.registerType(DynamicTreesPlus.location("cactus_fruit"), CactusFruit.TYPE);
+        }
     }
-
-    public static final ResourceLocation CACTUS = DynamicTreesPlus.location("cactus");
-    public static final ResourceLocation MUSHROOM = DynamicTreesPlus.location("mushroom");
 
     @SubscribeEvent
     public static void registerFamilyType(final TypeRegistryEvent<Family> event) {
-        event.registerType(CACTUS, CactusFamily.TYPE);
-        event.registerType(MUSHROOM, HugeMushroomFamily.TYPE);
+        if (event.isEntryOfType(Family.class)){
+            event.registerType(DynamicTreesPlus.CACTUS, CactusFamily.TYPE);
+            event.registerType(DynamicTreesPlus.MUSHROOM, HugeMushroomFamily.TYPE);
+        }
     }
 
     @SubscribeEvent
     public static void registerSpeciesType(final TypeRegistryEvent<Species> event) {
-        event.registerType(CACTUS, CactusSpecies.TYPE);
-        event.registerType(MUSHROOM, HugeMushroomSpecies.TYPE);
+        if (event.isEntryOfType(Species.class)){
+            event.registerType(DynamicTreesPlus.CACTUS, CactusSpecies.TYPE);
+            event.registerType(DynamicTreesPlus.MUSHROOM, HugeMushroomSpecies.TYPE);
+        }
     }
 
     @SubscribeEvent
     public static void onFeatureCancellerRegistry(final RegistryEvent<FeatureCanceller> event) {
-        event.getRegistry().registerAll(new CactusFeatureCanceller<>(DynamicTreesPlus.location("cactus"), CactusBlock.class));
+        if (event.isEntryOfType(FeatureCanceller.class)) {
+            event.getRegistry().registerAll(new CactusFeatureCanceller<>(DynamicTreesPlus.location("cactus"), CactusBlock.class));
+        }
     }
 
     @SubscribeEvent
     public static void onMushroomShapeKitRegistry(final RegistryEvent<MushroomShapeKit> event) {
-        MushroomShapeKits.register(event.getRegistry());
+        if (event.isEntryOfType(MushroomShapeKit.class)){
+            MushroomShapeKits.register(event.getRegistry());
+        }
     }
 
     @SubscribeEvent
     public static void newRegistry(NewRegistryEvent event) {
-        JsonDeserializers.register();
+        DTPJsonDeserializers.register();
 
         CapProperties.REGISTRY.postRegistryEvent();
         //MushroomShapeKit.REGISTRY.postRegistryEvent();
     }
 
     @SubscribeEvent
-    public static void onRegisterEvent(RegisterEvent event) {
-        if (event.getRegistryKey() == ForgeRegistries.Keys.BLOCKS) {
+    public static void loadResources(RegisterEvent event) {
+        if (event.getRegistryKey() == BuiltInRegistries.BLOCK.key()) {
             // Lock the registries
             CapProperties.REGISTRY.lock();
             MushroomShapeKit.REGISTRY.lock();

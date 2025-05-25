@@ -9,6 +9,7 @@ import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
 import com.dtteam.dynamictrees.systems.GrowSignal;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictreesplus.systems.mushroomlogic.MushroomCapDisc;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -122,7 +123,7 @@ public class DynamicCapBlock extends HugeMushroomBlock implements TreePart, Upda
     }
 
     @Override
-    public ItemStack getCloneItemStack(BlockState state, HitResult target, BlockGetter level, BlockPos pos, Player player) {
+    public ItemStack getCloneItemStack(BlockState state, HitResult target, LevelReader level, BlockPos pos, Player player) {
         return getProperties(state).getPrimitiveCapItemStack();
     }
 

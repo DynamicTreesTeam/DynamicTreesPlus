@@ -1,16 +1,15 @@
 package com.dtteam.dynamictreesplus.systems.featuregen;
 
 import com.dtteam.dynamictrees.api.configuration.ConfigurationProperty;
+import com.dtteam.dynamictrees.api.worldgen.LevelContext;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.systems.genfeature.GenFeature;
 import com.dtteam.dynamictrees.systems.genfeature.GenFeatureConfiguration;
 import com.dtteam.dynamictrees.systems.genfeature.context.PostGenerationContext;
 import com.dtteam.dynamictrees.systems.genfeature.context.PostGrowContext;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.util.CoordUtils;
-import com.dtteam.dynamictrees.util.LevelContext;
-import com.dtteam.dynamictrees.util.SafeChunkBounds;
-import com.dtteam.dynamictrees.worldgen.GenerationContext;
+import com.dtteam.dynamictrees.utility.CoordUtils;
+import com.dtteam.dynamictrees.worldgen.DynamicTreeGenerationContext;
 import com.dtteam.dynamictreesplus.block.CactusBranchBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
@@ -43,35 +42,35 @@ public class CactusClonesGenFeature extends GenFeature {
 
     @Override
     protected boolean postGenerate(GenFeatureConfiguration configuration, PostGenerationContext context) {
-        return this.tryToPlaceClones(context.levelContext(), context.pos(), context.species(), true, context.bounds());
+        return this.tryToPlaceClones(context.levelContext(), context.pos(), context.species(), true);
     }
 
     @Override
     protected boolean postGrow(GenFeatureConfiguration configuration, PostGrowContext context) {
         return context.random().nextFloat() < configuration.get(CHANCE_ON_GROW) &&
-                this.tryToPlaceClones(context.levelContext(), context.pos(), context.species(), false, SafeChunkBounds.ANY);
+                this.tryToPlaceClones(context.levelContext(), context.pos(), context.species(), false);
     }
 
-    private boolean tryToPlaceClones(LevelContext levelContext, BlockPos rootPos, Species species, boolean worldgen, SafeChunkBounds safeBounds) {
+    private boolean tryToPlaceClones(LevelContext levelContext, BlockPos rootPos, Species species, boolean worldgen) {
         LevelAccessor level = levelContext.accessor();
-        if (level == null || areCactiAround(level, rootPos.above(), safeBounds)) return false;
+        if (level == null || areCactiAround(level, rootPos.above())) return false;
         int clones = 3 + level.getRandom().nextInt(5); //between 3 and 8 clones
         List<CoordUtils.Surround> validDirs = new LinkedList<>(Arrays.asList(CoordUtils.Surround.values()));
         boolean clonePlaced = false;
         for (int i = 0; i < clones; i++) {
             CoordUtils.Surround selectedDir = validDirs.get(level.getRandom().nextInt(validDirs.size()));
-            if (placeCloneAtLocation(levelContext, rootPos.offset(selectedDir.getOffset()), species, worldgen, safeBounds))
+            if (placeCloneAtLocation(levelContext, rootPos.offset(selectedDir.getOffset()), species, worldgen))
                 clonePlaced = true;
             validDirs.remove(selectedDir);
         }
         return clonePlaced;
     }
 
-    private boolean areCactiAround(LevelAccessor world, BlockPos rootPos, SafeChunkBounds safeBounds) {
+    private boolean areCactiAround(LevelAccessor world, BlockPos rootPos) {
         for (CoordUtils.Surround dir : CoordUtils.Surround.values()) {
             for (int i = -1; i <= 1; i++) {
                 BlockPos offsetPos = rootPos.offset(dir.getOffset()).above(i);
-                if (safeBounds.inBounds(offsetPos, false) && world.getBlockState(offsetPos).getBlock() instanceof BranchBlock) {
+                if (world.getBlockState(offsetPos).getBlock() instanceof BranchBlock) {
                     return true;
                 }
             }
@@ -79,15 +78,15 @@ public class CactusClonesGenFeature extends GenFeature {
         return false;
     }
 
-    private boolean placeCloneAtLocation(LevelContext levelContext, BlockPos cloneRootPos, Species species, boolean worldgen, SafeChunkBounds safeBounds) {
+    private boolean placeCloneAtLocation(LevelContext levelContext, BlockPos cloneRootPos, Species species, boolean worldgen) {
         LevelAccessor level = levelContext.accessor();
         for (int i = 1; i >= -1; i--) {
             BlockPos offsetRootPos = cloneRootPos.above(i);
-            if (safeBounds.inBounds(offsetRootPos, false) && species.isAcceptableSoil(level.getBlockState(offsetRootPos))) {
+            if (species.isAcceptableSoil(level.getBlockState(offsetRootPos))) {
 
                 if (worldgen) {
                     if (level instanceof WorldGenRegion) {
-                        species.generate(new GenerationContext(levelContext, species, offsetRootPos, offsetRootPos.mutable(), level.getNoiseBiome(offsetRootPos.getX(), offsetRootPos.getY(), offsetRootPos.getZ()), CoordUtils.getRandomDir(level.getRandom()), 2, safeBounds));
+                        species.generate(new DynamicTreeGenerationContext(levelContext, species, offsetRootPos, offsetRootPos.mutable(), level.getNoiseBiome(offsetRootPos.getX(), offsetRootPos.getY(), offsetRootPos.getZ()), CoordUtils.getRandomDir(level.getRandom()), 2, worldgen));
                     }
                 } else if (level instanceof Level) {
                     species.transitionToTree((Level) level, offsetRootPos.above());

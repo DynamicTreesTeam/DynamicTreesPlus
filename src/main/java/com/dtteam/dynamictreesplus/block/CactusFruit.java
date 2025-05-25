@@ -1,10 +1,10 @@
 package com.dtteam.dynamictreesplus.block;
 
-import com.dtteam.dynamictrees.api.TreeHelper;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
-import com.dtteam.dynamictrees.block.FruitBlock;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
-import com.dtteam.dynamictrees.systems.fruit.Fruit;
+import com.dtteam.dynamictrees.block.fruit.Fruit;
+import com.dtteam.dynamictrees.block.fruit.FruitBlock;
+import com.dtteam.dynamictrees.tree.TreeHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;

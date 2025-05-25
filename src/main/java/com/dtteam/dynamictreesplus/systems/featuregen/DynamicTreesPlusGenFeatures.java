@@ -1,6 +1,6 @@
 package com.dtteam.dynamictreesplus.systems.featuregen;
 
-import com.dtteam.dynamictrees.api.registry.RegistryEvent;
+import com.dtteam.dynamictrees.event.RegistryEvent;
 import com.dtteam.dynamictrees.systems.genfeature.GenFeature;
 import com.dtteam.dynamictreesplus.DynamicTreesPlus;
 

@@ -1,11 +1,11 @@
 package com.dtteam.dynamictreesplus.model.loader;
 
-import com.dtteam.dynamictrees.models.geometry.BranchBlockModelGeometry;
-import com.dtteam.dynamictrees.models.loader.BranchBlockModelLoader;
+import com.dtteam.dynamictrees.model.geometry.BranchBlockModelGeometry;
+import com.dtteam.dynamictrees.model.loader.BranchBlockModelLoader;
 import com.dtteam.dynamictreesplus.model.geometry.CactusBranchBlockModelGeometry;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
 

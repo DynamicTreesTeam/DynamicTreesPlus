@@ -1,23 +1,22 @@
 package com.dtteam.dynamictreesplus.resources;
 
-import com.dtteam.dynamictrees.api.TreeRegistry;
 import com.dtteam.dynamictrees.api.configuration.ConfigurationTemplateResourceLoader;
 import com.dtteam.dynamictrees.api.resource.loading.preparation.JsonRegistryResourceLoader;
-import com.dtteam.dynamictrees.deserialisation.JsonHelper;
-import com.dtteam.dynamictrees.deserialisation.ResourceLocationDeserialiser;
-import com.dtteam.dynamictrees.deserialisation.result.JsonResult;
+import com.dtteam.dynamictrees.deserialization.JsonHelper;
+import com.dtteam.dynamictrees.deserialization.deserializer.ResourceLocationDeserializer;
+import com.dtteam.dynamictrees.deserialization.result.JsonResult;
 import com.dtteam.dynamictrees.tree.family.Family;
+import com.dtteam.dynamictrees.utility.ResourceLocationUtils;
 import com.dtteam.dynamictreesplus.block.mushroom.CapProperties;
 import com.dtteam.dynamictreesplus.systems.mushroomlogic.MushroomShapeConfiguration;
 import com.dtteam.dynamictreesplus.systems.mushroomlogic.shapekits.MushroomShapeKit;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.material.MapColor;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class CapPropertiesResourceLoader extends JsonRegistryResourceLoader<CapProperties> {
@@ -49,7 +48,7 @@ public class CapPropertiesResourceLoader extends JsonRegistryResourceLoader<CapP
         // Primitive leaves are needed both client and server (so cannot be done on load).
         this.setupAppliers.register("primitive_cap", Block.class, CapProperties::setPrimitiveCap)
                 .register("family", ResourceLocation.class, (capProperties, registryName) -> {
-                    final ResourceLocation processedRegName = TreeRegistry.processResLoc(registryName);
+                    final ResourceLocation processedRegName = ResourceLocationUtils.parseDTLocation(registryName);
                     Family.REGISTRY.runOnNextLock(Family.REGISTRY.generateIfValidRunnable(
                             processedRegName,
                             capProperties::setFamily,
@@ -81,15 +80,15 @@ public class CapPropertiesResourceLoader extends JsonRegistryResourceLoader<CapP
     private void readCustomBlockRegistryName(CapProperties capProperties, JsonObject json) {
         JsonResult.forInput(json)
                 .mapIfContains("block_registry_name", JsonElement.class, input ->
-                        ResourceLocationDeserialiser.create(capProperties.getRegistryName().getNamespace())
-                                .deserialise(input).orElseThrow(), capProperties.getBlockRegistryName()
+                        ResourceLocationDeserializer.create(capProperties.getRegistryName().getNamespace())
+                                .deserialize(input).orElseThrow(), capProperties.getBlockRegistryName()
                 ).ifSuccessOrElse(
                         capProperties::setBlockRegistryName,
                         error -> this.logError(capProperties.getRegistryName(), error),
                         warning -> this.logWarning(capProperties.getRegistryName(), warning)
                 ).mapIfContains("center_block_registry_name", JsonElement.class, input ->
-                        ResourceLocationDeserialiser.create(capProperties.getRegistryName().getNamespace())
-                                .deserialise(input).orElseThrow(), capProperties.getCenterBlockRegistryName()
+                        ResourceLocationDeserializer.create(capProperties.getRegistryName().getNamespace())
+                                .deserialize(input).orElseThrow(), capProperties.getCenterBlockRegistryName()
                 ).ifSuccessOrElse(
                         capProperties::setCenterBlockRegistryName,
                         error -> this.logError(capProperties.getRegistryName(), error),

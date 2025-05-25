@@ -1,7 +1,7 @@
 package com.dtteam.dynamictreesplus.block;
 
-import com.dtteam.dynamictrees.block.FruitBlock;
-import com.dtteam.dynamictrees.systems.fruit.Fruit;
+import com.dtteam.dynamictrees.block.fruit.Fruit;
+import com.dtteam.dynamictrees.block.fruit.FruitBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelReader;

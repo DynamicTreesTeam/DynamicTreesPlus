@@ -1,15 +1,15 @@
 package com.dtteam.dynamictreesplus.block.mushroom;
 
-import com.dtteam.dynamictrees.api.TreeHelper;
 import com.dtteam.dynamictrees.api.cell.Cell;
 import com.dtteam.dynamictrees.api.cell.CellNull;
 import com.dtteam.dynamictrees.api.network.MapSignal;
 import com.dtteam.dynamictrees.api.treedata.TreePart;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
-import com.dtteam.dynamictrees.data.DTBlockTags;
+import com.dtteam.dynamictrees.data.tags.DTBlockTags;
 import com.dtteam.dynamictrees.systems.GrowSignal;
 import com.dtteam.dynamictrees.systems.poissondisc.Vec2i;
+import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictreesplus.systems.mushroomlogic.MushroomCapDisc;
@@ -23,6 +23,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -136,7 +137,7 @@ public class DynamicCapCenterBlock extends Block implements TreePart, UpdatesSur
     }
 
     @Override
-    public ItemStack getCloneItemStack(BlockState state, HitResult target, BlockGetter level, BlockPos pos, Player player) {
+    public ItemStack getCloneItemStack(BlockState state, HitResult target, LevelReader level, BlockPos pos, Player player) {
         return getProperties(state).getPrimitiveCapItemStack();
     }
 

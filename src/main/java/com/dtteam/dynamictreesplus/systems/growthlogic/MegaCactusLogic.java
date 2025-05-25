@@ -1,9 +1,9 @@
 package com.dtteam.dynamictreesplus.systems.growthlogic;
 
 import com.dtteam.dynamictrees.api.configuration.ConfigurationProperty;
-import com.dtteam.dynamictrees.growthlogic.GrowthLogicKitConfiguration;
-import com.dtteam.dynamictrees.growthlogic.context.DirectionManipulationContext;
 import com.dtteam.dynamictrees.systems.GrowSignal;
+import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKitConfiguration;
+import com.dtteam.dynamictrees.systems.growthlogic.context.DirectionManipulationContext;
 import com.dtteam.dynamictreesplus.block.CactusBranchBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

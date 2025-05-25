@@ -1,18 +1,17 @@
 package com.dtteam.dynamictreesplus.systems.featuregen;
 
-import com.dtteam.dynamictrees.api.TreeHelper;
 import com.dtteam.dynamictrees.api.network.MapSignal;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
-import com.dtteam.dynamictrees.compat.season.SeasonHelper;
-import com.dtteam.dynamictrees.systems.fruit.Fruit;
+import com.dtteam.dynamictrees.block.fruit.Fruit;
 import com.dtteam.dynamictrees.systems.genfeature.FruitGenFeature;
 import com.dtteam.dynamictrees.systems.genfeature.GenFeatureConfiguration;
 import com.dtteam.dynamictrees.systems.genfeature.context.PostGenerationContext;
 import com.dtteam.dynamictrees.systems.genfeature.context.PostGrowContext;
 import com.dtteam.dynamictrees.systems.nodemapper.FindEndsNode;
+import com.dtteam.dynamictrees.systems.season.SeasonHelper;
+import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.util.CoordUtils;
-import com.dtteam.dynamictrees.util.SafeChunkBounds;
+import com.dtteam.dynamictrees.utility.CoordUtils;
 import com.dtteam.dynamictreesplus.block.CactusBranchBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
@@ -54,7 +53,7 @@ public class CactusFruitGenFeature extends FruitGenFeature {
             for (int i = 0; i < qty; i++) {
                 final BlockPos endPoint = context.endPoints().get(context.random().nextInt(context.endPoints().size()));
                 this.placeDuringWorldGen(configuration, context.species(), context.level(), context.pos().above(),
-                        endPoint, context.bounds(), context.seasonValue());
+                        endPoint, context.isWorldGen(), context.seasonValue());
             }
             return true;
         }
@@ -112,12 +111,10 @@ public class CactusFruitGenFeature extends FruitGenFeature {
     }
 
     @Override
-    protected void placeDuringWorldGen(GenFeatureConfiguration configuration, Species species, LevelAccessor world,
-                                       BlockPos treePos, BlockPos branchPos, SafeChunkBounds bounds,
-                                       Float seasonValue) {
+    protected void placeDuringWorldGen(GenFeatureConfiguration configuration, Species species, LevelAccessor level, BlockPos treePos, BlockPos branchPos, boolean worldGen, Float seasonValue) {
         final BlockPos fruitPos = branchPos.above();
-        if (shouldPlaceDuringWorldGen(configuration, world, fruitPos)) {
-            configuration.get(FRUIT).placeDuringWorldGen(world, fruitPos, seasonValue);
+        if (shouldPlaceDuringWorldGen(configuration, level, fruitPos)) {
+            configuration.get(FRUIT).placeDuringWorldGen(level, fruitPos, seasonValue);
         }
     }
 

@@ -1,8 +1,8 @@
 package com.dtteam.dynamictreesplus.systems.growthlogic;
 
-import com.dtteam.dynamictrees.growthlogic.GrowthLogicKitConfiguration;
-import com.dtteam.dynamictrees.growthlogic.context.DirectionManipulationContext;
 import com.dtteam.dynamictrees.systems.GrowSignal;
+import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKitConfiguration;
+import com.dtteam.dynamictrees.systems.growthlogic.context.DirectionManipulationContext;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 

@@ -1,8 +1,8 @@
 package com.dtteam.dynamictreesplus.systems.thicknesslogic;
 
-import com.dtteam.dynamictrees.api.TreeHelper;
-import com.dtteam.dynamictrees.block.rooty.RootyBlock;
+import com.dtteam.dynamictrees.block.soil.SoilBlock;
 import com.dtteam.dynamictrees.systems.GrowSignal;
+import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictreesplus.DynamicTreesPlus;
 import com.dtteam.dynamictreesplus.block.CactusBranchBlock;
 import net.minecraft.core.BlockPos;
@@ -64,7 +64,7 @@ public final class CactusThicknessLogicKits {
             Block down = world.getBlockState(pos.below()).getBlock();
             Block down2 = world.getBlockState(pos.below(2)).getBlock();
             Block down3 = world.getBlockState(pos.below(3)).getBlock();
-            if (down instanceof RootyBlock || down2 instanceof RootyBlock || down3 instanceof RootyBlock)
+            if (down instanceof SoilBlock || down2 instanceof SoilBlock || down3 instanceof SoilBlock)
                 return CactusBranchBlock.CactusThickness.CORE;
             return CactusBranchBlock.CactusThickness.TRUNK;
         }
@@ -75,7 +75,7 @@ public final class CactusThicknessLogicKits {
             Block down2 = world.getBlockState(pos.below(2)).getBlock();
             Block down3 = world.getBlockState(pos.below(3)).getBlock();
 
-            if (down instanceof RootyBlock || down2 instanceof RootyBlock || down3 instanceof RootyBlock)
+            if (down instanceof SoilBlock || down2 instanceof SoilBlock || down3 instanceof SoilBlock)
                 return CactusBranchBlock.CactusThickness.CORE;
             if (down instanceof CactusBranchBlock)
                 return CactusBranchBlock.CactusThickness.TRUNK;

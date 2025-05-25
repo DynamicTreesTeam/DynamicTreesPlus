@@ -1,31 +1,35 @@
 package com.dtteam.dynamictreesplus.tree;
 
 import com.dtteam.dynamictrees.DynamicTrees;
-import com.dtteam.dynamictrees.api.TreeHelper;
+import com.dtteam.dynamictrees.api.network.BranchDestructionData;
 import com.dtteam.dynamictrees.api.network.MapSignal;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
+import com.dtteam.dynamictrees.api.voxmap.SimpleVoxmap;
+import com.dtteam.dynamictrees.block.CommonVoxelShapes;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
-import com.dtteam.dynamictrees.block.entity.SpeciesBlockEntity;
 import com.dtteam.dynamictrees.block.leaves.DynamicLeavesBlock;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
-import com.dtteam.dynamictrees.block.rooty.RootyBlock;
-import com.dtteam.dynamictrees.block.rooty.SoilHelper;
-import com.dtteam.dynamictrees.cell.LeafClusters;
-import com.dtteam.dynamictrees.data.DTBlockTags;
-import com.dtteam.dynamictrees.data.DTItemTags;
-import com.dtteam.dynamictrees.event.SpeciesPostGenerationEvent;
-import com.dtteam.dynamictrees.init.DTConfigs;
-import com.dtteam.dynamictrees.init.DTRegistries;
-import com.dtteam.dynamictrees.resources.Resources;
+import com.dtteam.dynamictrees.block.soil.SoilBlock;
+import com.dtteam.dynamictrees.block.soil.SoilHelper;
+import com.dtteam.dynamictrees.block.soil.SpeciesBlockEntity;
+import com.dtteam.dynamictrees.data.tags.DTBlockTags;
+import com.dtteam.dynamictrees.data.tags.DTItemTags;
+import com.dtteam.dynamictrees.deserialization.JsonDeserializers;
+import com.dtteam.dynamictrees.platform.Services;
+import com.dtteam.dynamictrees.platform.services.IConfigHelper;
+import com.dtteam.dynamictrees.registry.DTRegistries;
+import com.dtteam.dynamictrees.systems.cell.LeafClusters;
 import com.dtteam.dynamictrees.systems.genfeature.context.PostGenerationContext;
 import com.dtteam.dynamictrees.systems.genfeature.context.PostRotContext;
 import com.dtteam.dynamictrees.systems.nodemapper.CollectorNode;
 import com.dtteam.dynamictrees.systems.nodemapper.FindEndsNode;
 import com.dtteam.dynamictrees.systems.nodemapper.NetVolumeNode;
+import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.util.*;
-import com.dtteam.dynamictrees.worldgen.GenerationContext;
+import com.dtteam.dynamictrees.utility.Optionals;
+import com.dtteam.dynamictrees.utility.ResourceLocationUtils;
+import com.dtteam.dynamictrees.worldgen.DynamicTreeGenerationContext;
 import com.dtteam.dynamictrees.worldgen.JoCode;
 import com.dtteam.dynamictreesplus.block.mushroom.CapProperties;
 import com.dtteam.dynamictreesplus.block.mushroom.DynamicCapBlock;
@@ -43,21 +47,20 @@ import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.Tags;
+import net.neoforged.neoforge.common.Tags;
 import oshi.util.tuples.Pair;
 
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.BiConsumer;
-
-import static com.dtteam.dynamictrees.util.ResourceLocationUtils.surround;
 
 public class HugeMushroomSpecies extends Species {
 
@@ -70,7 +73,7 @@ public class HugeMushroomSpecies extends Species {
     public static Codec<Species> createDefaultMushroomCodec(final Function3<ResourceLocation, Family, CapProperties, Species> constructor) {
         return RecordCodecBuilder.create(instance -> instance
                 .group(
-                        ResourceLocation.CODEC.fieldOf(Resources.RESOURCE_LOCATION.toString())
+                        ResourceLocation.CODEC.fieldOf(JsonDeserializers.RESOURCE_LOCATION.toString())
                                 .forGetter(Species::getRegistryName),
                         Family.REGISTRY.getGetterCodec().fieldOf("family")
                                 .forGetter(Species::getFamily),
@@ -98,7 +101,6 @@ public class HugeMushroomSpecies extends Species {
 
     @Override
     public Species setPreReloadDefaults() {
-        this.setTransformable(false);
         return this.setSaplingShape(CommonVoxelShapes.ROUND_MUSHROOM)
                 .setDefaultGrowingParameters()
                 .envFactor(Tags.Biomes.IS_DRY, 0.25f)
@@ -130,7 +132,7 @@ public class HugeMushroomSpecies extends Species {
         placeRootyDirtBlock(level, pos.below(), 15);
 
         if (doesRequireTileEntity(level, pos)) {
-            SpeciesBlockEntity speciesBlockEntity = DTRegistries.SPECIES_BLOCK_ENTITY.create(pos.below(), level.getBlockState(pos.below()));
+            SpeciesBlockEntity speciesBlockEntity = DTRegistries.SPECIES_BLOCK_ENTITY.get().create(pos.below(), level.getBlockState(pos.below()));
             assert speciesBlockEntity != null;
             level.setBlockEntity(speciesBlockEntity);
             speciesBlockEntity.setSpecies(this);
@@ -211,7 +213,7 @@ public class HugeMushroomSpecies extends Species {
     public boolean isAcceptableSoil(BlockState soilBlockState) {
         if (acceptAnySoil){
             Block soilBlock = soilBlockState.getBlock();
-            return (soilBlock instanceof RootyBlock || SoilHelper.isSoilRegistered(soilBlock)) && !isWater(soilBlockState);
+            return (soilBlock instanceof SoilBlock || SoilHelper.isSoilRegistered(soilBlock)) && !isWater(soilBlockState);
         }
         return super.isAcceptableSoil(soilBlockState);
     }
@@ -219,7 +221,7 @@ public class HugeMushroomSpecies extends Species {
     public boolean isAcceptableSoilForWorldgen(LevelAccessor level, BlockPos pos, BlockState soilBlockState) {
         if (acceptAnySoil){
             Block soilBlock = soilBlockState.getBlock();
-            return (soilBlock instanceof RootyBlock || SoilHelper.isSoilRegistered(soilBlock)) && !isWater(soilBlockState);
+            return (soilBlock instanceof SoilBlock || SoilHelper.isSoilRegistered(soilBlock)) && !isWater(soilBlockState);
         }
         return super.isAcceptableSoilForWorldgen(level, pos, soilBlockState);
     }
@@ -227,7 +229,7 @@ public class HugeMushroomSpecies extends Species {
     @Override
     public void addSaplingTextures(BiConsumer<String, ResourceLocation> textureConsumer,
                                    ResourceLocation leavesTextureLocation, ResourceLocation barkTextureLocation) {
-        final ResourceLocation capLocation = surround(this.getRegistryName(), "block/", "_cap");
+        final ResourceLocation capLocation = ResourceLocationUtils.surround(this.getRegistryName(), "block/", "_cap");
         textureConsumer.accept("stem", barkTextureLocation);
         textureConsumer.accept("cap", capLocation);
     }
@@ -314,14 +316,15 @@ public class HugeMushroomSpecies extends Species {
     @Override
     public JoCode getJoCode(String joCodeString) {
         return new JoCode(joCodeString){
-            public void generate(GenerationContext context) {
+
+            public void generate(DynamicTreeGenerationContext context) {
                 LevelAccessor level = context.level();
                 if (!(context.species() instanceof HugeMushroomSpecies species)) return;
                 int radius = context.radius();
-                boolean worldGen = context.safeBounds() != SafeChunkBounds.ANY;
+                boolean worldGen = context.isWorldGen();
 
                 this.setFacing(context.facing());
-                final BlockPos rootPos = species.preGeneration(level, context.rootPos(), radius, context.facing(), context.safeBounds(), this);
+                final BlockPos rootPos = species.preGeneration(level, context.rootPos(), radius, context.facing(), context.isWorldGen(), this);
 
                 if (rootPos == BlockPos.ZERO) {
                     return;
@@ -365,17 +368,18 @@ public class HugeMushroomSpecies extends Species {
                 generateMushroomCap(context, species, capAges);
 
                 // Rot the unsupported branches.
-                if (species.handleRot(level, endPoints, rootPos, treePos, 0, context.safeBounds())) {
+                if (species.handleRot(level, endPoints, rootPos, treePos, 0, context.isWorldGen())) {
                     return; // The entire tree rotted away before it had a chance.
                 }
 
                 // Allow for special decorations by the tree itself.
-                species.postGeneration(new PostGenerationContext(context, endPoints, initialDirtState));
-                MinecraftForge.EVENT_BUS.post(new SpeciesPostGenerationEvent(level, species, rootPos, endPoints, context.safeBounds(), initialDirtState));
+                PostGenerationContext pgContext = new PostGenerationContext(context, endPoints, initialDirtState);
+                species.postGeneration(pgContext);
+                Services.EVENT.postSpeciesPostGenerationEvent(pgContext);
 
             }
 
-            private void generateMushroomCap(GenerationContext context, HugeMushroomSpecies species, List<Pair<BlockPos, Integer>> capAges){
+            private void generateMushroomCap(DynamicTreeGenerationContext context, HugeMushroomSpecies species, List<Pair<BlockPos, Integer>> capAges){
                 LevelAccessor level = context.level();
                 for (Pair<BlockPos, Integer> posAge : capAges){
                     int age = Math.min(posAge.getB(), species.getMushroomShapeKit().getMaxCapAge());
@@ -385,7 +389,8 @@ public class HugeMushroomSpecies extends Species {
                 }
             }
 
-            protected void cleanupFrankentree(LevelAccessor level, BlockPos treePos, BlockState treeState, List<BlockPos> endPoints, SafeChunkBounds safeBounds) {
+            @Override
+            protected void cleanupFrankentree(LevelAccessor level, BlockPos treePos, BlockState treeState, List<BlockPos> endPoints, boolean worldGen) {
                 final Set<BlockPos> blocksToDestroy = new HashSet<>();
                 final BranchBlock branch = TreeHelper.getBranch(treeState);
                 final MapSignal signal = new MapSignal(new CollectorNode(blocksToDestroy));
@@ -399,59 +404,47 @@ public class HugeMushroomSpecies extends Species {
                 BranchBlock.destroyMode = DynamicTrees.DestroyMode.IGNORE;
 
                 for (BlockPos pos : blocksToDestroy) {
-                    if (safeBounds.inBounds(pos, false)) {
-                        final BlockState branchState = level.getBlockState(pos);
-                        final Optional<BranchBlock> branchBlock = TreeHelper.getBranchOpt(branchState);
+                    final BlockState branchState = level.getBlockState(pos);
+                    final Optional<BranchBlock> branchBlock = TreeHelper.getBranchOpt(branchState);
 
-                        if (branchBlock.isEmpty()) continue;
+                    if (branchBlock.isEmpty()) continue;
 
-                        int radius = branchBlock.get().getRadius(branchState);
-                        final Family family = branchBlock.get().getFamily();
-                        final Species species = family.getCommonSpecies();
+                    int radius = branchBlock.get().getRadius(branchState);
+                    final Family family = branchBlock.get().getFamily();
+                    final Species species = family.getCommonSpecies();
 
-                        if (family.getPrimaryThickness() == radius) {
-                            species.getLeavesProperties().ifValid(leavesProperties -> {
-                                final SimpleVoxmap leafCluster = leavesProperties.getCellKit().getLeafCluster();
+                    if (family.getPrimaryThickness() == radius) {
+                        species.getLeavesProperties().ifValid(leavesProperties -> {
+                            final SimpleVoxmap leafCluster = leavesProperties.getCellKit().getLeafCluster();
 
-                                if (leafCluster != LeafClusters.NULL_MAP) {
-                                    for (SimpleVoxmap.Cell cell : leafCluster.getAllNonZeroCells()) {
-                                        final BlockPos delPos = pos.offset(cell.getPos());
-                                        if (safeBounds.inBounds(delPos, false)) {
-                                            final BlockState leavesState = level.getBlockState(delPos);
-                                            if (TreeHelper.isLeaves(leavesState)) {
-                                                final DynamicLeavesBlock leavesBlock = (DynamicLeavesBlock) leavesState.getBlock();
-                                                if (leavesProperties.getFamily() == leavesBlock.getProperties(leavesState).getFamily()) {
-                                                    level.setBlock(delPos, BlockStates.AIR, 2);
-                                                }
-                                            }
+                            if (leafCluster != LeafClusters.NULL_MAP) {
+                                for (SimpleVoxmap.VoxmapCell cell : leafCluster.getAllNonZeroCells()) {
+                                    final BlockPos delPos = pos.offset(cell.getPos());
+                                    final BlockState leavesState = level.getBlockState(delPos);
+                                    if (TreeHelper.isLeaves(leavesState)) {
+                                        final DynamicLeavesBlock leavesBlock = (DynamicLeavesBlock) leavesState.getBlock();
+                                        if (leavesProperties.getFamily() == leavesBlock.getLeavesProperties().getFamily()) {
+                                            level.setBlock(delPos, Blocks.AIR.defaultBlockState(), 2);
                                         }
                                     }
                                 }
-                            });
-                        }
-
-                        level.setBlock(pos, BlockStates.AIR, 2);
+                            }
+                        });
                     }
+
+                    level.setBlock(pos, Blocks.AIR.defaultBlockState(), 2);
                 }
 
                 BranchBlock.destroyMode = DynamicTrees.DestroyMode.HARVEST;
-
-                // Now wreck out all surrounding leaves. Let them grow back naturally.
- 		/*if (!endPoints.isEmpty()) {
- 			final BlockBounds bounds = new BlockBounds(endPoints).expand(3);
-
- 			for (BlockPos pos : bounds) {
- 				if (safeBounds.inBounds(pos, false) && TreeHelper.isLeaves(level.getBlockState(pos))) {
-					level.setBlock(pos, DTRegistries.BLOCK_STATES.AIR, 2);
-				}
- 			}
- 		}*/
             }
+
         };
     }
 
-    public boolean rot(LevelAccessor level, BlockPos pos, int neighborCount, int radius, int fertility, Random random, boolean rapid, boolean growLeaves) {
-        if (rapid || (DTConfigs.MAX_BRANCH_ROT_RADIUS.get() != 0 && radius <= DTConfigs.MAX_BRANCH_ROT_RADIUS.get())) {
+    @Override
+    public boolean rot(LevelAccessor level, BlockPos pos, int neighborCount, int radius, int fertility, RandomSource random, boolean rapid, boolean growLeaves) {
+        int maxBranchRotRadius = Services.CONFIG.getIntConfig(IConfigHelper.MAX_BRANCH_ROT_RADIUS);
+        if (rapid || maxBranchRotRadius != 0 && radius <= maxBranchRotRadius) {
             BranchBlock branch = TreeHelper.getBranch(level.getBlockState(pos));
             if (branch != null) {
                 branch.rot(level, pos);

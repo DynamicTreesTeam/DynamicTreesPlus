@@ -9,6 +9,7 @@ import com.dtteam.dynamictrees.api.worldgen.LevelContext;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.data.DTDataProvider;
 import com.dtteam.dynamictrees.data.Generator;
+import com.dtteam.dynamictrees.deserialization.JsonDeserializers;
 import com.dtteam.dynamictrees.loot.DTLootContextParams;
 import com.dtteam.dynamictrees.loot.DTLootParameterSets;
 import com.dtteam.dynamictrees.loot.LootTableSupplier;
@@ -26,6 +27,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.ResourceLocation;
@@ -59,7 +61,7 @@ import java.util.function.BiConsumer;
 public class CapProperties extends RegistryEntry<CapProperties> implements Resettable<CapProperties> {
 
     public static final Codec<CapProperties> CODEC = RecordCodecBuilder.create(instance -> instance
-            .group(ResourceLocation.CODEC.fieldOf(TypedRegistry.RESOURCE_LOCATION.toString()).forGetter(CapProperties::getRegistryName))
+            .group(ResourceLocation.CODEC.fieldOf(JsonDeserializers.RESOURCE_LOCATION.toString()).forGetter(CapProperties::getRegistryName))
             .apply(instance, CapProperties::new));
 
     public static final CapProperties NULL = new CapProperties() {
@@ -378,11 +380,11 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
         return shouldGenerateDrops();
     }
 
-    public LootTable.Builder createBlockDrops() {
+    public LootTable.Builder createBlockDrops(HolderLookup.Provider registries) {
         if (getPrimitiveCapBlock().isPresent()) {
-            return DTPLootTableHandler.createCapBlockDrops(primitiveCap.getBlock(), getMushroomItem(), -6, 2);
+            return DTPLootTableHandler.createCapBlockDrops(primitiveCap.getBlock(), getMushroomItem(), -6, 2, registries);
         }
-        return DTPLootTableHandler.createCapDrops(primitiveCap.getBlock(), getMushroomItem(), LootContextParamSets.BLOCK);
+        return DTPLootTableHandler.createCapDrops(primitiveCap.getBlock(), getMushroomItem(), LootContextParamSets.BLOCK, registries);
     }
 
     private final LootTableSupplier lootTableSupplier;
@@ -399,8 +401,8 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
         return getPrimitiveCapBlock().isPresent();
     }
 
-    public LootTable.Builder createDrops() {
-        return DTPLootTableHandler.createCapDrops(primitiveCap.getBlock(), getMushroomItem(), DTLootParameterSets.LEAVES);
+    public LootTable.Builder createDrops(HolderLookup.Provider registries) {
+        return DTPLootTableHandler.createCapDrops(primitiveCap.getBlock(), getMushroomItem(), DTLootParameterSets.LEAVES, registries);
     }
 
     public List<ItemStack> getDrops(Level level, BlockPos pos, ItemStack tool, Species species) {

@@ -1,33 +1,33 @@
 package com.dtteam.dynamictreesplus.block;
 
 import com.dtteam.dynamictrees.DynamicTrees;
-import com.dtteam.dynamictrees.api.TreeHelper;
 import com.dtteam.dynamictrees.api.cell.Cell;
 import com.dtteam.dynamictrees.api.cell.CellNull;
+import com.dtteam.dynamictrees.api.network.Connections;
 import com.dtteam.dynamictrees.api.network.MapSignal;
 import com.dtteam.dynamictrees.api.treedata.TreePart;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
-import com.dtteam.dynamictrees.block.rooty.RootyBlock;
-import com.dtteam.dynamictrees.growthlogic.context.DirectionSelectionContext;
+import com.dtteam.dynamictrees.block.soil.SoilBlock;
 import com.dtteam.dynamictrees.loot.DTLootParameterSets;
 import com.dtteam.dynamictrees.loot.entry.SeedItemLootPoolEntry;
-import com.dtteam.dynamictrees.loot.function.MultiplyLogsCount;
-import com.dtteam.dynamictrees.loot.function.MultiplySticksCount;
+import com.dtteam.dynamictrees.loot.function.MultiplyByLogsCount;
+import com.dtteam.dynamictrees.loot.function.MultiplyBySticksCount;
 import com.dtteam.dynamictrees.systems.GrowSignal;
+import com.dtteam.dynamictrees.systems.growthlogic.context.DirectionSelectionContext;
+import com.dtteam.dynamictrees.tree.ChunkTreeHelper;
+import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.util.Connections;
-import com.dtteam.dynamictrees.util.CoordUtils;
 import com.dtteam.dynamictreesplus.init.DTPConfigs;
 import com.dtteam.dynamictreesplus.tree.CactusSpecies;
 import com.google.common.base.Predicate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.StringRepresentable;
-import net.minecraft.world.damagesource.DamageSources;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -50,7 +50,6 @@ import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -338,8 +337,8 @@ public class CactusBranchBlock extends BranchBlock {
     protected int getSideConnectionRadius(BlockGetter blockAccess, BlockPos pos, Direction side) {
         BlockPos deltaPos = pos.relative(side);
 
-        final BlockState otherState = CoordUtils.getStateSafe(blockAccess, deltaPos);
-        final BlockState state = CoordUtils.getStateSafe(blockAccess, pos);
+        final BlockState otherState = ChunkTreeHelper.getStateSafe(blockAccess, deltaPos);
+        final BlockState state = ChunkTreeHelper.getStateSafe(blockAccess, pos);
 
         // If the blocks aren't loaded, assume there is no connection.
         if (otherState == null || state == null || state.getBlock() != this)
@@ -347,7 +346,7 @@ public class CactusBranchBlock extends BranchBlock {
 
         if (otherState.getBlock() == this && (otherState.getValue(ORIGIN) == side.getOpposite() || state.getValue(ORIGIN) == side)) {
             return Math.min(getCactusRadius(state.getValue(TRUNK_TYPE)), getCactusRadius(otherState.getValue(TRUNK_TYPE)));
-        } else if (side == Direction.DOWN && state.getValue(ORIGIN) == side && (otherState.getBlock() == this || otherState.getBlock() instanceof RootyBlock)) {
+        } else if (side == Direction.DOWN && state.getValue(ORIGIN) == side && (otherState.getBlock() == this || otherState.getBlock() instanceof SoilBlock)) {
             return getCactusRadius(state.getValue(TRUNK_TYPE));
         }
 
@@ -359,7 +358,7 @@ public class CactusBranchBlock extends BranchBlock {
     ///////////////////////////////////////////
 
     @Override
-    public MapSignal analyse(BlockState blockState, LevelAccessor world, BlockPos pos, Direction fromDir, MapSignal signal) {
+    public MapSignal analyse(BlockState blockState, LevelAccessor world, BlockPos pos, @Nullable Direction fromDir, MapSignal signal) {
         // Note: fromDir will be null in the origin node
         if (signal.depth++ < 32) {// Prevents going too deep into large networks, or worse, being caught in a network loop
             BlockState state = world.getBlockState(pos);
@@ -395,17 +394,17 @@ public class CactusBranchBlock extends BranchBlock {
     }
 
     @Override
-    public LootTable.Builder createBranchDrops() {
+    public LootTable.Builder createBranchDrops(HolderLookup.Provider registries) {
         return LootTable.lootTable().withPool(
                 LootPool.lootPool().setRolls(ConstantValue.exactly(1)).add(
                         LootItem.lootTableItem(getPrimitiveLog().get())
-                                .apply(MultiplyLogsCount.multiplyLogsCount())
+                                .apply(MultiplyByLogsCount.multiplyByLogsCount())
                                 .apply(ApplyExplosionDecay.explosionDecay())
                 )
         ).withPool(
                 LootPool.lootPool().setRolls(ConstantValue.exactly(1)).add(
                         SeedItemLootPoolEntry.lootTableSeedItem()
-                                .apply(MultiplySticksCount.multiplySticksCount())
+                                .apply(MultiplyBySticksCount.multiplyBySticksCount())
                                 .apply(ApplyExplosionDecay.explosionDecay())
                 )
         ).setParamSet(DTLootParameterSets.BRANCHES);

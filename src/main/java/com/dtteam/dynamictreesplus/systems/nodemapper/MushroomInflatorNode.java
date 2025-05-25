@@ -1,10 +1,10 @@
 package com.dtteam.dynamictreesplus.systems.nodemapper;
 
-import com.dtteam.dynamictrees.api.TreeHelper;
 import com.dtteam.dynamictrees.api.network.NodeInspector;
 import com.dtteam.dynamictrees.api.treedata.TreePart;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
-import com.dtteam.dynamictrees.util.CoordUtils;
+import com.dtteam.dynamictrees.tree.TreeHelper;
+import com.dtteam.dynamictrees.utility.CoordUtils;
 import com.dtteam.dynamictreesplus.block.mushroom.DynamicCapCenterBlock;
 import com.dtteam.dynamictreesplus.systems.mushroomlogic.MushroomCapDisc;
 import com.dtteam.dynamictreesplus.tree.HugeMushroomSpecies;

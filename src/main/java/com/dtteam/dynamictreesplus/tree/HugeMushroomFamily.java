@@ -1,14 +1,12 @@
 package com.dtteam.dynamictreesplus.tree;
 
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
+import com.dtteam.dynamictrees.api.voxmap.BlockPosBounds;
 import com.dtteam.dynamictrees.block.branch.BasicBranchBlock;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
-import com.dtteam.dynamictrees.block.branch.ThickBranchBlock;
-import com.dtteam.dynamictrees.data.DTBlockTags;
-import com.dtteam.dynamictrees.data.DTItemTags;
+import com.dtteam.dynamictrees.data.tags.DTBlockTags;
+import com.dtteam.dynamictrees.data.tags.DTItemTags;
 import com.dtteam.dynamictrees.tree.family.Family;
-import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.util.BlockBounds;
 import com.dtteam.dynamictreesplus.block.mushroom.CapProperties;
 import com.dtteam.dynamictreesplus.block.mushroom.MushroomBranchBlock;
 import net.minecraft.core.BlockPos;
@@ -21,7 +19,6 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.function.BiConsumer;
 
 public class HugeMushroomFamily extends Family {
 
@@ -65,7 +62,7 @@ public class HugeMushroomFamily extends Family {
     }
 
     @Override
-    public BlockBounds expandLeavesBlockBounds(BlockBounds bounds) {
+    public BlockPosBounds expandLeavesBlockBounds(BlockPosBounds bounds) {
         return bounds.expand(8);
     }
 

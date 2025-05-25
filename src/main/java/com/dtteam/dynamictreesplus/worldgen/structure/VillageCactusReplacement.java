@@ -4,10 +4,10 @@ import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.worldgen.structure.RegularTemplatePoolModifier;
 import com.dtteam.dynamictrees.worldgen.structure.TreePoolElement;
 import com.dtteam.dynamictreesplus.init.DTPCacti;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.world.level.levelgen.structure.pools.LegacySinglePoolElement;
 import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElement;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
 
 import static net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool.Projection.RIGID;
@@ -19,7 +19,7 @@ import static net.minecraft.world.level.levelgen.structure.pools.StructureTempla
  */
 public final class VillageCactusReplacement {
 
-    public static void replaceCactiFromVanillaVillages(HolderLookup.Provider vanillaProvider, BootstapContext<StructureTemplatePool> context) {
+    public static void replaceCactiFromVanillaVillages(HolderLookup.Provider vanillaProvider, BootstrapContext<StructureTemplatePool> context) {
         // Replace cacti from Desert village.
         final TreePoolElement cactusElement = new TreePoolElement(Species.REGISTRY.get(DTPCacti.PILLAR), TERRAIN_MATCHING);
         RegularTemplatePoolModifier.village(vanillaProvider, "desert", "decor").replaceTemplate(1, cactusElement).registerPool(context);

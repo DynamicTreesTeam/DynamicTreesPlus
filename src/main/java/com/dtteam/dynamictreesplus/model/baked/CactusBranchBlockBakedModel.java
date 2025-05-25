@@ -146,143 +146,143 @@ public class CactusBranchBlockBakedModel implements IDynamicBakedModel {
             Direction face = e.getKey();
             builder.addCulledFace(face, ModelHelper.makeBakedQuad(part, e.getValue(), (dir == face) ? top : bark, face, BlockModelRotation.X0_Y0));
         }
-        float minV = negative ? 16 - halfSize : 0;
-        float maxV = negative ? 16 : halfSize;
+        float minV = (negative ? 16 - halfSize : 0) / 16f;
+        float maxV = (negative ? 16 : halfSize) / 16f;
         switch (dir.getAxis()) {
             case X:
 
                 builder.addCulledFace(Direction.NORTH, this.createQuad(
-                        v(posTo.x() / 16f, posTo.y() / 16f + 0.0625f, posFrom.z() / 16f - 0.002f), 16, minV,
-                        v(posTo.x() / 16f, posTo.y() / 16f - 0.0625f, posFrom.z() / 16f - 0.002f), 14, minV,
-                        v(posFrom.x() / 16f, posTo.y() / 16f - 0.0625f, posFrom.z() / 16f - 0.002f), 14, maxV,
-                        v(posFrom.x() / 16f, posTo.y() / 16f + 0.0625f, posFrom.z() / 16f - 0.002f), 16, maxV, bark));
+                        v(posTo.x() / 16f, posTo.y() / 16f + 0.0625f, posFrom.z() / 16f - 0.002f), 16/ 16f, minV,
+                        v(posTo.x() / 16f, posTo.y() / 16f - 0.0625f, posFrom.z() / 16f - 0.002f), 14/ 16f, minV,
+                        v(posFrom.x() / 16f, posTo.y() / 16f - 0.0625f, posFrom.z() / 16f - 0.002f), 14/ 16f, maxV,
+                        v(posFrom.x() / 16f, posTo.y() / 16f + 0.0625f, posFrom.z() / 16f - 0.002f), 16/ 16f, maxV, bark));
                 builder.addCulledFace(Direction.NORTH, this.createQuad(
-                        v(posTo.x() / 16f, posFrom.y() / 16f + 0.0625f, posFrom.z() / 16f - 0.002f), 2, minV,
+                        v(posTo.x() / 16f, posFrom.y() / 16f + 0.0625f, posFrom.z() / 16f - 0.002f), 2/ 16f, minV,
                         v(posTo.x() / 16f, posFrom.y() / 16f - 0.0625f, posFrom.z() / 16f - 0.002f), 0, minV,
                         v(posFrom.x() / 16f, posFrom.y() / 16f - 0.0625f, posFrom.z() / 16f - 0.002f), 0, maxV,
-                        v(posFrom.x() / 16f, posFrom.y() / 16f + 0.0625f, posFrom.z() / 16f - 0.002f), 2, maxV, bark));
+                        v(posFrom.x() / 16f, posFrom.y() / 16f + 0.0625f, posFrom.z() / 16f - 0.002f), 2/ 16f, maxV, bark));
                 builder.addCulledFace(Direction.SOUTH, this.createQuad(
-                        v(posFrom.x() / 16f, posTo.y() / 16f + 0.0625f, posTo.z() / 16f + 0.002f), 16, maxV,
-                        v(posFrom.x() / 16f, posTo.y() / 16f - 0.0625f, posTo.z() / 16f + 0.002f), 14, maxV,
-                        v(posTo.x() / 16f, posTo.y() / 16f - 0.0625f, posTo.z() / 16f + 0.002f), 14, minV,
-                        v(posTo.x() / 16f, posTo.y() / 16f + 0.0625f, posTo.z() / 16f + 0.002f), 16, minV, bark));
+                        v(posFrom.x() / 16f, posTo.y() / 16f + 0.0625f, posTo.z() / 16f + 0.002f), 16/ 16f, maxV,
+                        v(posFrom.x() / 16f, posTo.y() / 16f - 0.0625f, posTo.z() / 16f + 0.002f), 14/ 16f, maxV,
+                        v(posTo.x() / 16f, posTo.y() / 16f - 0.0625f, posTo.z() / 16f + 0.002f), 14/ 16f, minV,
+                        v(posTo.x() / 16f, posTo.y() / 16f + 0.0625f, posTo.z() / 16f + 0.002f), 16/ 16f, minV, bark));
                 builder.addCulledFace(Direction.SOUTH, this.createQuad(
-                        v(posFrom.x() / 16f, posFrom.y() / 16f + 0.0625f, posTo.z() / 16f + 0.002f), 2, maxV,
+                        v(posFrom.x() / 16f, posFrom.y() / 16f + 0.0625f, posTo.z() / 16f + 0.002f), 2/ 16f, maxV,
                         v(posFrom.x() / 16f, posFrom.y() / 16f - 0.0625f, posTo.z() / 16f + 0.002f), 0, maxV,
                         v(posTo.x() / 16f, posFrom.y() / 16f - 0.0625f, posTo.z() / 16f + 0.002f), 0, minV,
-                        v(posTo.x() / 16f, posFrom.y() / 16f + 0.0625f, posTo.z() / 16f + 0.002f), 2, minV, bark));
+                        v(posTo.x() / 16f, posFrom.y() / 16f + 0.0625f, posTo.z() / 16f + 0.002f), 2/ 16f, minV, bark));
 
                 builder.addCulledFace(Direction.DOWN, this.createQuad(
-                        v(posTo.x() / 16f, posFrom.y() / 16f - 0.002f, posTo.z() / 16f - 0.0625f), 14, minV,
-                        v(posTo.x() / 16f, posFrom.y() / 16f - 0.002f, posTo.z() / 16f + 0.0625f), 16, minV,
-                        v(posFrom.x() / 16f, posFrom.y() / 16f - 0.002f, posTo.z() / 16f + 0.0625f), 16, maxV,
-                        v(posFrom.x() / 16f, posFrom.y() / 16f - 0.002f, posTo.z() / 16f - 0.0625f), 14, maxV, bark));
+                        v(posTo.x() / 16f, posFrom.y() / 16f - 0.002f, posTo.z() / 16f - 0.0625f), 14/ 16f, minV,
+                        v(posTo.x() / 16f, posFrom.y() / 16f - 0.002f, posTo.z() / 16f + 0.0625f), 16/ 16f, minV,
+                        v(posFrom.x() / 16f, posFrom.y() / 16f - 0.002f, posTo.z() / 16f + 0.0625f), 16/ 16f, maxV,
+                        v(posFrom.x() / 16f, posFrom.y() / 16f - 0.002f, posTo.z() / 16f - 0.0625f), 14/ 16f, maxV, bark));
                 builder.addCulledFace(Direction.DOWN, this.createQuad(
                         v(posTo.x() / 16f, posFrom.y() / 16f - 0.002f, posFrom.z() / 16f - 0.0625f), 0, minV,
-                        v(posTo.x() / 16f, posFrom.y() / 16f - 0.002f, posFrom.z() / 16f + 0.0625f), 2, minV,
-                        v(posFrom.x() / 16f, posFrom.y() / 16f - 0.002f, posFrom.z() / 16f + 0.0625f), 2, maxV,
+                        v(posTo.x() / 16f, posFrom.y() / 16f - 0.002f, posFrom.z() / 16f + 0.0625f), 2/ 16f, minV,
+                        v(posFrom.x() / 16f, posFrom.y() / 16f - 0.002f, posFrom.z() / 16f + 0.0625f), 2/ 16f, maxV,
                         v(posFrom.x() / 16f, posFrom.y() / 16f - 0.002f, posFrom.z() / 16f - 0.0625f), 0, maxV, bark));
                 builder.addCulledFace(Direction.UP, this.createQuad(
-                        v(posFrom.x() / 16f, posTo.y() / 16f + 0.002f, posTo.z() / 16f - 0.0625f), 14, maxV,
-                        v(posFrom.x() / 16f, posTo.y() / 16f + 0.002f, posTo.z() / 16f + 0.0625f), 16, maxV,
-                        v(posTo.x() / 16f, posTo.y() / 16f + 0.002f, posTo.z() / 16f + 0.0625f), 16, minV,
-                        v(posTo.x() / 16f, posTo.y() / 16f + 0.002f, posTo.z() / 16f - 0.0625f), 14, minV, bark));
+                        v(posFrom.x() / 16f, posTo.y() / 16f + 0.002f, posTo.z() / 16f - 0.0625f), 14/ 16f, maxV,
+                        v(posFrom.x() / 16f, posTo.y() / 16f + 0.002f, posTo.z() / 16f + 0.0625f), 16/ 16f, maxV,
+                        v(posTo.x() / 16f, posTo.y() / 16f + 0.002f, posTo.z() / 16f + 0.0625f), 16/ 16f, minV,
+                        v(posTo.x() / 16f, posTo.y() / 16f + 0.002f, posTo.z() / 16f - 0.0625f), 14/ 16f, minV, bark));
                 builder.addCulledFace(Direction.UP, this.createQuad(
-                        v(posFrom.x() / 16f, posTo.y() / 16f + 0.002f, posFrom.z() / 16f - 0.0625f), 2, maxV,
+                        v(posFrom.x() / 16f, posTo.y() / 16f + 0.002f, posFrom.z() / 16f - 0.0625f), 2/ 16f, maxV,
                         v(posFrom.x() / 16f, posTo.y() / 16f + 0.002f, posFrom.z() / 16f + 0.0625f), 0, maxV,
                         v(posTo.x() / 16f, posTo.y() / 16f + 0.002f, posFrom.z() / 16f + 0.0625f), 0, minV,
-                        v(posTo.x() / 16f, posTo.y() / 16f + 0.002f, posFrom.z() / 16f - 0.0625f), 2, minV, bark));
+                        v(posTo.x() / 16f, posTo.y() / 16f + 0.002f, posFrom.z() / 16f - 0.0625f), 2/ 16f, minV, bark));
 
                 break;
             case Y:
 
                 builder.addCulledFace(Direction.WEST, this.createQuad(
-                        v(posFrom.x() / 16f - 0.001f, posTo.y() / 16f, posTo.z() / 16f + 0.0625f), 16, minV,
-                        v(posFrom.x() / 16f - 0.001f, posTo.y() / 16f, posTo.z() / 16f - 0.0625f), 14, minV,
-                        v(posFrom.x() / 16f - 0.001f, posFrom.y() / 16f, posTo.z() / 16f - 0.0625f), 14, maxV,
-                        v(posFrom.x() / 16f - 0.001f, posFrom.y() / 16f, posTo.z() / 16f + 0.0625f), 16, maxV, bark));
+                        v(posFrom.x() / 16f - 0.001f, posTo.y() / 16f, posTo.z() / 16f + 0.0625f), 16/ 16f, minV,
+                        v(posFrom.x() / 16f - 0.001f, posTo.y() / 16f, posTo.z() / 16f - 0.0625f), 14/ 16f, minV,
+                        v(posFrom.x() / 16f - 0.001f, posFrom.y() / 16f, posTo.z() / 16f - 0.0625f), 14/ 16f, maxV,
+                        v(posFrom.x() / 16f - 0.001f, posFrom.y() / 16f, posTo.z() / 16f + 0.0625f), 16/ 16f, maxV, bark));
                 builder.addCulledFace(Direction.WEST, this.createQuad(
-                        v(posFrom.x() / 16f - 0.001f, posTo.y() / 16f, posFrom.z() / 16f + 0.0625f), 2, minV,
+                        v(posFrom.x() / 16f - 0.001f, posTo.y() / 16f, posFrom.z() / 16f + 0.0625f), 2/ 16f, minV,
                         v(posFrom.x() / 16f - 0.001f, posTo.y() / 16f, posFrom.z() / 16f - 0.0625f), 0, minV,
                         v(posFrom.x() / 16f - 0.001f, posFrom.y() / 16f, posFrom.z() / 16f - 0.0625f), 0, maxV,
-                        v(posFrom.x() / 16f - 0.001f, posFrom.y() / 16f, posFrom.z() / 16f + 0.0625f), 2, maxV, bark));
+                        v(posFrom.x() / 16f - 0.001f, posFrom.y() / 16f, posFrom.z() / 16f + 0.0625f), 2/ 16f, maxV, bark));
                 builder.addCulledFace(Direction.EAST, this.createQuad(
-                        v(posTo.x() / 16f + 0.001f, posFrom.y() / 16f, posTo.z() / 16f + 0.0625f), 16, maxV,
-                        v(posTo.x() / 16f + 0.001f, posFrom.y() / 16f, posTo.z() / 16f - 0.0625f), 14, maxV,
-                        v(posTo.x() / 16f + 0.001f, posTo.y() / 16f, posTo.z() / 16f - 0.0625f), 14, minV,
-                        v(posTo.x() / 16f + 0.001f, posTo.y() / 16f, posTo.z() / 16f + 0.0625f), 16, minV, bark));
+                        v(posTo.x() / 16f + 0.001f, posFrom.y() / 16f, posTo.z() / 16f + 0.0625f), 16/ 16f, maxV,
+                        v(posTo.x() / 16f + 0.001f, posFrom.y() / 16f, posTo.z() / 16f - 0.0625f), 14/ 16f, maxV,
+                        v(posTo.x() / 16f + 0.001f, posTo.y() / 16f, posTo.z() / 16f - 0.0625f), 14/ 16f, minV,
+                        v(posTo.x() / 16f + 0.001f, posTo.y() / 16f, posTo.z() / 16f + 0.0625f), 16/ 16f, minV, bark));
                 builder.addCulledFace(Direction.EAST, this.createQuad(
-                        v(posTo.x() / 16f + 0.001f, posFrom.y() / 16f, posFrom.z() / 16f + 0.0625f), 2, maxV,
+                        v(posTo.x() / 16f + 0.001f, posFrom.y() / 16f, posFrom.z() / 16f + 0.0625f), 2/ 16f, maxV,
                         v(posTo.x() / 16f + 0.001f, posFrom.y() / 16f, posFrom.z() / 16f - 0.0625f), 0, maxV,
                         v(posTo.x() / 16f + 0.001f, posTo.y() / 16f, posFrom.z() / 16f - 0.0625f), 0, minV,
-                        v(posTo.x() / 16f + 0.001f, posTo.y() / 16f, posFrom.z() / 16f + 0.0625f), 2, minV, bark));
+                        v(posTo.x() / 16f + 0.001f, posTo.y() / 16f, posFrom.z() / 16f + 0.0625f), 2/ 16f, minV, bark));
 
                 builder.addCulledFace(Direction.NORTH, this.createQuad(
-                        v(posTo.x() / 16f + 0.0625f, posFrom.y() / 16f, posFrom.z() / 16f - 0.001f), 16, maxV,
-                        v(posTo.x() / 16f - 0.0625f, posFrom.y() / 16f, posFrom.z() / 16f - 0.001f), 14, maxV,
-                        v(posTo.x() / 16f - 0.0625f, posTo.y() / 16f, posFrom.z() / 16f - 0.001f), 14, minV,
-                        v(posTo.x() / 16f + 0.0625f, posTo.y() / 16f, posFrom.z() / 16f - 0.001f), 16, minV, bark));
+                        v(posTo.x() / 16f + 0.0625f, posFrom.y() / 16f, posFrom.z() / 16f - 0.001f), 16/ 16f, maxV,
+                        v(posTo.x() / 16f - 0.0625f, posFrom.y() / 16f, posFrom.z() / 16f - 0.001f), 14/ 16f, maxV,
+                        v(posTo.x() / 16f - 0.0625f, posTo.y() / 16f, posFrom.z() / 16f - 0.001f), 14/ 16f, minV,
+                        v(posTo.x() / 16f + 0.0625f, posTo.y() / 16f, posFrom.z() / 16f - 0.001f), 16/ 16f, minV, bark));
                 builder.addCulledFace(Direction.NORTH, this.createQuad(
-                        v(posFrom.x() / 16f + 0.0625f, posFrom.y() / 16f, posFrom.z() / 16f - 0.001f), 2, maxV,
+                        v(posFrom.x() / 16f + 0.0625f, posFrom.y() / 16f, posFrom.z() / 16f - 0.001f), 2/ 16f, maxV,
                         v(posFrom.x() / 16f - 0.0625f, posFrom.y() / 16f, posFrom.z() / 16f - 0.001f), 0, maxV,
                         v(posFrom.x() / 16f - 0.0625f, posTo.y() / 16f, posFrom.z() / 16f - 0.001f), 0, minV,
-                        v(posFrom.x() / 16f + 0.0625f, posTo.y() / 16f, posFrom.z() / 16f - 0.001f), 2, minV, bark));
+                        v(posFrom.x() / 16f + 0.0625f, posTo.y() / 16f, posFrom.z() / 16f - 0.001f), 2/ 16f, minV, bark));
                 builder.addCulledFace(Direction.SOUTH, this.createQuad(
-                        v(posTo.x() / 16f + 0.0625f, posTo.y() / 16f, posTo.z() / 16f + 0.001f), 16, minV,
-                        v(posTo.x() / 16f - 0.0625f, posTo.y() / 16f, posTo.z() / 16f + 0.001f), 14, minV,
-                        v(posTo.x() / 16f - 0.0625f, posFrom.y() / 16f, posTo.z() / 16f + 0.001f), 14, maxV,
-                        v(posTo.x() / 16f + 0.0625f, posFrom.y() / 16f, posTo.z() / 16f + 0.001f), 16, maxV, bark));
+                        v(posTo.x() / 16f + 0.0625f, posTo.y() / 16f, posTo.z() / 16f + 0.001f), 16/ 16f, minV,
+                        v(posTo.x() / 16f - 0.0625f, posTo.y() / 16f, posTo.z() / 16f + 0.001f), 14/ 16f, minV,
+                        v(posTo.x() / 16f - 0.0625f, posFrom.y() / 16f, posTo.z() / 16f + 0.001f), 14/ 16f, maxV,
+                        v(posTo.x() / 16f + 0.0625f, posFrom.y() / 16f, posTo.z() / 16f + 0.001f), 16/ 16f, maxV, bark));
                 builder.addCulledFace(Direction.SOUTH, this.createQuad(
-                        v(posFrom.x() / 16f + 0.0625f, posTo.y() / 16f, posTo.z() / 16f + 0.001f), 2, minV,
+                        v(posFrom.x() / 16f + 0.0625f, posTo.y() / 16f, posTo.z() / 16f + 0.001f), 2/ 16f, minV,
                         v(posFrom.x() / 16f - 0.0625f, posTo.y() / 16f, posTo.z() / 16f + 0.001f), 0, minV,
                         v(posFrom.x() / 16f - 0.0625f, posFrom.y() / 16f, posTo.z() / 16f + 0.001f), 0, maxV,
-                        v(posFrom.x() / 16f + 0.0625f, posFrom.y() / 16f, posTo.z() / 16f + 0.001f), 2, maxV, bark));
+                        v(posFrom.x() / 16f + 0.0625f, posFrom.y() / 16f, posTo.z() / 16f + 0.001f), 2/ 16f, maxV, bark));
 
 
                 break;
             case Z:
 
                 builder.addCulledFace(Direction.WEST, this.createQuad(
-                        v(posFrom.x() / 16f - 0.002f, posTo.y() / 16f + 0.0625f, posFrom.z() / 16f), 16, minV,
-                        v(posFrom.x() / 16f - 0.002f, posTo.y() / 16f - 0.0625f, posFrom.z() / 16f), 14, minV,
-                        v(posFrom.x() / 16f - 0.002f, posTo.y() / 16f - 0.0625f, posTo.z() / 16f), 14, maxV,
-                        v(posFrom.x() / 16f - 0.002f, posTo.y() / 16f + 0.0625f, posTo.z() / 16f), 16, maxV, bark));
+                        v(posFrom.x() / 16f - 0.002f, posTo.y() / 16f + 0.0625f, posFrom.z() / 16f), 16/ 16f, minV,
+                        v(posFrom.x() / 16f - 0.002f, posTo.y() / 16f - 0.0625f, posFrom.z() / 16f), 14/ 16f, minV,
+                        v(posFrom.x() / 16f - 0.002f, posTo.y() / 16f - 0.0625f, posTo.z() / 16f), 14/ 16f, maxV,
+                        v(posFrom.x() / 16f - 0.002f, posTo.y() / 16f + 0.0625f, posTo.z() / 16f), 16/ 16f, maxV, bark));
                 builder.addCulledFace(Direction.WEST, this.createQuad(
-                        v(posFrom.x() / 16f - 0.002f, posFrom.y() / 16f + 0.0625f, posFrom.z() / 16f), 2, minV,
+                        v(posFrom.x() / 16f - 0.002f, posFrom.y() / 16f + 0.0625f, posFrom.z() / 16f), 2/ 16f, minV,
                         v(posFrom.x() / 16f - 0.002f, posFrom.y() / 16f - 0.0625f, posFrom.z() / 16f), 0, minV,
                         v(posFrom.x() / 16f - 0.002f, posFrom.y() / 16f - 0.0625f, posTo.z() / 16f), 0, maxV,
-                        v(posFrom.x() / 16f - 0.002f, posFrom.y() / 16f + 0.0625f, posTo.z() / 16f), 2, maxV, bark));
+                        v(posFrom.x() / 16f - 0.002f, posFrom.y() / 16f + 0.0625f, posTo.z() / 16f), 2/ 16f, maxV, bark));
                 builder.addCulledFace(Direction.EAST, this.createQuad(
-                        v(posTo.x() / 16f + 0.002f, posTo.y() / 16f + 0.0625f, posTo.z() / 16f), 16, maxV,
-                        v(posTo.x() / 16f + 0.002f, posTo.y() / 16f - 0.0625f, posTo.z() / 16f), 14, maxV,
-                        v(posTo.x() / 16f + 0.002f, posTo.y() / 16f - 0.0625f, posFrom.z() / 16f), 14, minV,
-                        v(posTo.x() / 16f + 0.002f, posTo.y() / 16f + 0.0625f, posFrom.z() / 16f), 16, minV, bark));
+                        v(posTo.x() / 16f + 0.002f, posTo.y() / 16f + 0.0625f, posTo.z() / 16f), 16/ 16f, maxV,
+                        v(posTo.x() / 16f + 0.002f, posTo.y() / 16f - 0.0625f, posTo.z() / 16f), 14/ 16f, maxV,
+                        v(posTo.x() / 16f + 0.002f, posTo.y() / 16f - 0.0625f, posFrom.z() / 16f), 14/ 16f, minV,
+                        v(posTo.x() / 16f + 0.002f, posTo.y() / 16f + 0.0625f, posFrom.z() / 16f), 16/ 16f, minV, bark));
                 builder.addCulledFace(Direction.EAST, this.createQuad(
-                        v(posTo.x() / 16f + 0.002f, posFrom.y() / 16f + 0.0625f, posTo.z() / 16f), 2, maxV,
+                        v(posTo.x() / 16f + 0.002f, posFrom.y() / 16f + 0.0625f, posTo.z() / 16f), 2/ 16f, maxV,
                         v(posTo.x() / 16f + 0.002f, posFrom.y() / 16f - 0.0625f, posTo.z() / 16f), 0, maxV,
                         v(posTo.x() / 16f + 0.002f, posFrom.y() / 16f - 0.0625f, posFrom.z() / 16f), 0, minV,
-                        v(posTo.x() / 16f + 0.002f, posFrom.y() / 16f + 0.0625f, posFrom.z() / 16f), 2, minV, bark));
+                        v(posTo.x() / 16f + 0.002f, posFrom.y() / 16f + 0.0625f, posFrom.z() / 16f), 2/ 16f, minV, bark));
 
                 builder.addCulledFace(Direction.DOWN, this.createQuad(
-                        v(posTo.x() / 16f + 0.0625f, posFrom.y() / 16f - 0.001f, posTo.z() / 16f), 16, maxV,
-                        v(posTo.x() / 16f - 0.0625f, posFrom.y() / 16f - 0.001f, posTo.z() / 16f), 14, maxV,
-                        v(posTo.x() / 16f - 0.0625f, posFrom.y() / 16f - 0.001f, posFrom.z() / 16f), 14, minV,
-                        v(posTo.x() / 16f + 0.0625f, posFrom.y() / 16f - 0.001f, posFrom.z() / 16f), 16, minV, bark));
+                        v(posTo.x() / 16f + 0.0625f, posFrom.y() / 16f - 0.001f, posTo.z() / 16f), 16/ 16f, maxV,
+                        v(posTo.x() / 16f - 0.0625f, posFrom.y() / 16f - 0.001f, posTo.z() / 16f), 14/ 16f, maxV,
+                        v(posTo.x() / 16f - 0.0625f, posFrom.y() / 16f - 0.001f, posFrom.z() / 16f), 14/ 16f, minV,
+                        v(posTo.x() / 16f + 0.0625f, posFrom.y() / 16f - 0.001f, posFrom.z() / 16f), 16/ 16f, minV, bark));
                 builder.addCulledFace(Direction.DOWN, this.createQuad(
-                        v(posFrom.x() / 16f + 0.0625f, posFrom.y() / 16f - 0.001f, posTo.z() / 16f), 2, maxV,
+                        v(posFrom.x() / 16f + 0.0625f, posFrom.y() / 16f - 0.001f, posTo.z() / 16f), 2/ 16f, maxV,
                         v(posFrom.x() / 16f - 0.0625f, posFrom.y() / 16f - 0.001f, posTo.z() / 16f), 0, maxV,
                         v(posFrom.x() / 16f - 0.0625f, posFrom.y() / 16f - 0.001f, posFrom.z() / 16f), 0, minV,
-                        v(posFrom.x() / 16f + 0.0625f, posFrom.y() / 16f - 0.001f, posFrom.z() / 16f), 2, minV, bark));
+                        v(posFrom.x() / 16f + 0.0625f, posFrom.y() / 16f - 0.001f, posFrom.z() / 16f), 2/ 16f, minV, bark));
                 builder.addCulledFace(Direction.UP, this.createQuad(
-                        v(posTo.x() / 16f + 0.0625f, posTo.y() / 16f + 0.001f, posFrom.z() / 16f), 16, minV,
-                        v(posTo.x() / 16f - 0.0625f, posTo.y() / 16f + 0.001f, posFrom.z() / 16f), 14, minV,
-                        v(posTo.x() / 16f - 0.0625f, posTo.y() / 16f + 0.001f, posTo.z() / 16f), 14, maxV,
-                        v(posTo.x() / 16f + 0.0625f, posTo.y() / 16f + 0.001f, posTo.z() / 16f), 16, maxV, bark));
+                        v(posTo.x() / 16f + 0.0625f, posTo.y() / 16f + 0.001f, posFrom.z() / 16f), 16/ 16f, minV,
+                        v(posTo.x() / 16f - 0.0625f, posTo.y() / 16f + 0.001f, posFrom.z() / 16f), 14/ 16f, minV,
+                        v(posTo.x() / 16f - 0.0625f, posTo.y() / 16f + 0.001f, posTo.z() / 16f), 14/ 16f, maxV,
+                        v(posTo.x() / 16f + 0.0625f, posTo.y() / 16f + 0.001f, posTo.z() / 16f), 16/ 16f, maxV, bark));
                 builder.addCulledFace(Direction.UP, this.createQuad(
-                        v(posFrom.x() / 16f + 0.0625f, posTo.y() / 16f + 0.001f, posFrom.z() / 16f), 2, minV,
+                        v(posFrom.x() / 16f + 0.0625f, posTo.y() / 16f + 0.001f, posFrom.z() / 16f), 2/ 16f, minV,
                         v(posFrom.x() / 16f - 0.0625f, posTo.y() / 16f + 0.001f, posFrom.z() / 16f), 0, minV,
                         v(posFrom.x() / 16f - 0.0625f, posTo.y() / 16f + 0.001f, posTo.z() / 16f), 0, maxV,
-                        v(posFrom.x() / 16f + 0.0625f, posTo.y() / 16f + 0.001f, posTo.z() / 16f), 2, maxV, bark));
+                        v(posFrom.x() / 16f + 0.0625f, posTo.y() / 16f + 0.001f, posTo.z() / 16f), 2/ 16f, maxV, bark));
 
                 break;
         }
@@ -314,8 +314,8 @@ public class CactusBranchBlockBakedModel implements IDynamicBakedModel {
     }
 
     public BakedModel bakeCoreSpikes(int radius, TextureAtlasSprite bark) {
-        float minV = 8 - radius;
-        float maxV = 8 + radius;
+        float minV = (8 - radius) / 16f;
+        float maxV = (8 + radius) / 16f;
 
         Vector3f posFrom = new Vector3f(8 - radius, 8 - radius, 8 - radius);
         Vector3f posTo = new Vector3f(8 + radius, 8 + radius, 8 + radius);
@@ -324,140 +324,140 @@ public class CactusBranchBlockBakedModel implements IDynamicBakedModel {
 
         // X
         builder.addCulledFace(Direction.UP, this.createQuad(
-                v(posTo.x() / 16f, posTo.y() / 16f + 0.0625f, posFrom.z() / 16f - 0.002f), 16, minV,
-                v(posTo.x() / 16f, posTo.y() / 16f - 0.0625f, posFrom.z() / 16f - 0.002f), 14, minV,
-                v(posFrom.x() / 16f, posTo.y() / 16f - 0.0625f, posFrom.z() / 16f - 0.002f), 14, maxV,
-                v(posFrom.x() / 16f, posTo.y() / 16f + 0.0625f, posFrom.z() / 16f - 0.002f), 16, maxV, bark));
+                v(posTo.x() / 16f, posTo.y() / 16f + 0.0625f, posFrom.z() / 16f - 0.002f), 16/ 16f, minV,
+                v(posTo.x() / 16f, posTo.y() / 16f - 0.0625f, posFrom.z() / 16f - 0.002f), 14/ 16f, minV,
+                v(posFrom.x() / 16f, posTo.y() / 16f - 0.0625f, posFrom.z() / 16f - 0.002f), 14/ 16f, maxV,
+                v(posFrom.x() / 16f, posTo.y() / 16f + 0.0625f, posFrom.z() / 16f - 0.002f), 16/ 16f, maxV, bark));
         builder.addCulledFace(Direction.DOWN, this.createQuad(
-                v(posTo.x() / 16f, posFrom.y() / 16f + 0.0625f, posFrom.z() / 16f - 0.002f), 2, minV,
+                v(posTo.x() / 16f, posFrom.y() / 16f + 0.0625f, posFrom.z() / 16f - 0.002f), 2/ 16f, minV,
                 v(posTo.x() / 16f, posFrom.y() / 16f - 0.0625f, posFrom.z() / 16f - 0.002f), 0, minV,
                 v(posFrom.x() / 16f, posFrom.y() / 16f - 0.0625f, posFrom.z() / 16f - 0.002f), 0, maxV,
-                v(posFrom.x() / 16f, posFrom.y() / 16f + 0.0625f, posFrom.z() / 16f - 0.002f), 2, maxV, bark));
+                v(posFrom.x() / 16f, posFrom.y() / 16f + 0.0625f, posFrom.z() / 16f - 0.002f), 2/ 16f, maxV, bark));
         builder.addCulledFace(Direction.UP, this.createQuad(
-                v(posFrom.x() / 16f, posTo.y() / 16f + 0.0625f, posTo.z() / 16f + 0.002f), 16, maxV,
-                v(posFrom.x() / 16f, posTo.y() / 16f - 0.0625f, posTo.z() / 16f + 0.002f), 14, maxV,
-                v(posTo.x() / 16f, posTo.y() / 16f - 0.0625f, posTo.z() / 16f + 0.002f), 14, minV,
-                v(posTo.x() / 16f, posTo.y() / 16f + 0.0625f, posTo.z() / 16f + 0.002f), 16, minV, bark));
+                v(posFrom.x() / 16f, posTo.y() / 16f + 0.0625f, posTo.z() / 16f + 0.002f), 16/ 16f, maxV,
+                v(posFrom.x() / 16f, posTo.y() / 16f - 0.0625f, posTo.z() / 16f + 0.002f), 14/ 16f, maxV,
+                v(posTo.x() / 16f, posTo.y() / 16f - 0.0625f, posTo.z() / 16f + 0.002f), 14/ 16f, minV,
+                v(posTo.x() / 16f, posTo.y() / 16f + 0.0625f, posTo.z() / 16f + 0.002f), 16/ 16f, minV, bark));
         builder.addCulledFace(Direction.DOWN, this.createQuad(
-                v(posFrom.x() / 16f, posFrom.y() / 16f + 0.0625f, posTo.z() / 16f + 0.002f), 2, maxV,
+                v(posFrom.x() / 16f, posFrom.y() / 16f + 0.0625f, posTo.z() / 16f + 0.002f), 2/ 16f, maxV,
                 v(posFrom.x() / 16f, posFrom.y() / 16f - 0.0625f, posTo.z() / 16f + 0.002f), 0, maxV,
                 v(posTo.x() / 16f, posFrom.y() / 16f - 0.0625f, posTo.z() / 16f + 0.002f), 0, minV,
-                v(posTo.x() / 16f, posFrom.y() / 16f + 0.0625f, posTo.z() / 16f + 0.002f), 2, minV, bark));
+                v(posTo.x() / 16f, posFrom.y() / 16f + 0.0625f, posTo.z() / 16f + 0.002f), 2/ 16f, minV, bark));
 
         builder.addCulledFace(Direction.SOUTH, this.createQuad(
-                v(posTo.x() / 16f, posFrom.y() / 16f - 0.002f, posTo.z() / 16f - 0.0625f), 14, minV,
-                v(posTo.x() / 16f, posFrom.y() / 16f - 0.002f, posTo.z() / 16f + 0.0625f), 16, minV,
-                v(posFrom.x() / 16f, posFrom.y() / 16f - 0.002f, posTo.z() / 16f + 0.0625f), 16, maxV,
-                v(posFrom.x() / 16f, posFrom.y() / 16f - 0.002f, posTo.z() / 16f - 0.0625f), 14, maxV, bark));
+                v(posTo.x() / 16f, posFrom.y() / 16f - 0.002f, posTo.z() / 16f - 0.0625f), 14/ 16f, minV,
+                v(posTo.x() / 16f, posFrom.y() / 16f - 0.002f, posTo.z() / 16f + 0.0625f), 16/ 16f, minV,
+                v(posFrom.x() / 16f, posFrom.y() / 16f - 0.002f, posTo.z() / 16f + 0.0625f), 16/ 16f, maxV,
+                v(posFrom.x() / 16f, posFrom.y() / 16f - 0.002f, posTo.z() / 16f - 0.0625f), 14/ 16f, maxV, bark));
         builder.addCulledFace(Direction.NORTH, this.createQuad(
                 v(posTo.x() / 16f, posFrom.y() / 16f - 0.002f, posFrom.z() / 16f - 0.0625f), 0, minV,
-                v(posTo.x() / 16f, posFrom.y() / 16f - 0.002f, posFrom.z() / 16f + 0.0625f), 2, minV,
-                v(posFrom.x() / 16f, posFrom.y() / 16f - 0.002f, posFrom.z() / 16f + 0.0625f), 2, maxV,
+                v(posTo.x() / 16f, posFrom.y() / 16f - 0.002f, posFrom.z() / 16f + 0.0625f), 2/ 16f, minV,
+                v(posFrom.x() / 16f, posFrom.y() / 16f - 0.002f, posFrom.z() / 16f + 0.0625f), 2/ 16f, maxV,
                 v(posFrom.x() / 16f, posFrom.y() / 16f - 0.002f, posFrom.z() / 16f - 0.0625f), 0, maxV, bark));
         builder.addCulledFace(Direction.SOUTH, this.createQuad(
-                v(posFrom.x() / 16f, posTo.y() / 16f + 0.002f, posTo.z() / 16f - 0.0625f), 14, maxV,
-                v(posFrom.x() / 16f, posTo.y() / 16f + 0.002f, posTo.z() / 16f + 0.0625f), 16, maxV,
-                v(posTo.x() / 16f, posTo.y() / 16f + 0.002f, posTo.z() / 16f + 0.0625f), 16, minV,
-                v(posTo.x() / 16f, posTo.y() / 16f + 0.002f, posTo.z() / 16f - 0.0625f), 14, minV, bark));
+                v(posFrom.x() / 16f, posTo.y() / 16f + 0.002f, posTo.z() / 16f - 0.0625f), 14/ 16f, maxV,
+                v(posFrom.x() / 16f, posTo.y() / 16f + 0.002f, posTo.z() / 16f + 0.0625f), 16/ 16f, maxV,
+                v(posTo.x() / 16f, posTo.y() / 16f + 0.002f, posTo.z() / 16f + 0.0625f), 16/ 16f, minV,
+                v(posTo.x() / 16f, posTo.y() / 16f + 0.002f, posTo.z() / 16f - 0.0625f), 14/ 16f, minV, bark));
         builder.addCulledFace(Direction.NORTH, this.createQuad(
                 v(posFrom.x() / 16f, posTo.y() / 16f + 0.002f, posFrom.z() / 16f - 0.0625f), 0, maxV,
-                v(posFrom.x() / 16f, posTo.y() / 16f + 0.002f, posFrom.z() / 16f + 0.0625f), 2, maxV,
-                v(posTo.x() / 16f, posTo.y() / 16f + 0.002f, posFrom.z() / 16f + 0.0625f), 2, minV,
+                v(posFrom.x() / 16f, posTo.y() / 16f + 0.002f, posFrom.z() / 16f + 0.0625f), 2/ 16f, maxV,
+                v(posTo.x() / 16f, posTo.y() / 16f + 0.002f, posFrom.z() / 16f + 0.0625f), 2/ 16f, minV,
                 v(posTo.x() / 16f, posTo.y() / 16f + 0.002f, posFrom.z() / 16f - 0.0625f), 0, minV, bark));
 
         // Y
         builder.addCulledFace(Direction.SOUTH, this.createQuad(
-                v(posFrom.x() / 16f - 0.001f, posTo.y() / 16f, posTo.z() / 16f + 0.0625f), 16, minV,
-                v(posFrom.x() / 16f - 0.001f, posTo.y() / 16f, posTo.z() / 16f - 0.0625f), 14, minV,
-                v(posFrom.x() / 16f - 0.001f, posFrom.y() / 16f, posTo.z() / 16f - 0.0625f), 14, maxV,
-                v(posFrom.x() / 16f - 0.001f, posFrom.y() / 16f, posTo.z() / 16f + 0.0625f), 16, maxV, bark));
+                v(posFrom.x() / 16f - 0.001f, posTo.y() / 16f, posTo.z() / 16f + 0.0625f), 16/ 16f, minV,
+                v(posFrom.x() / 16f - 0.001f, posTo.y() / 16f, posTo.z() / 16f - 0.0625f), 14/ 16f, minV,
+                v(posFrom.x() / 16f - 0.001f, posFrom.y() / 16f, posTo.z() / 16f - 0.0625f), 14/ 16f, maxV,
+                v(posFrom.x() / 16f - 0.001f, posFrom.y() / 16f, posTo.z() / 16f + 0.0625f), 16/ 16f, maxV, bark));
         builder.addCulledFace(Direction.NORTH, this.createQuad(
-                v(posFrom.x() / 16f - 0.001f, posTo.y() / 16f, posFrom.z() / 16f + 0.0625f), 2, minV,
+                v(posFrom.x() / 16f - 0.001f, posTo.y() / 16f, posFrom.z() / 16f + 0.0625f), 2/ 16f, minV,
                 v(posFrom.x() / 16f - 0.001f, posTo.y() / 16f, posFrom.z() / 16f - 0.0625f), 0, minV,
                 v(posFrom.x() / 16f - 0.001f, posFrom.y() / 16f, posFrom.z() / 16f - 0.0625f), 0, maxV,
-                v(posFrom.x() / 16f - 0.001f, posFrom.y() / 16f, posFrom.z() / 16f + 0.0625f), 2, maxV, bark));
+                v(posFrom.x() / 16f - 0.001f, posFrom.y() / 16f, posFrom.z() / 16f + 0.0625f), 2/ 16f, maxV, bark));
         builder.addCulledFace(Direction.SOUTH, this.createQuad(
-                v(posTo.x() / 16f + 0.001f, posFrom.y() / 16f, posTo.z() / 16f + 0.0625f), 16, maxV,
-                v(posTo.x() / 16f + 0.001f, posFrom.y() / 16f, posTo.z() / 16f - 0.0625f), 14, maxV,
-                v(posTo.x() / 16f + 0.001f, posTo.y() / 16f, posTo.z() / 16f - 0.0625f), 14, minV,
-                v(posTo.x() / 16f + 0.001f, posTo.y() / 16f, posTo.z() / 16f + 0.0625f), 16, minV, bark));
+                v(posTo.x() / 16f + 0.001f, posFrom.y() / 16f, posTo.z() / 16f + 0.0625f), 16/ 16f, maxV,
+                v(posTo.x() / 16f + 0.001f, posFrom.y() / 16f, posTo.z() / 16f - 0.0625f), 14/ 16f, maxV,
+                v(posTo.x() / 16f + 0.001f, posTo.y() / 16f, posTo.z() / 16f - 0.0625f), 14/ 16f, minV,
+                v(posTo.x() / 16f + 0.001f, posTo.y() / 16f, posTo.z() / 16f + 0.0625f), 16/ 16f, minV, bark));
         builder.addCulledFace(Direction.NORTH, this.createQuad(
-                v(posTo.x() / 16f + 0.001f, posFrom.y() / 16f, posFrom.z() / 16f + 0.0625f), 2, maxV,
+                v(posTo.x() / 16f + 0.001f, posFrom.y() / 16f, posFrom.z() / 16f + 0.0625f), 2/ 16f, maxV,
                 v(posTo.x() / 16f + 0.001f, posFrom.y() / 16f, posFrom.z() / 16f - 0.0625f), 0, maxV,
                 v(posTo.x() / 16f + 0.001f, posTo.y() / 16f, posFrom.z() / 16f - 0.0625f), 0, minV,
-                v(posTo.x() / 16f + 0.001f, posTo.y() / 16f, posFrom.z() / 16f + 0.0625f), 2, minV, bark));
+                v(posTo.x() / 16f + 0.001f, posTo.y() / 16f, posFrom.z() / 16f + 0.0625f), 2/ 16f, minV, bark));
 
         builder.addCulledFace(Direction.EAST, this.createQuad(
-                v(posTo.x() / 16f + 0.0625f, posFrom.y() / 16f, posFrom.z() / 16f - 0.001f), 16, maxV,
-                v(posTo.x() / 16f - 0.0625f, posFrom.y() / 16f, posFrom.z() / 16f - 0.001f), 14, maxV,
-                v(posTo.x() / 16f - 0.0625f, posTo.y() / 16f, posFrom.z() / 16f - 0.001f), 14, minV,
-                v(posTo.x() / 16f + 0.0625f, posTo.y() / 16f, posFrom.z() / 16f - 0.001f), 16, minV, bark));
+                v(posTo.x() / 16f + 0.0625f, posFrom.y() / 16f, posFrom.z() / 16f - 0.001f), 16/ 16f, maxV,
+                v(posTo.x() / 16f - 0.0625f, posFrom.y() / 16f, posFrom.z() / 16f - 0.001f), 14/ 16f, maxV,
+                v(posTo.x() / 16f - 0.0625f, posTo.y() / 16f, posFrom.z() / 16f - 0.001f), 14/ 16f, minV,
+                v(posTo.x() / 16f + 0.0625f, posTo.y() / 16f, posFrom.z() / 16f - 0.001f), 16/ 16f, minV, bark));
         builder.addCulledFace(Direction.WEST, this.createQuad(
-                v(posFrom.x() / 16f + 0.0625f, posFrom.y() / 16f, posFrom.z() / 16f - 0.001f), 2, maxV,
+                v(posFrom.x() / 16f + 0.0625f, posFrom.y() / 16f, posFrom.z() / 16f - 0.001f), 2/ 16f, maxV,
                 v(posFrom.x() / 16f - 0.0625f, posFrom.y() / 16f, posFrom.z() / 16f - 0.001f), 0, maxV,
                 v(posFrom.x() / 16f - 0.0625f, posTo.y() / 16f, posFrom.z() / 16f - 0.001f), 0, minV,
-                v(posFrom.x() / 16f + 0.0625f, posTo.y() / 16f, posFrom.z() / 16f - 0.001f), 2, minV, bark));
+                v(posFrom.x() / 16f + 0.0625f, posTo.y() / 16f, posFrom.z() / 16f - 0.001f), 2/ 16f, minV, bark));
         builder.addCulledFace(Direction.EAST, this.createQuad(
-                v(posTo.x() / 16f + 0.0625f, posTo.y() / 16f, posTo.z() / 16f + 0.001f), 16, minV,
-                v(posTo.x() / 16f - 0.0625f, posTo.y() / 16f, posTo.z() / 16f + 0.001f), 14, minV,
-                v(posTo.x() / 16f - 0.0625f, posFrom.y() / 16f, posTo.z() / 16f + 0.001f), 14, maxV,
-                v(posTo.x() / 16f + 0.0625f, posFrom.y() / 16f, posTo.z() / 16f + 0.001f), 16, maxV, bark));
+                v(posTo.x() / 16f + 0.0625f, posTo.y() / 16f, posTo.z() / 16f + 0.001f), 16/ 16f, minV,
+                v(posTo.x() / 16f - 0.0625f, posTo.y() / 16f, posTo.z() / 16f + 0.001f), 14/ 16f, minV,
+                v(posTo.x() / 16f - 0.0625f, posFrom.y() / 16f, posTo.z() / 16f + 0.001f), 14/ 16f, maxV,
+                v(posTo.x() / 16f + 0.0625f, posFrom.y() / 16f, posTo.z() / 16f + 0.001f), 16/ 16f, maxV, bark));
         builder.addCulledFace(Direction.WEST, this.createQuad(
-                v(posFrom.x() / 16f + 0.0625f, posTo.y() / 16f, posTo.z() / 16f + 0.001f), 2, minV,
+                v(posFrom.x() / 16f + 0.0625f, posTo.y() / 16f, posTo.z() / 16f + 0.001f), 2/ 16f, minV,
                 v(posFrom.x() / 16f - 0.0625f, posTo.y() / 16f, posTo.z() / 16f + 0.001f), 0, minV,
                 v(posFrom.x() / 16f - 0.0625f, posFrom.y() / 16f, posTo.z() / 16f + 0.001f), 0, maxV,
-                v(posFrom.x() / 16f + 0.0625f, posFrom.y() / 16f, posTo.z() / 16f + 0.001f), 2, maxV, bark));
+                v(posFrom.x() / 16f + 0.0625f, posFrom.y() / 16f, posTo.z() / 16f + 0.001f), 2/ 16f, maxV, bark));
 
         // Z
         builder.addCulledFace(Direction.UP, this.createQuad(
-                v(posFrom.x() / 16f - 0.002f, posTo.y() / 16f + 0.0625f, posFrom.z() / 16f), 16, minV,
-                v(posFrom.x() / 16f - 0.002f, posTo.y() / 16f - 0.0625f, posFrom.z() / 16f), 14, minV,
-                v(posFrom.x() / 16f - 0.002f, posTo.y() / 16f - 0.0625f, posTo.z() / 16f), 14, maxV,
-                v(posFrom.x() / 16f - 0.002f, posTo.y() / 16f + 0.0625f, posTo.z() / 16f), 16, maxV, bark));
+                v(posFrom.x() / 16f - 0.002f, posTo.y() / 16f + 0.0625f, posFrom.z() / 16f), 16/ 16f, minV,
+                v(posFrom.x() / 16f - 0.002f, posTo.y() / 16f - 0.0625f, posFrom.z() / 16f), 14/ 16f, minV,
+                v(posFrom.x() / 16f - 0.002f, posTo.y() / 16f - 0.0625f, posTo.z() / 16f), 14/ 16f, maxV,
+                v(posFrom.x() / 16f - 0.002f, posTo.y() / 16f + 0.0625f, posTo.z() / 16f), 16/ 16f, maxV, bark));
         builder.addCulledFace(Direction.DOWN, this.createQuad(
-                v(posFrom.x() / 16f - 0.002f, posFrom.y() / 16f + 0.0625f, posFrom.z() / 16f), 2, minV,
+                v(posFrom.x() / 16f - 0.002f, posFrom.y() / 16f + 0.0625f, posFrom.z() / 16f), 2/ 16f, minV,
                 v(posFrom.x() / 16f - 0.002f, posFrom.y() / 16f - 0.0625f, posFrom.z() / 16f), 0, minV,
                 v(posFrom.x() / 16f - 0.002f, posFrom.y() / 16f - 0.0625f, posTo.z() / 16f), 0, maxV,
-                v(posFrom.x() / 16f - 0.002f, posFrom.y() / 16f + 0.0625f, posTo.z() / 16f), 2, maxV, bark));
+                v(posFrom.x() / 16f - 0.002f, posFrom.y() / 16f + 0.0625f, posTo.z() / 16f), 2/ 16f, maxV, bark));
         builder.addCulledFace(Direction.UP, this.createQuad(
-                v(posTo.x() / 16f + 0.002f, posTo.y() / 16f + 0.0625f, posTo.z() / 16f), 16, maxV,
-                v(posTo.x() / 16f + 0.002f, posTo.y() / 16f - 0.0625f, posTo.z() / 16f), 14, maxV,
-                v(posTo.x() / 16f + 0.002f, posTo.y() / 16f - 0.0625f, posFrom.z() / 16f), 14, minV,
-                v(posTo.x() / 16f + 0.002f, posTo.y() / 16f + 0.0625f, posFrom.z() / 16f), 16, minV, bark));
+                v(posTo.x() / 16f + 0.002f, posTo.y() / 16f + 0.0625f, posTo.z() / 16f), 16/ 16f, maxV,
+                v(posTo.x() / 16f + 0.002f, posTo.y() / 16f - 0.0625f, posTo.z() / 16f), 14/ 16f, maxV,
+                v(posTo.x() / 16f + 0.002f, posTo.y() / 16f - 0.0625f, posFrom.z() / 16f), 14/ 16f, minV,
+                v(posTo.x() / 16f + 0.002f, posTo.y() / 16f + 0.0625f, posFrom.z() / 16f), 16/ 16f, minV, bark));
         builder.addCulledFace(Direction.DOWN, this.createQuad(
-                v(posTo.x() / 16f + 0.002f, posFrom.y() / 16f + 0.0625f, posTo.z() / 16f), 2, maxV,
+                v(posTo.x() / 16f + 0.002f, posFrom.y() / 16f + 0.0625f, posTo.z() / 16f), 2/ 16f, maxV,
                 v(posTo.x() / 16f + 0.002f, posFrom.y() / 16f - 0.0625f, posTo.z() / 16f), 0, maxV,
                 v(posTo.x() / 16f + 0.002f, posFrom.y() / 16f - 0.0625f, posFrom.z() / 16f), 0, minV,
-                v(posTo.x() / 16f + 0.002f, posFrom.y() / 16f + 0.0625f, posFrom.z() / 16f), 2, minV, bark));
+                v(posTo.x() / 16f + 0.002f, posFrom.y() / 16f + 0.0625f, posFrom.z() / 16f), 2/ 16f, minV, bark));
 
         builder.addCulledFace(Direction.EAST, this.createQuad(
-                v(posTo.x() / 16f + 0.0625f, posFrom.y() / 16f - 0.001f, posTo.z() / 16f), 16, maxV,
-                v(posTo.x() / 16f - 0.0625f, posFrom.y() / 16f - 0.001f, posTo.z() / 16f), 14, maxV,
-                v(posTo.x() / 16f - 0.0625f, posFrom.y() / 16f - 0.001f, posFrom.z() / 16f), 14, minV,
-                v(posTo.x() / 16f + 0.0625f, posFrom.y() / 16f - 0.001f, posFrom.z() / 16f), 16, minV, bark));
+                v(posTo.x() / 16f + 0.0625f, posFrom.y() / 16f - 0.001f, posTo.z() / 16f), 16/ 16f, maxV,
+                v(posTo.x() / 16f - 0.0625f, posFrom.y() / 16f - 0.001f, posTo.z() / 16f), 14/ 16f, maxV,
+                v(posTo.x() / 16f - 0.0625f, posFrom.y() / 16f - 0.001f, posFrom.z() / 16f), 14/ 16f, minV,
+                v(posTo.x() / 16f + 0.0625f, posFrom.y() / 16f - 0.001f, posFrom.z() / 16f), 16/ 16f, minV, bark));
         builder.addCulledFace(Direction.WEST, this.createQuad(
-                v(posFrom.x() / 16f + 0.0625f, posFrom.y() / 16f - 0.001f, posTo.z() / 16f), 2, maxV,
+                v(posFrom.x() / 16f + 0.0625f, posFrom.y() / 16f - 0.001f, posTo.z() / 16f), 2/ 16f, maxV,
                 v(posFrom.x() / 16f - 0.0625f, posFrom.y() / 16f - 0.001f, posTo.z() / 16f), 0, maxV,
                 v(posFrom.x() / 16f - 0.0625f, posFrom.y() / 16f - 0.001f, posFrom.z() / 16f), 0, minV,
-                v(posFrom.x() / 16f + 0.0625f, posFrom.y() / 16f - 0.001f, posFrom.z() / 16f), 2, minV, bark));
+                v(posFrom.x() / 16f + 0.0625f, posFrom.y() / 16f - 0.001f, posFrom.z() / 16f), 2/ 16f, minV, bark));
         builder.addCulledFace(Direction.EAST, this.createQuad(
-                v(posTo.x() / 16f + 0.0625f, posTo.y() / 16f + 0.001f, posFrom.z() / 16f), 16, minV,
-                v(posTo.x() / 16f - 0.0625f, posTo.y() / 16f + 0.001f, posFrom.z() / 16f), 14, minV,
-                v(posTo.x() / 16f - 0.0625f, posTo.y() / 16f + 0.001f, posTo.z() / 16f), 14, maxV,
-                v(posTo.x() / 16f + 0.0625f, posTo.y() / 16f + 0.001f, posTo.z() / 16f), 16, maxV, bark));
+                v(posTo.x() / 16f + 0.0625f, posTo.y() / 16f + 0.001f, posFrom.z() / 16f), 16/ 16f, minV,
+                v(posTo.x() / 16f - 0.0625f, posTo.y() / 16f + 0.001f, posFrom.z() / 16f), 14/ 16f, minV,
+                v(posTo.x() / 16f - 0.0625f, posTo.y() / 16f + 0.001f, posTo.z() / 16f), 14/ 16f, maxV,
+                v(posTo.x() / 16f + 0.0625f, posTo.y() / 16f + 0.001f, posTo.z() / 16f), 16/ 16f, maxV, bark));
         builder.addCulledFace(Direction.WEST, this.createQuad(
-                v(posFrom.x() / 16f + 0.0625f, posTo.y() / 16f + 0.001f, posFrom.z() / 16f), 2, minV,
+                v(posFrom.x() / 16f + 0.0625f, posTo.y() / 16f + 0.001f, posFrom.z() / 16f), 2/ 16f, minV,
                 v(posFrom.x() / 16f - 0.0625f, posTo.y() / 16f + 0.001f, posFrom.z() / 16f), 0, minV,
                 v(posFrom.x() / 16f - 0.0625f, posTo.y() / 16f + 0.001f, posTo.z() / 16f), 0, maxV,
-                v(posFrom.x() / 16f + 0.0625f, posTo.y() / 16f + 0.001f, posTo.z() / 16f), 2, maxV, bark));
+                v(posFrom.x() / 16f + 0.0625f, posTo.y() / 16f + 0.001f, posTo.z() / 16f), 2/ 16f, maxV, bark));
 
 
         return builder.build();
     }
 
     public BakedModel bakeTopSleeveSpikes(TextureAtlasSprite bark) {
-        float minV = 4;
-        float maxV = 12;
+        float minV = 4/ 16f;
+        float maxV = 12/ 16f;
 
         Vector3f posFrom = new Vector3f(4, 16, 4);
         Vector3f posTo = new Vector3f(12, 16, 12);
@@ -466,46 +466,46 @@ public class CactusBranchBlockBakedModel implements IDynamicBakedModel {
 
 
         builder.addCulledFace(Direction.UP, this.createQuad(
-                v(posTo, posTo, posFrom, 0, +0.0625f, -0.002f), 16, minV,
-                v(posTo, posTo, posFrom, 0, -0.0625f, -0.002f), 14, minV,
-                v(posFrom, posTo, posFrom, 0, -0.0625f, -0.002f), 14, maxV,
-                v(posFrom, posTo, posFrom, 0, +0.0625f, -0.002f), 16, maxV, bark));
+                v(posTo, posTo, posFrom, 0, +0.0625f, -0.002f), 16/ 16f, minV,
+                v(posTo, posTo, posFrom, 0, -0.0625f, -0.002f), 14/ 16f, minV,
+                v(posFrom, posTo, posFrom, 0, -0.0625f, -0.002f), 14/ 16f, maxV,
+                v(posFrom, posTo, posFrom, 0, +0.0625f, -0.002f), 16/ 16f, maxV, bark));
         builder.addCulledFace(Direction.UP, this.createQuad(
-                v(posFrom, posTo, posTo, 0, +0.0625f, +0.002f), 16, maxV,
-                v(posFrom, posTo, posTo, 0, -0.0625f, +0.002f), 14, maxV,
-                v(posTo, posTo, posTo, 0, -0.0625f, +0.002f), 14, minV,
-                v(posTo, posTo, posTo, 0, +0.0625f, +0.002f), 16, minV, bark));
+                v(posFrom, posTo, posTo, 0, +0.0625f, +0.002f), 16/ 16f, maxV,
+                v(posFrom, posTo, posTo, 0, -0.0625f, +0.002f), 14/ 16f, maxV,
+                v(posTo, posTo, posTo, 0, -0.0625f, +0.002f), 14/ 16f, minV,
+                v(posTo, posTo, posTo, 0, +0.0625f, +0.002f), 16/ 16f, minV, bark));
         builder.addCulledFace(Direction.UP, this.createQuad(
-                v(posFrom, posTo, posTo, 0, +0.002f, -0.0625f), 14, maxV,
-                v(posFrom, posTo, posTo, 0, +0.002f, +0.0625f), 16, maxV,
-                v(posTo, posTo, posTo, 0, +0.002f, +0.0625f), 16, minV,
-                v(posTo, posTo, posTo, 0, +0.002f, -0.0625f), 14, minV, bark));
+                v(posFrom, posTo, posTo, 0, +0.002f, -0.0625f), 14/ 16f, maxV,
+                v(posFrom, posTo, posTo, 0, +0.002f, +0.0625f), 16/ 16f, maxV,
+                v(posTo, posTo, posTo, 0, +0.002f, +0.0625f), 16/ 16f, minV,
+                v(posTo, posTo, posTo, 0, +0.002f, -0.0625f), 14/ 16f, minV, bark));
         builder.addCulledFace(Direction.UP, this.createQuad(
                 v(posFrom, posTo, posFrom, 0, +0.002f, -0.0625f), 0, maxV,
-                v(posFrom, posTo, posFrom, 0, +0.002f, +0.0625f), 2, maxV,
-                v(posTo, posTo, posFrom, 0, +0.002f, +0.0625f), 2, minV,
+                v(posFrom, posTo, posFrom, 0, +0.002f, +0.0625f), 2/ 16f, maxV,
+                v(posTo, posTo, posFrom, 0, +0.002f, +0.0625f), 2/ 16f, minV,
                 v(posTo, posTo, posFrom, 0, +0.002f, -0.0625f), 0, minV, bark));
 
         builder.addCulledFace(Direction.UP, this.createQuad(
-                v(posFrom.x() / 16f - 0.002f, posTo.y() / 16f + 0.0625f, posFrom.z() / 16f), 16, minV,
-                v(posFrom.x() / 16f - 0.002f, posTo.y() / 16f - 0.0625f, posFrom.z() / 16f), 14, minV,
-                v(posFrom.x() / 16f - 0.002f, posTo.y() / 16f - 0.0625f, posTo.z() / 16f), 14, maxV,
-                v(posFrom.x() / 16f - 0.002f, posTo.y() / 16f + 0.0625f, posTo.z() / 16f), 16, maxV, bark));
+                v(posFrom.x() / 16f - 0.002f, posTo.y() / 16f + 0.0625f, posFrom.z() / 16f), 16/ 16f, minV,
+                v(posFrom.x() / 16f - 0.002f, posTo.y() / 16f - 0.0625f, posFrom.z() / 16f), 14/ 16f, minV,
+                v(posFrom.x() / 16f - 0.002f, posTo.y() / 16f - 0.0625f, posTo.z() / 16f), 14/ 16f, maxV,
+                v(posFrom.x() / 16f - 0.002f, posTo.y() / 16f + 0.0625f, posTo.z() / 16f), 16/ 16f, maxV, bark));
         builder.addCulledFace(Direction.UP, this.createQuad(
-                v(posTo.x() / 16f + 0.002f, posTo.y() / 16f + 0.0625f, posTo.z() / 16f), 16, maxV,
-                v(posTo.x() / 16f + 0.002f, posTo.y() / 16f - 0.0625f, posTo.z() / 16f), 14, maxV,
-                v(posTo.x() / 16f + 0.002f, posTo.y() / 16f - 0.0625f, posFrom.z() / 16f), 14, minV,
-                v(posTo.x() / 16f + 0.002f, posTo.y() / 16f + 0.0625f, posFrom.z() / 16f), 16, minV, bark));
+                v(posTo.x() / 16f + 0.002f, posTo.y() / 16f + 0.0625f, posTo.z() / 16f), 16/ 16f, maxV,
+                v(posTo.x() / 16f + 0.002f, posTo.y() / 16f - 0.0625f, posTo.z() / 16f), 14/ 16f, maxV,
+                v(posTo.x() / 16f + 0.002f, posTo.y() / 16f - 0.0625f, posFrom.z() / 16f), 14/ 16f, minV,
+                v(posTo.x() / 16f + 0.002f, posTo.y() / 16f + 0.0625f, posFrom.z() / 16f), 16/ 16f, minV, bark));
         builder.addCulledFace(Direction.UP, this.createQuad(
-                v(posTo.x() / 16f + 0.0625f, posTo.y() / 16f + 0.001f, posFrom.z() / 16f), 16, minV,
-                v(posTo.x() / 16f - 0.0625f, posTo.y() / 16f + 0.001f, posFrom.z() / 16f), 14, minV,
-                v(posTo.x() / 16f - 0.0625f, posTo.y() / 16f + 0.001f, posTo.z() / 16f), 14, maxV,
-                v(posTo.x() / 16f + 0.0625f, posTo.y() / 16f + 0.001f, posTo.z() / 16f), 16, maxV, bark));
+                v(posTo.x() / 16f + 0.0625f, posTo.y() / 16f + 0.001f, posFrom.z() / 16f), 16/ 16f, minV,
+                v(posTo.x() / 16f - 0.0625f, posTo.y() / 16f + 0.001f, posFrom.z() / 16f), 14/ 16f, minV,
+                v(posTo.x() / 16f - 0.0625f, posTo.y() / 16f + 0.001f, posTo.z() / 16f), 14/ 16f, maxV,
+                v(posTo.x() / 16f + 0.0625f, posTo.y() / 16f + 0.001f, posTo.z() / 16f), 16/ 16f, maxV, bark));
         builder.addCulledFace(Direction.UP, this.createQuad(
-                v(posFrom.x() / 16f + 0.0625f, posTo.y() / 16f + 0.001f, posFrom.z() / 16f), 2, minV,
+                v(posFrom.x() / 16f + 0.0625f, posTo.y() / 16f + 0.001f, posFrom.z() / 16f), 2/ 16f, minV,
                 v(posFrom.x() / 16f - 0.0625f, posTo.y() / 16f + 0.001f, posFrom.z() / 16f), 0, minV,
                 v(posFrom.x() / 16f - 0.0625f, posTo.y() / 16f + 0.001f, posTo.z() / 16f), 0, maxV,
-                v(posFrom.x() / 16f + 0.0625f, posTo.y() / 16f + 0.001f, posTo.z() / 16f), 2, maxV, bark));
+                v(posFrom.x() / 16f + 0.0625f, posTo.y() / 16f + 0.001f, posTo.z() / 16f), 2/ 16f, maxV, bark));
 
 
         return builder.build();

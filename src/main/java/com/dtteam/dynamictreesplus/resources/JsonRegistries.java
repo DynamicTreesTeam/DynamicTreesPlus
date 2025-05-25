@@ -1,19 +1,14 @@
 package com.dtteam.dynamictreesplus.resources;
 
-import com.dtteam.dynamictrees.deserialization.JsonDeserializers;
 import com.dtteam.dynamictrees.deserialization.PropertyAppliers;
-import com.dtteam.dynamictrees.deserialization.deserializer.EnumDeserializer;
-import com.dtteam.dynamictrees.deserialization.deserializer.RegistryEntryDeserializer;
 import com.dtteam.dynamictrees.event.ApplierRegistryEvent;
 import com.dtteam.dynamictrees.event.JsonDeserializerRegistryEvent;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.utility.ResourceLocationUtils;
 import com.dtteam.dynamictreesplus.DynamicTreesPlus;
-import com.dtteam.dynamictreesplus.block.CactusBranchBlock;
 import com.dtteam.dynamictreesplus.block.mushroom.CapProperties;
 import com.dtteam.dynamictreesplus.systems.mushroomlogic.MushroomShapeConfiguration;
-import com.dtteam.dynamictreesplus.systems.mushroomlogic.shapekits.MushroomShapeKit;
 import com.dtteam.dynamictreesplus.systems.thicknesslogic.CactusThicknessLogic;
 import com.dtteam.dynamictreesplus.tree.CactusSpecies;
 import com.dtteam.dynamictreesplus.tree.HugeMushroomFamily;
@@ -102,21 +97,7 @@ public final class JsonRegistries {
 
     @SubscribeEvent
     public static void registerJsonDeserializers(final JsonDeserializerRegistryEvent event) {
-        // Register cactus thickness logic kits and lock it.
-        CactusThicknessLogic.REGISTRY.postRegistryEvent();
-        MushroomShapeKit.REGISTRY.postRegistryEvent();
-        CactusThicknessLogic.REGISTRY.lock();
-        MushroomShapeKit.REGISTRY.lock();
-
-        // Register getter for cactus thickness logic and mushroom shape logic.
-        JsonDeserializers.register(CactusThicknessLogic.class,
-                new RegistryEntryDeserializer<>(CactusThicknessLogic.REGISTRY));
-        JsonDeserializers.register(MushroomShapeKit.class,
-                new RegistryEntryDeserializer<>(MushroomShapeKit.REGISTRY));
-
-        // Register getter for cactus thickness enum.
-        JsonDeserializers.register(CactusBranchBlock.CactusThickness.class,
-                new EnumDeserializer<>(CactusBranchBlock.CactusThickness.class));
+        DTPJsonDeserializers.register();
     }
 
 }

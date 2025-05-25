@@ -12,10 +12,13 @@ import com.dtteam.dynamictrees.utility.CoordUtils;
 import com.dtteam.dynamictrees.worldgen.DynamicTreeGenerationContext;
 import com.dtteam.dynamictreesplus.block.CactusBranchBlock;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.WorldGenRegion;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.biome.Biome;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -80,13 +83,15 @@ public class CactusClonesGenFeature extends GenFeature {
 
     private boolean placeCloneAtLocation(LevelContext levelContext, BlockPos cloneRootPos, Species species, boolean worldgen) {
         LevelAccessor level = levelContext.accessor();
+        ChunkPos chunkPos = new ChunkPos(cloneRootPos);
+        if (!level.hasChunk(chunkPos.x, chunkPos.z)) return false;
         for (int i = 1; i >= -1; i--) {
             BlockPos offsetRootPos = cloneRootPos.above(i);
             if (species.isAcceptableSoil(level.getBlockState(offsetRootPos))) {
-
                 if (worldgen) {
                     if (level instanceof WorldGenRegion) {
-                        species.generate(new DynamicTreeGenerationContext(levelContext, species, offsetRootPos, offsetRootPos.mutable(), level.getNoiseBiome(offsetRootPos.getX(), offsetRootPos.getY(), offsetRootPos.getZ()), CoordUtils.getRandomDir(level.getRandom()), 2, worldgen));
+                        Holder<Biome> biome = level.getBiome(offsetRootPos);
+                        species.generate(new DynamicTreeGenerationContext(levelContext, species, offsetRootPos, offsetRootPos.mutable(), biome, CoordUtils.getRandomDir(level.getRandom()), 2, worldgen));
                     }
                 } else if (level instanceof Level) {
                     species.transitionToTree((Level) level, offsetRootPos.above());

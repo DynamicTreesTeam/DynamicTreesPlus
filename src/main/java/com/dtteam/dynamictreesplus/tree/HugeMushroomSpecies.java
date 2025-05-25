@@ -14,7 +14,6 @@ import com.dtteam.dynamictrees.block.soil.SoilHelper;
 import com.dtteam.dynamictrees.block.soil.SpeciesBlockEntity;
 import com.dtteam.dynamictrees.data.tags.DTBlockTags;
 import com.dtteam.dynamictrees.data.tags.DTItemTags;
-import com.dtteam.dynamictrees.deserialization.JsonDeserializers;
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.dtteam.dynamictrees.registry.DTRegistries;
@@ -73,7 +72,7 @@ public class HugeMushroomSpecies extends Species {
     public static Codec<Species> createDefaultMushroomCodec(final Function3<ResourceLocation, Family, CapProperties, Species> constructor) {
         return RecordCodecBuilder.create(instance -> instance
                 .group(
-                        ResourceLocation.CODEC.fieldOf(JsonDeserializers.RESOURCE_LOCATION.toString())
+                        ResourceLocation.CODEC.fieldOf(TypedRegistry.RESOURCE_LOCATION.toString())
                                 .forGetter(Species::getRegistryName),
                         Family.REGISTRY.getGetterCodec().fieldOf("family")
                                 .forGetter(Species::getFamily),

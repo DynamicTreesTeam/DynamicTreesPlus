@@ -9,7 +9,6 @@ import com.dtteam.dynamictrees.api.worldgen.LevelContext;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.data.DTDataProvider;
 import com.dtteam.dynamictrees.data.Generator;
-import com.dtteam.dynamictrees.deserialization.JsonDeserializers;
 import com.dtteam.dynamictrees.loot.DTLootContextParams;
 import com.dtteam.dynamictrees.loot.DTLootParameterSets;
 import com.dtteam.dynamictrees.loot.LootTableSupplier;
@@ -61,7 +60,7 @@ import java.util.function.BiConsumer;
 public class CapProperties extends RegistryEntry<CapProperties> implements Resettable<CapProperties> {
 
     public static final Codec<CapProperties> CODEC = RecordCodecBuilder.create(instance -> instance
-            .group(ResourceLocation.CODEC.fieldOf(JsonDeserializers.RESOURCE_LOCATION.toString()).forGetter(CapProperties::getRegistryName))
+            .group(ResourceLocation.CODEC.fieldOf(TypedRegistry.RESOURCE_LOCATION.toString()).forGetter(CapProperties::getRegistryName))
             .apply(instance, CapProperties::new));
 
     public static final CapProperties NULL = new CapProperties() {

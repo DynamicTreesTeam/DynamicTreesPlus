@@ -3,18 +3,17 @@ package com.dtteam.dynamictreesplus.init;
 import com.dtteam.dynamictrees.api.worldgen.FeatureCanceller;
 import com.dtteam.dynamictrees.block.CommonVoxelShapes;
 import com.dtteam.dynamictrees.block.fruit.Fruit;
+import com.dtteam.dynamictrees.event.AddResourceLoadersEvent;
 import com.dtteam.dynamictrees.event.RegistryEvent;
 import com.dtteam.dynamictrees.event.TypeRegistryEvent;
 import com.dtteam.dynamictrees.systems.genfeature.GenFeature;
 import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKit;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.treepack.Resources;
 import com.dtteam.dynamictreesplus.DynamicTreesPlus;
 import com.dtteam.dynamictreesplus.block.CactusFruit;
 import com.dtteam.dynamictreesplus.block.mushroom.CapProperties;
 import com.dtteam.dynamictreesplus.resources.CapPropertiesResourceLoader;
-import com.dtteam.dynamictreesplus.resources.DTPJsonDeserializers;
 import com.dtteam.dynamictreesplus.systems.featuregen.DynamicTreesPlusGenFeatures;
 import com.dtteam.dynamictreesplus.systems.growthlogic.MegaCactusLogic;
 import com.dtteam.dynamictreesplus.systems.growthlogic.SaguaroCactusLogic;
@@ -38,7 +37,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.registries.NewRegistryEvent;
 import net.neoforged.neoforge.registries.RegisterEvent;
 
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = DynamicTreesPlus.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
 public class DTPRegistries {
 
     public static final StraightLogic STRAIGHT_LOGIC = new StraightLogic(DynamicTreesPlus.location("straight"));
@@ -51,9 +50,6 @@ public class DTPRegistries {
 
 
     public static void setup() {
-        Resources.MANAGER.addLoader(CapPropertiesResourceLoader.CAP_PROPERTIES_LOADER);
-        Resources.MANAGER.addLoader(CapPropertiesResourceLoader.MUSHROOM_SHAPE_KIT_TEMPLATE_LOADER);
-
         CommonVoxelShapes.SHAPES.put(DynamicTreesPlus.location("tall_cactus").toString(), TALL_CACTUS_SAPLING_SHAPE);
         CommonVoxelShapes.SHAPES.put(DynamicTreesPlus.location("medium_cactus").toString(), MEDIUM_CACTUS_SAPLING_SHAPE);
         CommonVoxelShapes.SHAPES.put(DynamicTreesPlus.location("short_cactus").toString(), SHORT_CACTUS_SAPLING_SHAPE);
@@ -118,19 +114,24 @@ public class DTPRegistries {
     }
 
     @SubscribeEvent
-    public static void newRegistry(NewRegistryEvent event) {
-        DTPJsonDeserializers.register();
+    public static void addResourceLoaders(AddResourceLoadersEvent.Pre event){
+        event.getResourceManager().addLoader(CapPropertiesResourceLoader.CAP_PROPERTIES_LOADER);
+        event.getResourceManager().addLoader(CapPropertiesResourceLoader.MUSHROOM_SHAPE_KIT_TEMPLATE_LOADER);
+    }
 
+    @SubscribeEvent
+    public static void newRegistry(NewRegistryEvent event) {
+        CactusThicknessLogic.REGISTRY.postRegistryEvent();
+        MushroomShapeKit.REGISTRY.postRegistryEvent();
         CapProperties.REGISTRY.postRegistryEvent();
-        //MushroomShapeKit.REGISTRY.postRegistryEvent();
     }
 
     @SubscribeEvent
     public static void loadResources(RegisterEvent event) {
         if (event.getRegistryKey() == BuiltInRegistries.BLOCK.key()) {
-            // Lock the registries
-            CapProperties.REGISTRY.lock();
+            CactusThicknessLogic.REGISTRY.lock();
             MushroomShapeKit.REGISTRY.lock();
+            CapProperties.REGISTRY.lock();
         }
     }
 

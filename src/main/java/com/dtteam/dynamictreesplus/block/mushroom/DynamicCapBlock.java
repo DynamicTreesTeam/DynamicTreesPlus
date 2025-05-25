@@ -9,6 +9,8 @@ import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
 import com.dtteam.dynamictrees.systems.GrowSignal;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictreesplus.systems.mushroomlogic.MushroomCapDisc;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.core.BlockPos;
@@ -229,4 +231,30 @@ public class DynamicCapBlock extends HugeMushroomBlock implements TreePart, Upda
         }
         super.tick(state, level, pos, random);
     }
+
+    //Same behavior as beds
+    @Override
+    public void fallOn(Level level, BlockState state, BlockPos pos, Entity entity, float fallDistance) {
+        super.fallOn(level, state, pos, entity, fallDistance * 0.5F);
+    }
+
+    //Same behavior as beds
+    @Override
+    public void updateEntityAfterFallOn(BlockGetter level, Entity entity) {
+        if (entity.isSuppressingBounce()) {
+            super.updateEntityAfterFallOn(level, entity);
+        } else {
+            this.bounceUp(entity);
+        }
+    }
+
+    //Same behavior as beds
+    private void bounceUp(Entity entity) {
+        Vec3 vec3 = entity.getDeltaMovement();
+        if (vec3.y < 0.0) {
+            double d0 = entity instanceof LivingEntity ? 1.0 : 0.8;
+            entity.setDeltaMovement(vec3.x, -vec3.y * 0.66F * d0, vec3.z);
+        }
+    }
+
 }

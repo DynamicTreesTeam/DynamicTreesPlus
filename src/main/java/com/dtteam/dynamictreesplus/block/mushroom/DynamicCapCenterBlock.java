@@ -18,6 +18,8 @@ import com.dtteam.dynamictreesplus.tree.HugeMushroomSpecies;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
@@ -31,6 +33,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
@@ -276,6 +279,10 @@ public class DynamicCapCenterBlock extends Block implements TreePart, UpdatesSur
         return positions;
     }
 
+    ///////////////////////////////////////////
+    // PROPERTIES
+    ///////////////////////////////////////////
+
     public static boolean canCapReplace(BlockState state){
         // Mushroom caps take precedence over leaves
         return state.canBeReplaced() || state.is(DTBlockTags.FOLIAGE) || state.is(BlockTags.LEAVES);
@@ -301,6 +308,31 @@ public class DynamicCapCenterBlock extends Block implements TreePart, UpdatesSur
         //We update neighboring cap blocks in the corners as well
         updateNeighborsSurround(level, pos, DynamicCapBlock.class);
         return destroyed;
+    }
+
+    //Same behavior as beds
+    @Override
+    public void fallOn(Level level, BlockState state, BlockPos pos, Entity entity, float fallDistance) {
+        super.fallOn(level, state, pos, entity, fallDistance * 0.5F);
+    }
+
+    //Same behavior as beds
+    @Override
+    public void updateEntityAfterFallOn(BlockGetter level, Entity entity) {
+        if (entity.isSuppressingBounce()) {
+            super.updateEntityAfterFallOn(level, entity);
+        } else {
+            this.bounceUp(entity);
+        }
+    }
+
+    //Same behavior as beds
+    private void bounceUp(Entity entity) {
+        Vec3 vec3 = entity.getDeltaMovement();
+        if (vec3.y < 0.0) {
+            double d0 = entity instanceof LivingEntity ? 1.0 : 0.8;
+            entity.setDeltaMovement(vec3.x, -vec3.y * 0.66F * d0, vec3.z);
+        }
     }
 
     ///////////////////////////////////////////

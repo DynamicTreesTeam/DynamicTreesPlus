@@ -13,18 +13,20 @@
                 {
                   "condition": "minecraft:match_tool",
                   "predicate": {
-                    "enchantments": [
-                      {
-                        "enchantment": "minecraft:silk_touch",
-                        "levels": {
-                          "min": 1
+                    "predicates": {
+                      "minecraft:enchantments": [
+                        {
+                          "enchantments": "minecraft:silk_touch",
+                          "levels": {
+                            "min": 1
+                          }
                         }
-                      }
-                    ]
+                      ]
+                    }
                   }
                 }
               ],
-              "name": "minecraft:red_mushroom_block"
+              "name": "minecraft:brown_mushroom_block"
             },
             {
               "type": "minecraft:item",
@@ -48,7 +50,7 @@
                   "function": "minecraft:explosion_decay"
                 }
               ],
-              "name": "minecraft:red_mushroom"
+              "name": "minecraft:brown_mushroom"
             }
           ]
         }
@@ -56,5 +58,5 @@
       "rolls": 1.0
     }
   ],
-  "random_sequence": "dynamictreesplus:blocks/red_mushroom_cap"
+  "random_sequence": "dynamictreesplus:blocks/brown_mushroom_cap"
 }

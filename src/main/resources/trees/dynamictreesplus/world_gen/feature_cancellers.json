@@ -1,7 +1,7 @@
 [
   {
     "__comment": "Cancel standard cactus features from the desert and badlands.",
-    "select": { "OR": [{"tag": "#minecraft:is_badlands"},{"tag": "#forge:is_desert"}] },
+    "select": { "OR": [{"tag": "#minecraft:is_badlands"},{"tag": "#c:is_desert"}] },
     "cancellers": {
       "type": "dynamictreesplus:cactus",
       "namespace": "minecraft"

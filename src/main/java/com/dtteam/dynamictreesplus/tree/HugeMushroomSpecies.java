@@ -304,6 +304,11 @@ public class HugeMushroomSpecies extends Species {
         return map;
     }
 
+    @Override
+    public float falloverParticleFlingMultiplier() {
+        return 0;
+    }
+
     ///////////////////////////////////////////
     // GENERATION
     ///////////////////////////////////////////

@@ -1,3 +1,5 @@
+import me.modmuss50.mpp.ReleaseType
+
 plugins {
     id 'java-library'
     id 'eclipse'
@@ -128,6 +130,31 @@ publishing {
         maven {
             url "file://${project.projectDir}/repo"
         }
+    }
+}
+
+def changelogFile = file("build/changelog.txt")
+
+publishMods {
+    file = jar.archiveFile
+    if (changelogFile.exists()) {
+        changelog.set(changelogFile.getText())
+    }
+    type = ReleaseType.of(version_type.toUpperCase())
+    modLoaders.add("neoforge")
+
+    curseforge {
+        projectId = "478155"
+        projectSlug = "dynamictreesplus" // Required for discord webhook
+        accessToken = curseApiKey ?: System.getenv("CURSEFORGE_API_KEY")
+        minecraftVersions.add("1.21.1")
+        requires("252818")
+    }
+    modrinth {
+        projectId = "qaO9Dqpu"
+        accessToken = modrinthToken ?: System.getenv("MODRINTH_TOKEN")
+        minecraftVersions.add("1.21.1")
+        requires("vdjF5PL5")
     }
 }
 

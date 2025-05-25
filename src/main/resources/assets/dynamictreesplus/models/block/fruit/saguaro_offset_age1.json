@@ -1,41 +1,39 @@
 {
 	"credit": "Made with Blockbench",
 	"ambientocclusion": false,
+	"render_type": "cutout_mipped",
 	"textures": {
 		"particle": "dynamictreesplus:block/saguaro_fruit",
 		"fruit": "dynamictreesplus:block/saguaro_fruit"
 	},
 	"elements": [
 		{
-			"name": "Element",
-			"from": [10, -0.8, 8.8],
-			"to": [12.4, 0.8, 8.8],
+			"name": "stem1",
+			"from": [4.5, 0, 5],
+			"to": [7.5, 2, 5],
 			"shade": false,
-			"rotation": {"angle": -45, "axis": "y", "origin": [11.2, 0.8, 8.8]},
-			"faces": {
-				"north": {"uv": [13, 3, 16, 5], "texture": "#fruit"},
-				"east": {"uv": [0, 0, 0, 0], "texture": "#fruit"},
-				"south": {"uv": [13, 3, 16, 5], "texture": "#fruit"},
-				"west": {"uv": [0, 0, 0, 0], "texture": "#fruit"},
-				"up": {"uv": [0, 0, 0, 0], "texture": "#fruit"},
-				"down": {"uv": [0, 0, 0, 0], "texture": "#fruit"}
-			}
-		},
-		{
-			"name": "Element",
-			"from": [10, -0.8, 8.8],
-			"to": [12.4, 0.8, 8.8],
-			"shade": false,
-			"rotation": {"angle": 45, "axis": "y", "origin": [11.2, 0.8, 8.8]},
+			"rotation": {"angle": -45, "axis": "y", "origin": [6, 0, 5]},
 			"faces": {
 				"north": {"uv": [13, 3, 16, 5], "texture": "#fruit"},
 				"south": {"uv": [13, 3, 16, 5], "texture": "#fruit"}
 			}
 		},
 		{
-			"from": [10.4, -4, 8],
-			"to": [12, -0.8, 9.6],
-			"rotation": {"angle": 0, "axis": "y", "origin": [18.8, 4, 16.4]},
+			"name": "stem2",
+			"from": [6, 0, 3.5],
+			"to": [6, 2, 6.5],
+			"shade": false,
+			"rotation": {"angle": -45, "axis": "y", "origin": [6, 0, 5]},
+			"faces": {
+				"east": {"uv": [13, 3, 16, 5], "texture": "#fruit"},
+				"west": {"uv": [13, 3, 16, 5], "texture": "#fruit"}
+			}
+		},
+		{
+			"name": "fruit",
+			"from": [5, -4, 4],
+			"to": [7, 0, 6],
+			"rotation": {"angle": 0, "axis": "y", "origin": [13.4, 4, 12.4]},
 			"faces": {
 				"north": {"uv": [0, 2, 2, 6], "texture": "#fruit"},
 				"east": {"uv": [0, 2, 2, 6], "texture": "#fruit"},
@@ -46,35 +44,32 @@
 			}
 		},
 		{
-			"name": "Element",
-			"from": [3.6, -0.8, 11.2],
-			"to": [6, 0.8, 11.2],
+			"name": "stem2",
+			"from": [9.5, 0, 9],
+			"to": [12.5, 2, 9],
 			"shade": false,
-			"rotation": {"angle": 45, "axis": "y", "origin": [4.8, 0.8, 11.2]},
+			"rotation": {"angle": -45, "axis": "y", "origin": [11, 0, 9]},
 			"faces": {
 				"north": {"uv": [13, 3, 16, 5], "texture": "#fruit"},
 				"south": {"uv": [13, 3, 16, 5], "texture": "#fruit"}
 			}
 		},
 		{
-			"name": "Element",
-			"from": [3.6, -0.8, 11.2],
-			"to": [6, 0.8, 11.2],
+			"name": "stem3",
+			"from": [11, 0, 7.5],
+			"to": [11, 2, 10.5],
 			"shade": false,
-			"rotation": {"angle": -45, "axis": "y", "origin": [4.8, 0.8, 11.2]},
+			"rotation": {"angle": -45, "axis": "y", "origin": [11, 0, 9]},
 			"faces": {
-				"north": {"uv": [13, 3, 16, 5], "texture": "#fruit"},
-				"east": {"uv": [0, 0, 0, 0], "texture": "#fruit"},
-				"south": {"uv": [13, 3, 16, 5], "texture": "#fruit"},
-				"west": {"uv": [0, 0, 0, 0], "texture": "#fruit"},
-				"up": {"uv": [0, 0, 0, 0], "texture": "#fruit"},
-				"down": {"uv": [0, 0, 0, 0], "texture": "#fruit"}
+				"east": {"uv": [13, 3, 16, 5], "texture": "#fruit"},
+				"west": {"uv": [13, 3, 16, 5], "texture": "#fruit"}
 			}
 		},
 		{
-			"from": [4, -4, 10.4],
-			"to": [5.6, -0.8, 12],
-			"rotation": {"angle": 0, "axis": "y", "origin": [12.4, 4, 18.8]},
+			"name": "fruit",
+			"from": [10, -4, 8],
+			"to": [12, 0, 10],
+			"rotation": {"angle": 0, "axis": "y", "origin": [18.4, 4, 16.4]},
 			"faces": {
 				"north": {"uv": [0, 2, 2, 6], "texture": "#fruit"},
 				"east": {"uv": [0, 2, 2, 6], "texture": "#fruit"},
@@ -85,9 +80,32 @@
 			}
 		},
 		{
-			"from": [5.6, -4, 4],
-			"to": [7.2, -0.8, 5.6],
-			"rotation": {"angle": 0, "axis": "y", "origin": [14, 4, 12.4]},
+			"name": "stem1",
+			"from": [3.5, 0, 11],
+			"to": [6.5, 2, 11],
+			"shade": false,
+			"rotation": {"angle": -45, "axis": "y", "origin": [5, 0, 11]},
+			"faces": {
+				"north": {"uv": [13, 3, 16, 5], "texture": "#fruit"},
+				"south": {"uv": [13, 3, 16, 5], "texture": "#fruit"}
+			}
+		},
+		{
+			"name": "stem2",
+			"from": [5, 0, 9.5],
+			"to": [5, 2, 12.5],
+			"shade": false,
+			"rotation": {"angle": -45, "axis": "y", "origin": [5, 0, 11]},
+			"faces": {
+				"east": {"uv": [13, 3, 16, 5], "texture": "#fruit"},
+				"west": {"uv": [13, 3, 16, 5], "texture": "#fruit"}
+			}
+		},
+		{
+			"name": "fruit",
+			"from": [4, -4, 10],
+			"to": [6, 0, 12],
+			"rotation": {"angle": 0, "axis": "y", "origin": [12.4, 4, 18.4]},
 			"faces": {
 				"north": {"uv": [0, 2, 2, 6], "texture": "#fruit"},
 				"east": {"uv": [0, 2, 2, 6], "texture": "#fruit"},
@@ -95,49 +113,26 @@
 				"west": {"uv": [0, 2, 2, 6], "texture": "#fruit"},
 				"up": {"uv": [0, 0, 2, 2], "texture": "#fruit"},
 				"down": {"uv": [0, 6, 2, 8], "texture": "#fruit"}
-			}
-		},
-		{
-			"name": "Element",
-			"from": [5.2, -0.8, 4.8],
-			"to": [7.6, 0.8, 4.8],
-			"shade": false,
-			"rotation": {"angle": -45, "axis": "y", "origin": [6.4, 0.8, 4.8]},
-			"faces": {
-				"north": {"uv": [13, 3, 16, 5], "texture": "#fruit"},
-				"east": {"uv": [0, 0, 0, 0], "texture": "#fruit"},
-				"south": {"uv": [13, 3, 16, 5], "texture": "#fruit"},
-				"west": {"uv": [0, 0, 0, 0], "texture": "#fruit"},
-				"up": {"uv": [0, 0, 0, 0], "texture": "#fruit"},
-				"down": {"uv": [0, 0, 0, 0], "texture": "#fruit"}
-			}
-		},
-		{
-			"name": "Element",
-			"from": [5.2, -0.8, 4.8],
-			"to": [7.6, 0.8, 4.8],
-			"shade": false,
-			"rotation": {"angle": 45, "axis": "y", "origin": [6.4, 0.8, 4.8]},
-			"faces": {
-				"north": {"uv": [13, 3, 16, 5], "texture": "#fruit"},
-				"south": {"uv": [13, 3, 16, 5], "texture": "#fruit"}
 			}
 		}
 	],
 	"groups": [
 		{
-			"name": "group",
-			"origin": [18, 4, 16.4],
+			"name": "fruit1",
+			"origin": [14, 8, 12.4],
+			"color": 0,
 			"children": [0, 1, 2]
 		},
 		{
-			"name": "group",
-			"origin": [13.2, 4, 18],
+			"name": "fruit1",
+			"origin": [14, 8, 12.4],
+			"color": 0,
 			"children": [3, 4, 5]
 		},
 		{
-			"name": "group",
-			"origin": [6.4, 0.8, 5.6],
+			"name": "fruit2",
+			"origin": [14, 8, 12.4],
+			"color": 0,
 			"children": [6, 7, 8]
 		}
 	]

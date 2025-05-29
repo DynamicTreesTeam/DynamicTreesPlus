@@ -87,8 +87,8 @@ configurations {
 dependencies {
     implementation "net.neoforged:neoforge:${neo_version}"
 
-    //implementation 'curse.maven:dynamictrees-252818:6360173'
-    implementation ':dynamictrees-neoforge:1.21.1-1.5.0-BETA05'
+    implementation 'curse.maven:dynamictrees-252818:6565776'
+    //implementation ':dynamictrees-neoforge:1.21.1-1.5.0-BETA05'
 
     runtimeOnly 'curse.maven:jade-324717:6291517'
     runtimeOnly "curse.maven:jei-238222:5846880"
@@ -137,6 +137,7 @@ def changelogFile = file("build/changelog.txt")
 
 publishMods {
     file = jar.archiveFile
+    displayName = "${mod_name.replace(' ','')}-${minecraft_version} ${mod_version}"
     if (changelogFile.exists()) {
         changelog.set(changelogFile.getText())
     }

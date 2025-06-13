@@ -54,7 +54,7 @@ public class BellShape extends MushroomShapeKit {
 
     @Override
     public List<BlockPos> getShapeCluster(MushroomShapeConfiguration configuration, MushroomCapContext context){
-        return placeRing(configuration, context, ringAction.GET);
+        return placeRings(configuration, context, ringAction.GET);
     }
 
     @Override
@@ -69,21 +69,21 @@ public class BellShape extends MushroomShapeKit {
 
     @Override
     public void generateMushroomCap(MushroomShapeConfiguration configuration, MushroomCapContext context) {
-        placeRing(configuration, context, ringAction.PLACE);
+        placeRings(configuration, context, ringAction.PLACE);
     }
 
     @Override
     public void clearMushroomCap (MushroomShapeConfiguration configuration, MushroomCapContext context){
-        placeRing(configuration, context, ringAction.CLEAR);
+        placeRings(configuration, context, ringAction.CLEAR);
     }
 
-    enum ringAction {
+    protected enum ringAction {
         PLACE,
         CLEAR,
         GET
     }
 
-    private List<BlockPos> placeRing (MushroomShapeConfiguration configuration, MushroomCapContext context, ringAction action){
+    protected List<BlockPos> placeRings(MushroomShapeConfiguration configuration, MushroomCapContext context, ringAction action){
         DynamicCapCenterBlock centerBlock = context.species().getCapProperties().getDynamicCapCenterBlock().orElse(null);
         List<BlockPos> ringPositions = new LinkedList<>();
         if (centerBlock == null) return ringPositions;
@@ -118,7 +118,7 @@ public class BellShape extends MushroomShapeKit {
         return ringPositions;
     }
 
-    private float calculateFactor (MushroomShapeConfiguration configuration, MushroomCapContext context){
+    protected float calculateFactor (MushroomShapeConfiguration configuration, MushroomCapContext context){
         HugeMushroomSpecies species = context.species();
         CapProperties properties = species.getCapProperties();
         int age = context.age();

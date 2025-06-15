@@ -157,11 +157,7 @@ public class DynamicCapCenterBlock extends Block implements TreePart, UpdatesSur
         {
             BlockState thisState = level.getBlockState(pos);
             int age = thisState.hasProperty(AGE) ? thisState.getValue(AGE) : 0;
-            if (age != 0 && level.getRandom().nextFloat() < species.getChanceToAge()){
-                tryGrowCap(level, properties, age, signal, pos, pos, true);
-            } else {
-                this.branchOut(level, pos, signal, age); // When a growth signal hits a cap block it attempts to become a tree branch.
-            }
+            this.branchOut(level, pos, signal, age);
         }
         return signal;
     }
@@ -175,7 +171,8 @@ public class DynamicCapCenterBlock extends Block implements TreePart, UpdatesSur
             return signal;
         }
 
-        boolean couldGrow = tryGrowCap(level, capProperties, age, signal, pos.relative(signal.dir), pos, false);
+        BlockPos nextPos = pos.relative(signal.dir);
+        boolean couldGrow = tryGrowCap(level, capProperties, age, signal, nextPos, pos, false);
 
         if (couldGrow) {
             Family family = species.getFamily();
@@ -196,25 +193,32 @@ public class DynamicCapCenterBlock extends Block implements TreePart, UpdatesSur
         return signal;
     }
 
+    public boolean isBlockCapCenter(Level level, BlockPos pos){
+        final TreePart treePart = TreeHelper.getTreePart(level.getBlockState(pos));
+        return treePart instanceof DynamicCapCenterBlock;
+    }
+
     public boolean tryGrowCap(Level level, CapProperties capProp, int currentAge, GrowSignal signal, BlockPos pos, BlockPos previousPos, boolean forceAge) {
         if (!(signal.getSpecies() instanceof HugeMushroomSpecies species)) return false;
+        int age = currentAge;
+        if (currentAge == 0){
+            age = 1;
+        } else if (forceAge || level.getRandom().nextFloat() < species.getChanceToAge())
+            age = Math.min(age+1, properties.getMaxAge(species));
         if (level.isEmptyBlock(pos)) {
-            int age = currentAge;
-            if (currentAge == 0){
-                age = 1;
-            } else if (forceAge || level.getRandom().nextFloat() < species.getChanceToAge())
-                age = Math.min(age+1, properties.getMaxAge(species));
             level.setBlock(pos, getCapBlockStateForPlacement(level, pos, age == 0 ? 1 : age, capProp.getDynamicCapState(true), false), 2); // Removed Notify Neighbors Flag for performance.
             if (age != currentAge){
                 ageBranchUnderCap(level, pos, signal, currentAge);
             }
-            if (!(signal.getSpecies() instanceof HugeMushroomSpecies)) return false;
+        } else {
+            //the age didn't change so no need to regenerate the cap
+            if (age == currentAge) return false;
+        }
+        if (isBlockCapCenter(level, pos)){
             generateCap(age, level, (HugeMushroomSpecies) signal.getSpecies(), pos, previousPos, currentAge, signal.rootPos);
             return true;
-        } else {
-            final TreePart treePart = TreeHelper.getTreePart(level.getBlockState(pos));
-            return treePart instanceof DynamicCapCenterBlock;
         }
+        return false;
     }
 
     protected void ageBranchUnderCap (Level level, BlockPos pos, GrowSignal signal, int currentAge){

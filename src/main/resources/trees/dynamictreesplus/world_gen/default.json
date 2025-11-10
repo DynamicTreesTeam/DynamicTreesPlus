@@ -54,7 +54,7 @@
     "apply": {
       "species": {
         "random": {
-          "dark_oak": 24,
+          "dark_oak": 20,
           "dynamictreesplus:red_mushroom": 2,
           "dynamictreesplus:brown_mushroom": 1
         }

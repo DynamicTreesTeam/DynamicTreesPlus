@@ -31,6 +31,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootTable;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -110,7 +111,8 @@ public class MushroomBranchBlock extends ThickBranchBlock {
             cutDir = Direction.DOWN;
         }
 
-        return new BranchDestructionData(species, stateMapper.getBranchConnectionMap(), destroyedLeaves, leavesDropsList, endPoints, volumeSum.getVolume(), cutPos, cutPos, cutDir, toolDir, trunkHeight);
+        Pair<ResourceLocation, Integer> soilState = getCachedSoilState(level, cutPos.offset(cutDir.getNormal()), true);
+        return new BranchDestructionData(species, stateMapper.getBranchConnectionMap(), destroyedLeaves, leavesDropsList, endPoints, volumeSum.getVolume(), cutPos, cutPos, cutDir, toolDir, trunkHeight, soilState);
     }
 
     //Method is called destroy leaves but this one is to destroy mushroom caps

@@ -27,8 +27,10 @@ import com.dtteam.dynamictreesplus.tree.CactusSpecies;
 import com.dtteam.dynamictreesplus.tree.HugeMushroomFamily;
 import com.dtteam.dynamictreesplus.tree.HugeMushroomSpecies;
 import com.dtteam.dynamictreesplus.worldgen.canceller.CactusFeatureCanceller;
+import com.dtteam.dynamictreesplus.worldgen.canceller.MushroomFeatureCanceller;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.CactusBlock;
+import net.minecraft.world.level.levelgen.feature.configurations.HugeMushroomFeatureConfiguration;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -103,6 +105,7 @@ public class DTPRegistries {
     public static void onFeatureCancellerRegistry(final RegistryEvent<FeatureCanceller> event) {
         if (event.isEntryOfType(FeatureCanceller.class)) {
             event.getRegistry().registerAll(new CactusFeatureCanceller<>(DynamicTreesPlus.location("cactus"), CactusBlock.class));
+            event.getRegistry().registerAll(new MushroomFeatureCanceller<>(DynamicTreesPlus.location("mushroom"), HugeMushroomFeatureConfiguration.class));
         }
     }
 

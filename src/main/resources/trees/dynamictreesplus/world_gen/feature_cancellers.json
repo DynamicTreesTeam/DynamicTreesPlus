@@ -6,5 +6,21 @@
       "type": "dynamictreesplus:cactus",
       "namespace": "minecraft"
     }
+  },
+  {
+    "_comment": "Cancel regular mushroom generation from the mushroom fields biome.",
+    "select": { "name": "minecraft:mushroom_fields" },
+    "cancellers": {
+      "type": "dynamictreesplus:mushroom",
+      "namespace": "minecraft"
+    }
+  },
+  {
+    "_comment": "Cancel regular mushroom generation from dark forests.",
+    "select": { "name": "minecraft:dark_forest" },
+    "cancellers": {
+      "types": ["dynamictreesplus:mushroom", "tree"],
+      "namespace": "minecraft"
+    }
   }
 ]

@@ -107,7 +107,6 @@ public class CapPropertiesResourceLoader extends JsonRegistryResourceLoader<CapP
     private void generateBlocks(CapProperties capProperties, JsonObject json) {
         final BlockBehaviour.Properties blockProperties = JsonHelper.getBlockProperties(
                 json,
-                capProperties.getDefaultMapColor(),
                 capProperties::getDefaultBlockProperties,
                 error -> this.logError(capProperties.getRegistryName(), error),
                 warning -> this.logWarning(capProperties.getRegistryName(), warning)

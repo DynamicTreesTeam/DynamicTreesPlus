@@ -7,6 +7,7 @@ import com.dtteam.dynamictreesplus.DynamicTreesPlus;
 import com.dtteam.dynamictreesplus.block.CactusBranchBlock;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
 
 public class CactusFamily extends Family {
@@ -18,13 +19,10 @@ public class CactusFamily extends Family {
     }
 
     @Override
-    public MapColor getDefaultBranchMapColor() {
-        return MapColor.PLANT;
-    }
-
-    @Override
-    public SoundType getDefaultBranchSoundType() {
-        return SoundType.WOOL;
+    public BlockBehaviour.Properties getDefaultBranchProperties() {
+        return super.getDefaultBranchProperties()
+                .sound(SoundType.WOOL)
+                .mapColor(MapColor.PLANT);
     }
 
     @Override

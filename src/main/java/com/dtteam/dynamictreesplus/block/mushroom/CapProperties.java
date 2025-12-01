@@ -204,15 +204,11 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
         this.fireSpreadSpeed = fireSpreadSpeed;
     }
 
-    public MapColor getDefaultMapColor() {
-        return MapColor.WOOD;
-    }
-
-    public BlockBehaviour.Properties getDefaultBlockProperties(final MapColor mapColor) {
+    public BlockBehaviour.Properties getDefaultBlockProperties() {
         return BlockBehaviour.Properties.of()
-                .mapColor(mapColor)
-                .strength(0.2F)
-                .sound(SoundType.WOOD);
+                .mapColor(MapColor.WOOD)
+                .sound(SoundType.WOOD)
+                .strength(0.2F);
     }
 
     public int getMaxAge(HugeMushroomSpecies species) {

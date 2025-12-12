@@ -4,6 +4,7 @@ import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.network.BranchDestructionData;
 import com.dtteam.dynamictrees.api.network.MapSignal;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
+import com.dtteam.dynamictrees.api.season.ClimateZoneType;
 import com.dtteam.dynamictrees.api.voxmap.SimpleVoxmap;
 import com.dtteam.dynamictrees.block.CommonVoxelShapes;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
@@ -54,7 +55,6 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.common.Tags;
 import oshi.util.tuples.Pair;
 
 import javax.annotation.Nullable;
@@ -100,11 +100,9 @@ public class HugeMushroomSpecies extends Species {
 
     @Override
     public Species setPreReloadDefaults() {
+        this.setPreferredClimate(ClimateZoneType.ARID);
         return this.setSaplingShape(CommonVoxelShapes.ROUND_MUSHROOM)
                 .setDefaultGrowingParameters()
-                .envFactor(Tags.Biomes.IS_DRY, 0.25f)
-                .envFactor(Tags.Biomes.IS_HOT, 0.75f)
-                .envFactor(Tags.Biomes.IS_COLD, 1.05f)
                 .setCanSaplingGrowNaturally(false)
                 .setGrowthLogicKit(DTPRegistries.STRAIGHT_LOGIC);
     }

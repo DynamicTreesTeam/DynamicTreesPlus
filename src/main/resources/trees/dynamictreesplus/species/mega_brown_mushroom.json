@@ -16,6 +16,7 @@
       "curve_factor_variation": 0.05
     }
   },
+  "climate_tolerance": 1.0,
   "acceptable_soils": ["fungus_like"],
   "features" : [
     "bottom_flare",

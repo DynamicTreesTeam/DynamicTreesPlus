@@ -10,6 +10,7 @@
   "generate_sapling": true,
   "cap_properties": "dynamictreesplus:red_mushroom",
   "mushroom_shape_kit": "dynamictreesplus:bell",
+  "climate_tolerance": 1.0,
   "primitive_sapling": "red_mushroom",
   "acceptable_soils": ["fungus_like"],
   "mega_species": "dynamictreesplus:mega_red_mushroom",

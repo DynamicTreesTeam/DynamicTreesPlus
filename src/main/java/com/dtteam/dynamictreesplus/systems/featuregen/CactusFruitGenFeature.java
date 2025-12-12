@@ -73,7 +73,7 @@ public class CactusFruitGenFeature extends FruitGenFeature {
             final BlockPos rootPos = context.pos();
             final float fruitingFactor = fruit.seasonalFruitProductionFactor(context.levelContext(), rootPos);
 
-            if (fruitingFactor > fruit.getMinProductionFactor() && fruitingFactor > world.getRandom().nextFloat()) {
+            if (fruitingFactor > fruit.getRequiredProductionFactor() && fruitingFactor > world.getRandom().nextFloat()) {
                 final FindEndsNode endFinder = new FindEndsNode();
                 TreeHelper.startAnalysisFromRoot(world, rootPos, new MapSignal(endFinder));
                 final List<BlockPos> endPoints = endFinder.getEnds();

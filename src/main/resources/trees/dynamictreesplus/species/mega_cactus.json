@@ -14,5 +14,7 @@
       "mod": 6
     }
   },
+  "preferred_climate": "arid",
+  "climate_tolerance": 0.6,
   "cactus_thickness_logic": "dynamictreesplus:mega"
 }

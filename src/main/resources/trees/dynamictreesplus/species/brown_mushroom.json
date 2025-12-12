@@ -16,6 +16,7 @@
       "min_age_curve_factor": 0.2
     }
   },
+  "climate_tolerance": 1.0,
   "primitive_sapling": "brown_mushroom",
   "sapling_shape": "flat_mushroom",
   "acceptable_soils": ["fungus_like"],

@@ -3,6 +3,7 @@ package com.dtteam.dynamictreesplus.tree;
 import com.dtteam.dynamictrees.api.network.MapSignal;
 import com.dtteam.dynamictrees.api.registry.RegistryHandler;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
+import com.dtteam.dynamictrees.api.season.ClimateZoneType;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
 import com.dtteam.dynamictrees.block.soil.SoilHelper;
@@ -25,17 +26,14 @@ import com.dtteam.dynamictreesplus.items.FoodSeed;
 import com.dtteam.dynamictreesplus.systems.thicknesslogic.CactusThicknessLogic;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.common.Tags;
 
 import java.util.List;
 import java.util.Optional;
@@ -54,12 +52,10 @@ public class CactusSpecies extends Species {
 
     @Override
     public Species setPreReloadDefaults() {
+        this.setPreferredClimate(ClimateZoneType.ARID);
         return this.setSaplingShape(DTPRegistries.MEDIUM_CACTUS_SAPLING_SHAPE)
                 .setSaplingSound(SoundType.WOOL)
                 .setDefaultGrowingParameters()
-                .envFactor(Tags.Biomes.IS_SNOWY, 0.25f)
-                .envFactor(Tags.Biomes.IS_COLD, 0.5f)
-                .envFactor(Tags.Biomes.IS_SANDY, 1.05f)
                 .setGrowthLogicKit(DTPRegistries.STRAIGHT_LOGIC);
     }
 
@@ -95,12 +91,6 @@ public class CactusSpecies extends Species {
     @Override
     public JoCode getJoCode(String joCodeString) {
         return new JoCodeCactus(joCodeString);
-    }
-
-    @Override
-    public boolean isBiomePerfect(Holder<Biome> biome) {
-        return this.perfectBiomes.size() > 0 ? super.isBiomePerfect(biome) :
-                biome.is(Tags.Biomes.IS_DRY) && biome.is(Tags.Biomes.IS_SANDY);
     }
 
     @Override
@@ -164,7 +154,7 @@ public class CactusSpecies extends Species {
         public boolean setBlockForGeneration(LevelAccessor level, Species species, BlockPos pos, Direction dir,
                                              boolean careful, boolean isLast) {
             final Optional<BranchBlock> branch = species.getFamily().getBranch();
-            if (!(species instanceof CactusSpecies) || !branch.isPresent()) {
+            if (!(species instanceof CactusSpecies) || branch.isEmpty()) {
                 return false;
             }
             BlockState defaultBranchState = branch.get().defaultBlockState();

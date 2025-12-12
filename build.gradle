@@ -88,7 +88,7 @@ dependencies {
     implementation "net.neoforged:neoforge:${neo_version}"
 
     //implementation 'curse.maven:dynamictrees-252818:7201567'
-    implementation 'com.dtteam.dynamictrees:dynamictrees-neoforge-1.21.1:1.5.1'
+    implementation 'com.dtteam.dynamictrees:dynamictrees-neoforge-1.21.1:1.6.0-BETA03'
 
     runtimeOnly 'curse.maven:jade-324717:6291517'
     runtimeOnly "curse.maven:jei-238222:5846880"

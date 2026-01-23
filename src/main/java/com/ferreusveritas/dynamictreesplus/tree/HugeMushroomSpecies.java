@@ -30,6 +30,7 @@ import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.ferreusveritas.dynamictreesplus.block.mushroom.CapProperties;
 import com.ferreusveritas.dynamictreesplus.block.mushroom.DynamicCapBlock;
 import com.ferreusveritas.dynamictreesplus.block.mushroom.DynamicCapCenterBlock;
+import com.ferreusveritas.dynamictreesplus.init.DTPConfigs;
 import com.ferreusveritas.dynamictreesplus.init.DTPRegistries;
 import com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.MushroomShapeConfiguration;
 import com.ferreusveritas.dynamictreesplus.systems.mushroomlogic.context.MushroomCapContext;
@@ -200,6 +201,20 @@ public class HugeMushroomSpecies extends Species {
     @Override
     public ResourceLocation getSaplingSmartModelLocation() {
         return DynamicTrees.location("block/smartmodel/mushroom_" + (this.getSaplingShape() == CommonVoxelShapes.FLAT_MUSHROOM ? "flat" : "round"));
+    }
+
+    @Override
+    public boolean shouldReplaceSaplingWhenPlaced(BlockState originalSapling) {
+        if (DTPConfigs.REPLACE_MUSHROOM_SAPLING_ON_PLACEMENT.get())
+            return super.shouldReplaceSaplingWhenPlaced(originalSapling);
+        return false;
+    }
+
+    @Override
+    public boolean shouldReplaceSaplingWhenGrown(BlockState originalSapling) {
+        if (DTPConfigs.REPLACE_MUSHROOM_SAPLING_ON_GROWTH.get())
+            return super.shouldReplaceSaplingWhenGrown(originalSapling);
+        return false;
     }
 
     @Override

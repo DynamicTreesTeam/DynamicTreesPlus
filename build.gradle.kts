@@ -35,6 +35,7 @@ repositories {
     flatDir {
         dir("libs")
     }
+    mavenLocal()
 }
 
 val modName = property("modName")

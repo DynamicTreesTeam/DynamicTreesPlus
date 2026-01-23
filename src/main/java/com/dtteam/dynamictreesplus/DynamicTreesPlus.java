@@ -33,6 +33,7 @@ public class DynamicTreesPlus {
     public DynamicTreesPlus(IEventBus modBus, ModContainer modContainer) {
 
         modContainer.registerConfig(ModConfig.Type.SERVER, DTPConfigs.SERVER_CONFIG);
+        modContainer.registerConfig(ModConfig.Type.COMMON, DTPConfigs.COMMON_CONFIG);
 
         modBus.addListener(this::clientSetup);
         modBus.addListener(this::commonSetup);

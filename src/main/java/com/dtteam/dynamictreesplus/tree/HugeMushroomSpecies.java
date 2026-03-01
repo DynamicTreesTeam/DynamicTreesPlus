@@ -459,12 +459,16 @@ public class HugeMushroomSpecies extends Species {
 
     @Override
     public boolean rot(LevelAccessor level, BlockPos pos, int neighborCount, int radius, int fertility, RandomSource random, boolean rapid, boolean growLeaves) {
-        int maxBranchRotRadius = Services.CONFIG.getIntConfig(IConfigHelper.MAX_BRANCH_ROT_RADIUS);
+
+        Integer configValue = Services.CONFIG.getIntConfig(IConfigHelper.MAX_BRANCH_ROT_RADIUS);
+        final int maxBranchRotRadius = configValue != null ? configValue : 0;
+
         if (rapid || maxBranchRotRadius != 0 && radius <= maxBranchRotRadius) {
             BranchBlock branch = TreeHelper.getBranch(level.getBlockState(pos));
             if (branch != null) {
                 branch.rot(level, pos);
             }
+
             this.postRot(new PostRotContext(level, pos, this, radius, neighborCount, fertility, rapid));
             return true;
         }

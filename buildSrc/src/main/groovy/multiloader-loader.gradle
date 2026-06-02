@@ -1,0 +1,88 @@
+plugins {
+    id 'multiloader-common'
+}
+
+configurations {
+    commonJava{
+        canBeResolved = true
+    }
+    commonResources{
+        canBeResolved = true
+    }
+}
+
+dependencies {
+    compileOnly(project(':common')) {
+        capabilities {
+            requireCapability "$group:$mod_id"
+        }
+    }
+    commonJava project(path: ':common', configuration: 'commonJava')
+    commonResources project(path: ':common', configuration: 'commonResources')
+}
+
+tasks.named('compileJava', JavaCompile) {
+    dependsOn(configurations.commonJava)
+    source(configurations.commonJava)
+}
+
+processResources {
+    dependsOn(configurations.commonResources)
+    from(configurations.commonResources)
+}
+
+tasks.named('javadoc', Javadoc).configure {
+    dependsOn(configurations.commonJava)
+    source(configurations.commonJava)
+}
+
+tasks.named('sourcesJar', Jar) {
+    dependsOn(configurations.commonJava)
+    from(configurations.commonJava)
+    dependsOn(configurations.commonResources)
+    from(configurations.commonResources)
+}
+
+pluginManager.withPlugin('me.modmuss50.mod-publish-plugin') {
+    def isFabric = project.name == 'fabric'
+    def loaderName = isFabric ? 'Fabric' : 'NeoForge'
+    def changelogFile = file("../${project.name}/build/changelog.txt")
+    def releaseType = isFabric ? project.findProperty('fabricVersionType') : project.findProperty('versionType')
+
+    afterEvaluate {
+        publishMods {
+            file = isFabric ? remapJar.archiveFile : jar.archiveFile
+            displayName = "${mod_name.replace(' ','')}-${loaderName}-${minecraft_version} ${project.mod_version}"
+            println(displayName)
+            if (changelogFile.exists()) {
+                changelog.set(changelogFile.getText())
+            }
+            type = me.modmuss50.mpp.ReleaseType.of(releaseType?.toUpperCase() ?: 'RELEASE')
+            if (isFabric) {
+                modLoaders.add("fabric")
+                modLoaders.add("quilt")
+            } else {
+                modLoaders.add("neoforge")
+            }
+            curseforge {
+                projectId = "478155"
+                projectSlug = "dynamictreesplus" // Required for discord webhook
+                accessToken = providers.gradleProperty("curseApiKey").getOrElse(providers.environmentVariable("CURSEFORGE_API_KEY").getOrNull())
+                minecraftVersions.add(minecraft_version)
+                if (isFabric) {
+                    requires("forge-config-api-port")
+                }
+                requires("dynamictrees")
+            }
+            modrinth {
+                projectId = "qaO9Dqpu"
+                accessToken = providers.gradleProperty("modrinthToken").getOrElse(providers.environmentVariable("MODRINTH_TOKEN").getOrNull())
+                minecraftVersions.add(minecraft_version)
+                if (isFabric) {
+                    requires("ohNO6lps")
+                }
+                requires("vdjF5PL5")
+            }
+        }
+    }
+}

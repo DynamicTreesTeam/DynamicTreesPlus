@@ -1,0 +1,81 @@
+plugins {
+    id 'multiloader-loader'
+    id 'net.neoforged.moddev'
+    id "me.modmuss50.mod-publish-plugin"
+}
+
+mod_version = "${mod_version}${neoVersionAppend}"
+version = mod_version
+
+neoForge {
+    version = neoforge_version
+    // Automatically enable neoforge AccessTransformers if the file exists
+    def at = project(':common').file('src/main/resources/META-INF/accesstransformer.cfg')
+    if (at.exists()) {
+        accessTransformers.from(at.absolutePath)
+    }
+    parchment {
+        minecraftVersion = parchment_minecraft
+        mappingsVersion = parchment_version
+    }
+    def mainResources = project(":common").file("src/main/resources")
+    def genResources = project(":common").file("src/generated/resources")
+    runs {
+        configureEach {
+            systemProperty('neoforge.enabledGameTestNamespaces', mod_id)
+            ideName = "NeoForge ${it.name.capitalize()} (${project.path})" // Unify the run config names with fabric
+        }
+        client {
+            client()
+        }
+        data {
+            data()
+            programArgument ('--all')
+            programArgument ('--existing')
+            programArgument (mainResources.absolutePath)
+            programArgument ('--output')
+            programArgument (genResources.absolutePath)
+            programArgument ('--mod')
+            programArgument ("${mod_id}")
+            programArgument ('--mod')
+            programArgument ("dynamictrees")
+        }
+        server {
+            server()
+        }
+    }
+    mods {
+        "${mod_id}" {
+            sourceSet sourceSets.main
+        }
+    }
+
+    repositories {
+        maven {
+            url "https://cursemaven.com"
+            content {
+                includeGroup "curse.maven"
+            }
+        }
+        maven {
+            name = "Harley O' Connor"
+            url = 'https://harleyoconnor.com/maven'
+        }
+        flatDir {
+            dir 'libs'
+        }
+    }
+    dependencies {
+        implementation "com.dtteam.dynamictrees:dynamictrees-neoforge-${project.minecraft_version}:${project.neoforge_dynamic_trees_version}"
+
+        implementation "curse.maven:jade-324717:6011258"
+        implementation "curse.maven:jei-238222:5846880"
+        implementation "curse.maven:glitchcore-955399:5660740"
+        implementation "curse.maven:serene-seasons-291874:5753503"
+
+        runtimeOnly "curse.maven:patchouli-306770:6164617"
+        runtimeOnly "curse.maven:spark-361579:6225208"
+    }
+}
+
+sourceSets.main.resources { srcDir 'src/generated/resources' }

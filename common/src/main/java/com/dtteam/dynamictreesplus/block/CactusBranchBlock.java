@@ -50,12 +50,10 @@ import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Objects;
 
-@SuppressWarnings("deprecation")
 public class CactusBranchBlock extends BranchBlock {
 
     // The direction it grew from. Can't be up, since cacti can't grow down.
@@ -187,15 +185,11 @@ public class CactusBranchBlock extends BranchBlock {
     }
 
     protected int getCactusRadius(CactusThickness trunk) {
-        switch (trunk) {
-            default:
-            case BRANCH:
-                return (int) getFamily().getSecondaryThickness();
-            case TRUNK:
-                return (int) getFamily().getPrimaryThickness();
-            case CORE:
-                return 7;
-        }
+        return switch (trunk) {
+            case CORE -> 7;
+            case TRUNK -> getFamily().getPrimaryThickness();
+            default -> getFamily().getSecondaryThickness();
+        };
     }
 
     @Override
@@ -288,7 +282,7 @@ public class CactusBranchBlock extends BranchBlock {
 
 
     @Override
-    public Connections getConnectionData(@Nonnull BlockAndTintGetter world, @Nonnull BlockPos pos, @Nonnull BlockState state) {
+    public Connections getConnectionData(BlockAndTintGetter world, BlockPos pos, BlockState state) {
         Connections connections = new Connections();
 
         for (Direction dir : Direction.values()) {
@@ -383,8 +377,7 @@ public class CactusBranchBlock extends BranchBlock {
             signal.returnRun(blockState, world, pos, fromDir);
         } else {
             BlockState state = world.getBlockState(pos);
-            if (state.getBlock() instanceof BranchBlock) {
-                BranchBlock branch = (BranchBlock) state.getBlock();
+            if (state.getBlock() instanceof BranchBlock branch) {
                 branch.breakDeliberate(world, pos, DynamicTrees.DestroyMode.OVERFLOW);// Destroy one of the offending nodes
             }
             signal.overflow = true;

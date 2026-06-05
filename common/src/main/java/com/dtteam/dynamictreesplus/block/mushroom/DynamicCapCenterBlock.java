@@ -37,9 +37,8 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.Nullable;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -289,7 +288,6 @@ public class DynamicCapCenterBlock extends Block implements TreePart, UpdatesSur
         return state.canBeReplaced() || state.is(DTBlockTags.FOLIAGE) || state.is(BlockTags.LEAVES);
     }
 
-    @Nonnull
     private BlockState getStateForAge(CapProperties properties, int age, Vec2i centerDirection, boolean yMoved, boolean negativeFactor, boolean topIsCap){
         boolean[] dirs = {false, !topIsCap, true, true, true, true};
         if (yMoved || age == 1){
@@ -300,7 +298,6 @@ public class DynamicCapCenterBlock extends Block implements TreePart, UpdatesSur
             }
         }
         return properties.getDynamicCapState(age, dirs);
-
     }
 
     /**NeoForge Override*/ @SuppressWarnings("unused")

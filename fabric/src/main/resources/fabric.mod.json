@@ -16,7 +16,10 @@
     "environment": "*",
     "entrypoints": {
         "main": [
-            "com.example.examplemod.ExampleMod"
+            "com.dtteam.dynamictreesplus.DynamicTreesPlusFabric"
+        ],
+        "dynamictrees": [
+            "com.dtteam.dynamictreesplus.event.DTPAddonEntrypoint"
         ]
     },
     "mixins": [
@@ -25,7 +28,8 @@
         "fabricloader": ">=${fabric_loader_version}",
         "fabric-api": "*",
         "minecraft": "${minecraft_version}",
-        "java": ">=${java_version}"
+        "java": ">=${java_version}",
+        "dynamictrees": ">=${fabric_dynamic_trees_version}"
     },
     "suggests": {
         "another-mod": "*"

@@ -15,6 +15,8 @@ dependencies {
     }
     modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
+
+    modApi "fuzs.forgeconfigapiport:forgeconfigapiport-fabric:${project.forge_config_api_port_version}"
 }
 
 loom {
@@ -39,4 +41,39 @@ loom {
             runDir('runs/server')
         }
     }
+
+    repositories {
+        maven {
+            url "https://cursemaven.com"
+            content {
+                includeGroup "curse.maven"
+            }
+        }
+        maven {
+            url "https://api.modrinth.com/maven"
+            content {
+                includeGroup "maven.modrinth"
+            }
+        }
+        flatDir {
+            dir 'libs'
+        }
+        mavenLocal()
+    }
+
+    dependencies {
+        modImplementation "com.dtteam.dynamictrees:dynamictrees-fabric-${project.minecraft_version}:${project.fabric_dynamic_trees_version}"
+
+        modImplementation "curse.maven:jade-324717:6011268"
+        modImplementation "curse.maven:jei-238222:5846878"
+
+        implementation("net.jodah:typetools:0.6.3")
+
+        modImplementation "curse.maven:glitchcore-955399:5660741"
+        modImplementation "curse.maven:serene-seasons-291874:5753502"
+
+        modRuntimeOnly "maven.modrinth:sodium:u1OEbNKx"
+    }
 }
+
+sourceSets.main.resources { srcDir 'src/generated/resources' }

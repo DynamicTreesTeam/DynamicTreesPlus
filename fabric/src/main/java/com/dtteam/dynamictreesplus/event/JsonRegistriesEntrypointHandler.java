@@ -1,14 +1,11 @@
 package com.dtteam.dynamictreesplus.event;
 
+import com.dtteam.dynamictrees.api.resource.loading.StagedApplierResourceLoader;
 import com.dtteam.dynamictrees.deserialization.PropertyAppliers;
-import com.dtteam.dynamictrees.event.ApplierRegistryEvent;
-import com.dtteam.dynamictrees.event.JsonDeserializerRegistryEvent;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.utility.ResourceLocationUtils;
-import com.dtteam.dynamictreesplus.DynamicTreesPlus;
 import com.dtteam.dynamictreesplus.block.mushroom.CapProperties;
-import com.dtteam.dynamictreesplus.resources.DTPJsonDeserializers;
 import com.dtteam.dynamictreesplus.systems.mushroomlogic.MushroomShapeConfiguration;
 import com.dtteam.dynamictreesplus.systems.thicknesslogic.CactusThicknessLogic;
 import com.dtteam.dynamictreesplus.tree.CactusSpecies;
@@ -16,34 +13,39 @@ import com.dtteam.dynamictreesplus.tree.HugeMushroomFamily;
 import com.dtteam.dynamictreesplus.tree.HugeMushroomSpecies;
 import com.google.gson.JsonElement;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-/**
- * @author Harley O'Connor
- */
-@EventBusSubscriber(modid = DynamicTreesPlus.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
-public final class JsonRegistriesEventHandler {
+import java.util.function.Consumer;
+
+public class JsonRegistriesEntrypointHandler {
+
+    public static <O, I> void onRegisterStagedApplier(StagedApplierResourceLoader.ApplierStage stage, PropertyAppliers<O, I> appliers, String identifier){
+        if (stage == StagedApplierResourceLoader.ApplierStage.COMMON){
+            runIfValidType(Family.class, JsonRegistriesEntrypointHandler::registerMushroomCommonApplier, appliers);
+        }
+        if (stage == StagedApplierResourceLoader.ApplierStage.LOAD){
+            runIfValidType(Species.class, JsonRegistriesEntrypointHandler::registerCactusLoadApplier, appliers);
+        }
+        if (stage == StagedApplierResourceLoader.ApplierStage.RELOAD){
+            runIfValidType(Species.class, JsonRegistriesEntrypointHandler::registerMushroomReloadApplier, appliers);
+            runIfValidType(Species.class, JsonRegistriesEntrypointHandler::registerCactusReloadApplier, appliers);
+        }
+        if (stage == StagedApplierResourceLoader.ApplierStage.GATHER_DATA){
+            runIfValidType(Species.class, JsonRegistriesEntrypointHandler::registerCactusReloadApplier, appliers);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T, O,I> void runIfValidType(Class<T> objectType, Consumer<PropertyAppliers<T, JsonElement>> consumer, PropertyAppliers<O, I> appliers){
+        if (appliers.getInputType() == JsonElement.class && appliers.getObjectType() == objectType){
+            consumer.accept((PropertyAppliers<T, JsonElement>)appliers);
+        }
+    }
 
     private static final Logger LOGGER = LogManager.getLogger();
-
-    private static void logError(ResourceLocation name, String error, String registryName) {
-        LOGGER.error("Error whilst loading type \"{}\" with name \"{}\": {}", registryName, name, error);
-    }
-
     private static void logWarning(ResourceLocation name, String warning, String registryName) {
         LOGGER.warn("Warning whilst loading type \"{}\" with name \"{}\": {}", registryName, name, warning);
-    }
-
-    ///////////////////////////////////////////
-    // FAMILY
-    ///////////////////////////////////////////
-
-    @SubscribeEvent
-    public static void registerFamilyCommonAppliers(final ApplierRegistryEvent.Common<Family, JsonElement> event) {
-        registerMushroomCommonApplier(event.getAppliers());
     }
 
     public static void registerMushroomCommonApplier(PropertyAppliers<Family, JsonElement> appliers) {
@@ -60,24 +62,6 @@ public final class JsonRegistriesEventHandler {
                 });
     }
 
-    ///////////////////////////////////////////
-    // SPECIES
-    ///////////////////////////////////////////
-
-    @SubscribeEvent
-    public static void registerSpeciesLoadAppliers(final ApplierRegistryEvent.Load<Species, JsonElement> event) {
-        registerCactusLoadApplier(event.getAppliers());
-    }
-    @SubscribeEvent
-    public static void registerSpeciesReloadAppliers(final ApplierRegistryEvent.Reload<Species, JsonElement> event) {
-        registerMushroomReloadApplier(event.getAppliers());
-        registerCactusReloadApplier(event.getAppliers());
-    }
-    @SubscribeEvent
-    public static void registerSpeciesDataAppliers(final ApplierRegistryEvent.GatherData<Species, JsonElement> event) {
-        registerCactusReloadApplier(event.getAppliers());
-    }
-
     public static void registerCactusLoadApplier(PropertyAppliers<Species, JsonElement> appliers) {
         appliers.register("is_seed_edible", CactusSpecies.class, Boolean.class,
                 CactusSpecies::setSeedEdible);
@@ -91,14 +75,4 @@ public final class JsonRegistriesEventHandler {
     public static void registerCactusReloadApplier(PropertyAppliers<Species, JsonElement> appliers) {
         appliers.register("cactus_thickness_logic", CactusSpecies.class, CactusThicknessLogic.class, CactusSpecies::setThicknessLogic);
     }
-
-    ///////////////////////////////////////////
-    // DESERIALIZERS
-    ///////////////////////////////////////////
-
-    @SubscribeEvent
-    public static void registerJsonDeserializers(final JsonDeserializerRegistryEvent event) {
-        DTPJsonDeserializers.register();
-    }
-
 }

@@ -4,7 +4,7 @@ Official extension of [Dynamic Trees](https://github.com/ferreusveritas/DynamicT
 
 ![Logo](./header.png)
 
-This branch is for the 1.19.2 version of Minecraft.
+This branch is for the 1.20.1 version of Minecraft.
 
 ### Links
 - [Downloads](https://www.curseforge.com/minecraft/mc-mods/dynamictreesplus/files)

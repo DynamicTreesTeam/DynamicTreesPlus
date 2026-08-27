@@ -2,6 +2,7 @@ package com.dtteam.dynamictreesplus.worldgen.canceller;
 
 import com.dtteam.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.dtteam.dynamictrees.api.worldgen.FeatureCanceller;
+import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
@@ -30,12 +31,12 @@ public class MushroomFeatureCanceller<T extends FeatureConfiguration> extends Fe
 
         // Mushrooms come in RandomBooleanFeatureConfiguration or RandomFeatureConfiguration
         if (configuredFeature.config() instanceof RandomFeatureConfiguration randomFeatureConfig) {
-            return randomFeatureContainsConfigClass(randomFeatureConfig.getFeatures())
+            return randomFeatureContainsConfigClass(randomFeatureConfig.features.stream().map(w -> w.feature.value().feature().value()))
                     && featureCancellations.shouldCancelNamespace(featureRegistryName.getNamespace());
         }
 
         if (configuredFeature.config() instanceof RandomBooleanFeatureConfiguration randomBoolConfig) {
-            return randomFeatureContainsConfigClass(randomBoolConfig.getFeatures())
+            return randomFeatureContainsConfigClass(randomBoolConfig.getSubFeatures().map(Holder::value))
                     && featureCancellations.shouldCancelNamespace(featureRegistryName.getNamespace());
         }
 

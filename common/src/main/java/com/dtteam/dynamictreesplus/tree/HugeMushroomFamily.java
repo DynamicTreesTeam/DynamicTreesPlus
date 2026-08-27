@@ -15,6 +15,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Collections;
@@ -75,11 +76,12 @@ public class HugeMushroomFamily extends Family {
     }
 
     @Override
-    protected BranchBlock createBranchBlock(Identifier name) {
-        final BasicBranchBlock branch = new MushroomBranchBlock(name, this.getProperties());
+    protected BranchBlock createBranch(Identifier name, BlockBehaviour.Properties properties) {
+        final BasicBranchBlock branch = new MushroomBranchBlock(name, properties);
         if (this.isFireProof()) {
             branch.setFireSpreadSpeed(0).setFlammability(0);
         }
         return branch;
     }
+
 }

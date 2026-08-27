@@ -83,15 +83,15 @@ public class CactusClonesGenFeature extends GenFeature {
 
     private boolean placeCloneAtLocation(LevelContext levelContext, BlockPos cloneRootPos, Species species, boolean worldgen) {
         LevelAccessor level = levelContext.accessor();
-        ChunkPos chunkPos = new ChunkPos(cloneRootPos);
-        if (!level.hasChunk(chunkPos.x, chunkPos.z)) return false;
+        ChunkPos chunkPos = ChunkPos.containing(cloneRootPos);
+        if (!level.hasChunk(chunkPos.x(), chunkPos.z())) return false;
         for (int i = 1; i >= -1; i--) {
             BlockPos offsetRootPos = cloneRootPos.above(i);
             if (species.isAcceptableSoil(level.getBlockState(offsetRootPos))) {
                 if (worldgen) {
                     if (level instanceof WorldGenRegion) {
                         Holder<Biome> biome = level.getBiome(offsetRootPos);
-                        species.generate(new DynamicTreeGenerationContext(levelContext, species, offsetRootPos, offsetRootPos.mutable(), biome, CoordUtils.getRandomDir(level.getRandom()), 2, worldgen));
+                        species.generate(new DynamicTreeGenerationContext(levelContext, species, offsetRootPos, offsetRootPos.mutable(), biome, CoordUtils.getRandom2DDir(level.getRandom()), 2, worldgen));
                     }
                 } else if (level instanceof Level) {
                     species.transitionToTree((Level) level, offsetRootPos.above());

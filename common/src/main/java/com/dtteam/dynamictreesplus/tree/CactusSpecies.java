@@ -202,7 +202,7 @@ public class CactusSpecies extends Species {
     }
 
     public Seed createSeedItem(){
-        return isSeedEdible ? new FoodSeed(this) : new Seed(this);
+        return isSeedEdible ? new FoodSeed(getSeedName(),this) : new Seed(getSeedName(), this);
     }
 
     public void setSeedEdible (boolean edible){

@@ -19,15 +19,15 @@ public class CactusFamily extends Family {
     }
 
     @Override
-    public BlockBehaviour.Properties getDefaultBranchProperties() {
-        return super.getDefaultBranchProperties()
+    public BlockBehaviour.Properties defaultBranchProperties() {
+        return super.defaultBranchProperties()
                 .sound(SoundType.WOOL)
                 .mapColor(MapColor.PLANT);
     }
 
     @Override
-    protected BranchBlock createBranchBlock(Identifier name) {
-        return new CactusBranchBlock(name, this.getProperties());
+    protected BranchBlock createBranch(Identifier name, BlockBehaviour.Properties properties) {
+        return new CactusBranchBlock(name, properties);
     }
 
     @Override

@@ -24,7 +24,7 @@ import org.apache.logging.log4j.Logger;
 /**
  * @author Harley O'Connor
  */
-@EventBusSubscriber(modid = DynamicTreesPlus.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = DynamicTreesPlus.MOD_ID)
 public final class JsonRegistriesEventHandler {
 
     private static final Logger LOGGER = LogManager.getLogger();

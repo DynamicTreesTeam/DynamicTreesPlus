@@ -44,7 +44,7 @@ public final class MegaCactusLogic extends StraightLogic {
 
         int height = pos.getY() - signal.rootPos.getY();
 
-        if (height >= configuration.get(MAX_HEIGHT) && level.random.nextFloat() < 0.8f) {
+        if (height >= configuration.get(MAX_HEIGHT) && level.getRandom().nextFloat() < 0.8f) {
             signal.energy = 0;
             return new int[]{0, 0, 0, 0, 0, 0};
         }

@@ -25,6 +25,11 @@ public abstract class CactusThicknessLogic extends RegistryEntry<CactusThickness
         super(registryName);
     }
 
+    @Override
+    public Class<CactusThicknessLogic> getRegistryType() {
+        return CactusThicknessLogic.class;
+    }
+
     public abstract CactusBranchBlock.CactusThickness thicknessAfterGrowthSignal(Level world, BlockPos pos, GrowSignal signal, CactusBranchBlock.CactusThickness currentThickness);
 
     public abstract CactusBranchBlock.CactusThickness thicknessForBranchPlaced(LevelAccessor world, BlockPos pos, boolean isLast);

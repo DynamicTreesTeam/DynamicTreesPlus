@@ -5,11 +5,11 @@ import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKitConfiguration;
 import com.dtteam.dynamictrees.systems.growthlogic.context.DirectionManipulationContext;
 import com.dtteam.dynamictrees.systems.growthlogic.context.PositionalSpeciesContext;
 import com.dtteam.dynamictrees.utility.CoordUtils;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class StraightLogic extends GrowthLogicKit {
 
-    public StraightLogic(final ResourceLocation registryName) {
+    public StraightLogic(final Identifier registryName) {
         super(registryName);
     }
 

@@ -4,7 +4,7 @@ import com.dtteam.dynamictrees.api.resource.loading.StagedApplierResourceLoader;
 import com.dtteam.dynamictrees.deserialization.PropertyAppliers;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.utility.ResourceLocationUtils;
+import com.dtteam.dynamictrees.utility.IdentifierUtils;
 import com.dtteam.dynamictreesplus.block.mushroom.CapProperties;
 import com.dtteam.dynamictreesplus.systems.mushroomlogic.MushroomShapeConfiguration;
 import com.dtteam.dynamictreesplus.systems.thicknesslogic.CactusThicknessLogic;
@@ -12,7 +12,7 @@ import com.dtteam.dynamictreesplus.tree.CactusSpecies;
 import com.dtteam.dynamictreesplus.tree.HugeMushroomFamily;
 import com.dtteam.dynamictreesplus.tree.HugeMushroomSpecies;
 import com.google.gson.JsonElement;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -44,14 +44,14 @@ public class JsonRegistriesEntrypointHandler {
     }
 
     private static final Logger LOGGER = LogManager.getLogger();
-    private static void logWarning(ResourceLocation name, String warning, String registryName) {
+    private static void logWarning(Identifier name, String warning, String registryName) {
         LOGGER.warn("Warning whilst loading type \"{}\" with name \"{}\": {}", registryName, name, warning);
     }
 
     public static void registerMushroomCommonApplier(PropertyAppliers<Family, JsonElement> appliers) {
-        appliers.register("common_cap", HugeMushroomFamily.class, ResourceLocation.class,
+        appliers.register("common_cap", HugeMushroomFamily.class, Identifier.class,
                 (family, registryName) -> {
-                    final ResourceLocation processedRegName = ResourceLocationUtils.parseDTLocation(registryName);
+                    final Identifier processedRegName = IdentifierUtils.parseDTLocation(registryName);
                     CapProperties.REGISTRY.runOnNextLock(CapProperties.REGISTRY.generateIfValidRunnable(
                             processedRegName,
                             family::setCommonCap,

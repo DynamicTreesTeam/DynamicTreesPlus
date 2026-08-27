@@ -7,9 +7,10 @@ import com.dtteam.dynamictrees.block.fruit.FruitBlock;
 import com.dtteam.dynamictrees.tree.TreeHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,13 +18,13 @@ public class CactusFruit extends Fruit {
 
     public static final TypedRegistry.EntryType<Fruit> TYPE = TypedRegistry.newType(CactusFruit::new);
 
-    public CactusFruit(ResourceLocation registryName) {
+    public CactusFruit(Identifier registryName) {
         super(registryName);
     }
 
     @Override
-    protected FruitBlock createBlock(Block.Properties properties) {
-        return new CactusFruitBlock(properties, this);
+    protected FruitBlock createBlock(Identifier id, BlockBehaviour.Properties properties) {
+        return new CactusFruitBlock(id, properties, this);
     }
 
     @Override

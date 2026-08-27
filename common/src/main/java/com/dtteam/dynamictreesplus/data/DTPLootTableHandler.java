@@ -2,10 +2,16 @@ package com.dtteam.dynamictreesplus.data;
 
 import com.dtteam.dynamictrees.loot.DTLootParameterSets;
 import com.dtteam.dynamictrees.loot.function.MultiplyByLogsCount;
-import net.minecraft.advancements.critereon.*;
+import net.minecraft.advancements.criterion.DataComponentMatchers;
+import net.minecraft.advancements.criterion.EnchantmentPredicate;
+import net.minecraft.advancements.criterion.ItemPredicate;
+import net.minecraft.advancements.criterion.MinMaxBounds;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.predicates.DataComponentPredicates;
+import net.minecraft.core.component.predicates.EnchantmentsPredicate;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.util.context.ContextKeySet;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -18,7 +24,6 @@ import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.functions.ApplyExplosionDecay;
 import net.minecraft.world.level.storage.loot.functions.LimitCount;
 import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.predicates.BonusLevelTableCondition;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
@@ -31,8 +36,15 @@ import java.util.List;
 public class DTPLootTableHandler {
 
     protected static LootItemCondition.Builder hasSilkTouch(HolderLookup.Provider registries) {
-        HolderLookup.RegistryLookup<Enchantment> registrylookup = registries.lookupOrThrow(Registries.ENCHANTMENT);
-        return MatchTool.toolMatches(ItemPredicate.Builder.item().withSubPredicate(ItemSubPredicates.ENCHANTMENTS, ItemEnchantmentsPredicate.enchantments(List.of(new EnchantmentPredicate(registrylookup.getOrThrow(Enchantments.SILK_TOUCH), MinMaxBounds.Ints.atLeast(1))))));
+        return MatchTool.toolMatches(
+                ItemPredicate.Builder.item().withComponents(DataComponentMatchers.Builder.components().partial(
+                        DataComponentPredicates.ENCHANTMENTS,
+                        EnchantmentsPredicate.enchantments(List.of(new EnchantmentPredicate(
+                                registries.lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(Enchantments.SILK_TOUCH),
+                                MinMaxBounds.Ints.atLeast(1)
+                        )))
+                ).build())
+        );
     }
 
     protected static Holder<Enchantment> getFortune(HolderLookup.Provider registries) {
@@ -65,7 +77,7 @@ public class DTPLootTableHandler {
         ).setParamSet(LootContextParamSets.BLOCK);
     }
 
-    public static LootTable.Builder createCapDrops(Block primitiveCapBlock, Item primitiveSapling, LootContextParamSet parameterSet, HolderLookup.Provider registries) {
+    public static LootTable.Builder createCapDrops(Block primitiveCapBlock, Item primitiveSapling, ContextKeySet parameterSet, HolderLookup.Provider registries) {
         return LootTable.lootTable().withPool(
                 LootPool.lootPool().setRolls(ConstantValue.exactly(1)).add(
                                 AlternativesEntry.alternatives(

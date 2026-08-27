@@ -1,4 +1,0 @@
-@MethodsReturnNonnullByDefault
-package com.dtteam.dynamictreesplus.systems.featuregen;
-
-import net.minecraft.MethodsReturnNonnullByDefault;

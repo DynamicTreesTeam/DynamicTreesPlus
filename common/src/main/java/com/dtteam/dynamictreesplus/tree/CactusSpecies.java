@@ -15,7 +15,7 @@ import com.dtteam.dynamictrees.systems.nodemapper.FindEndsNode;
 import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.utility.ResourceLocationUtils;
+import com.dtteam.dynamictrees.utility.IdentifierUtils;
 import com.dtteam.dynamictrees.worldgen.DynamicTreeGenerationContext;
 import com.dtteam.dynamictrees.worldgen.JoCode;
 import com.dtteam.dynamictreesplus.DynamicTreesPlus;
@@ -27,7 +27,7 @@ import com.dtteam.dynamictreesplus.systems.growthlogic.DTPGrowthLogicKits;
 import com.dtteam.dynamictreesplus.systems.thicknesslogic.CactusThicknessLogic;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
@@ -47,7 +47,7 @@ public class CactusSpecies extends Species {
     private CactusThicknessLogic thicknessLogic;
     private boolean isSeedEdible = false;
 
-    public CactusSpecies(ResourceLocation name, Family family, LeavesProperties leavesProperties) {
+    public CactusSpecies(Identifier name, Family family, LeavesProperties leavesProperties) {
         super(name, family, leavesProperties);
     }
 
@@ -175,16 +175,16 @@ public class CactusSpecies extends Species {
     }
 
     @Override
-    public ResourceLocation getSaplingSmartModelLocation() {
+    public Identifier getSaplingSmartModelLocation() {
         return DynamicTreesPlus.location("block/smart_model/" + this.thicknessLogic.getRegistryName().getPath() + "_cactus");
     }
 
     @Override
-    public void addSaplingTextures(BiConsumer<String, ResourceLocation> textureConsumer,
-                                   ResourceLocation leavesTextureLocation, ResourceLocation barkTextureLocation) {
-        ResourceLocation sideLoc = this.getFamily().getTexturePath(Family.BRANCH).orElse(ResourceLocationUtils.suffix(barkTextureLocation, "_side"));
-        ResourceLocation topLoc = this.getFamily().getTexturePath(Family.BRANCH_TOP).orElse(ResourceLocationUtils.suffix(barkTextureLocation, "_top"));
-        ResourceLocation botLoc = this.getFamily().getTexturePath(CactusFamily.BRANCH_BOTTOM).orElse(ResourceLocationUtils.suffix(barkTextureLocation, "_bottom"));
+    public void addSaplingTextures(BiConsumer<String, Identifier> textureConsumer,
+                                   Identifier leavesTextureLocation, Identifier barkTextureLocation) {
+        Identifier sideLoc = this.getFamily().getTexturePath(Family.BRANCH).orElse(IdentifierUtils.suffix(barkTextureLocation, "_side"));
+        Identifier topLoc = this.getFamily().getTexturePath(Family.BRANCH_TOP).orElse(IdentifierUtils.suffix(barkTextureLocation, "_top"));
+        Identifier botLoc = this.getFamily().getTexturePath(CactusFamily.BRANCH_BOTTOM).orElse(IdentifierUtils.suffix(barkTextureLocation, "_bottom"));
         textureConsumer.accept("side", sideLoc);
         textureConsumer.accept("top", topLoc);
         textureConsumer.accept("bottom", botLoc);

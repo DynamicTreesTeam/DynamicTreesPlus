@@ -1,24 +1,20 @@
 package com.dtteam.dynamictreesplus.block.mushroom;
 
 import com.dtteam.dynamictrees.DynamicTrees;
-import com.dtteam.dynamictrees.api.lazyvalue.MutableLazyValue;
 import com.dtteam.dynamictrees.api.registry.RegistryEntry;
 import com.dtteam.dynamictrees.api.registry.RegistryHandler;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.api.worldgen.LevelContext;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
-import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
 import com.dtteam.dynamictrees.data.DTDataProvider;
-import com.dtteam.dynamictrees.data.Generator;
 import com.dtteam.dynamictrees.loot.DTLootContextParams;
 import com.dtteam.dynamictrees.loot.DTLootParameterSets;
 import com.dtteam.dynamictrees.loot.LootTableSupplier;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.treepack.Resettable;
+import com.dtteam.dynamictrees.utility.IdentifierUtils;
 import com.dtteam.dynamictrees.utility.Optionals;
-import com.dtteam.dynamictrees.utility.ResourceLocationUtils;
-import com.dtteam.dynamictreesplus.DynamicTreesPlus;
 import com.dtteam.dynamictreesplus.data.DTPLootTableHandler;
 import com.dtteam.dynamictreesplus.systems.mushroomlogic.MushroomCapDisc;
 import com.dtteam.dynamictreesplus.tree.HugeMushroomSpecies;
@@ -29,7 +25,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.ReloadableServerRegistries;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
@@ -56,14 +52,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.BiConsumer;
-import java.util.function.Supplier;
 
 public class CapProperties extends RegistryEntry<CapProperties> implements Resettable<CapProperties> {
 
-    public static final HashMap<ResourceLocation, Supplier<Generator<DTDataProvider.BlockState, CapProperties>>> blockStateGenerators = new HashMap<>();
-
     public static final Codec<CapProperties> CODEC = RecordCodecBuilder.create(instance -> instance
-            .group(ResourceLocation.CODEC.fieldOf(TypedRegistry.RESOURCE_LOCATION.toString()).forGetter(CapProperties::getRegistryName))
+            .group(Identifier.CODEC.fieldOf(TypedRegistry.RESOURCE_LOCATION.toString()).forGetter(CapProperties::getRegistryName))
             .apply(instance, CapProperties::new));
 
     public static final CapProperties NULL = new CapProperties() {
@@ -120,16 +113,21 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
         this.lootTableSupplier = new LootTableSupplier("null/", DynamicTrees.NULL);
     }
 
-    public CapProperties(final ResourceLocation registryName) {
+    public CapProperties(final Identifier registryName) {
         this(null, registryName);
     }
 
-    public CapProperties(@Nullable final BlockState primitiveCap, final ResourceLocation registryName) {
+    @Override
+    public Class<CapProperties> getRegistryType() {
+        return CapProperties.class;
+    }
+
+    public CapProperties(@Nullable final BlockState primitiveCap, final Identifier registryName) {
         this.family = Family.NULL_FAMILY;
         this.primitiveCap = primitiveCap != null ? primitiveCap : Blocks.AIR.defaultBlockState();
         this.setRegistryName(registryName);
-        this.centerBlockRegistryName = ResourceLocationUtils.suffix(registryName, this.getCenterBlockRegistryNameSuffix());
-        this.blockRegistryName = ResourceLocationUtils.suffix(registryName, this.getBlockRegistryNameSuffix());
+        this.centerBlockRegistryName = IdentifierUtils.suffix(registryName, this.getCenterBlockRegistryNameSuffix());
+        this.blockRegistryName = IdentifierUtils.suffix(registryName, this.getBlockRegistryNameSuffix());
         this.blockLootTableSupplier = new LootTableSupplier("blocks/", blockRegistryName);
         this.lootTableSupplier = new LootTableSupplier("trees/mushroom_caps/", registryName);
     }
@@ -234,19 +232,19 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
      * The registry name for the leaves block. This allows for built-in compatibility where the dynamic leaves may
      * otherwise share the same name as their regular leaves block.
      */
-    private ResourceLocation blockRegistryName;
-    private ResourceLocation centerBlockRegistryName;
+    private Identifier blockRegistryName;
+    private Identifier centerBlockRegistryName;
 
     /**
      * Gets the {@link #blockRegistryName} for this {@link CapProperties} object.
      *
      * @return The {@link #blockRegistryName} for this {@link CapProperties} object.
      */
-    public ResourceLocation getBlockRegistryName() {
+    public Identifier getBlockRegistryName() {
         return this.blockRegistryName;
     }
 
-    public ResourceLocation getCenterBlockRegistryName() {
+    public Identifier getCenterBlockRegistryName() {
         return this.centerBlockRegistryName;
     }
 
@@ -254,15 +252,15 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
      * Sets the {@link #blockRegistryName} for this {@link CapProperties} object to the specified {@code
      * blockRegistryName}.
      *
-     * @param blockRegistryName The new {@link ResourceLocation} object to set.
+     * @param blockRegistryName The new {@link Identifier} object to set.
      * @return This {@link CapProperties} object for chaining.
      */
-    public CapProperties setBlockRegistryName(ResourceLocation blockRegistryName) {
+    public CapProperties setBlockRegistryName(Identifier blockRegistryName) {
         this.blockRegistryName = blockRegistryName;
         return this;
     }
 
-    public CapProperties setCenterBlockRegistryName(ResourceLocation blockRegistryName) {
+    public CapProperties setCenterBlockRegistryName(Identifier blockRegistryName) {
         this.centerBlockRegistryName = blockRegistryName;
         return this;
     }
@@ -370,7 +368,7 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
 
     private final LootTableSupplier blockLootTableSupplier;
 
-    public ResourceLocation getBlockLootTableName() {
+    public Identifier getBlockLootTableName() {
         return blockLootTableSupplier.getName();
     }
 
@@ -387,7 +385,7 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
 
     private final LootTableSupplier lootTableSupplier;
 
-    public ResourceLocation getLootTableName() {
+    public Identifier getLootTableName() {
         return lootTableSupplier.getName();
     }
 
@@ -404,7 +402,7 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
     }
 
     public List<ItemStack> getDrops(Level level, BlockPos pos, ItemStack tool, Species species) {
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             return Collections.emptyList();
         }
         return getLootTable(Objects.requireNonNull(level.getServer()).reloadableRegistries(), species)
@@ -433,23 +431,6 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
     // DATA GENERATION
     ///////////////////////////////////////////
 
-    protected final MutableLazyValue<Generator<DTDataProvider.BlockState, CapProperties>> capStateGenerator =
-            MutableLazyValue.supplied(blockStateGenerators.get(
-                    DynamicTreesPlus.location("cap")
-            ));
-    protected final MutableLazyValue<Generator<DTDataProvider.BlockState, CapProperties>> capCenterStateGenerator =
-            MutableLazyValue.supplied(blockStateGenerators.get(
-                    DynamicTreesPlus.location("cap_center")
-            ));
-
-
-    @Override
-    public void generateStateData(DTDataProvider.BlockState provider) {
-        // Generate cap block state and model.
-        this.capStateGenerator.get().generate(provider, this);
-        this.capCenterStateGenerator.get().generate(provider, this);
-    }
-
     public String getCapCenterAgeZeroModelName() {
         return "block/mushroom/" + centerBlockRegistryName.getPath() + "_age0";
     }
@@ -460,11 +441,11 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
         return "block/mushroom/" + blockRegistryName.getPath() + "_inside";
     }
 
-    public ResourceLocation getCapCenterAgeZeroModelParent() {
-        return getModelPath(CAP_CENTER_AGE_0_PARENT).orElse(ResourceLocation.parse("block/cube_bottom_top"));
+    public Identifier getCapCenterAgeZeroModelParent() {
+        return getModelPath(CAP_CENTER_AGE_0_PARENT).orElse(Identifier.parse("block/cube_bottom_top"));
     }
-    public ResourceLocation getFaceModelParent() {
-        return getModelPath(FACE).orElse(ResourceLocation.parse("block/template_single_face"));
+    public Identifier getFaceModelParent() {
+        return getModelPath(FACE).orElse(Identifier.parse("block/template_single_face"));
     }
 
     private boolean generateFaceModels = false;
@@ -477,38 +458,38 @@ public class CapProperties extends RegistryEntry<CapProperties> implements Reset
         return generateFaceModels;
     }
 
-    public void addCapCenterAgeZeroTextures(BiConsumer<String, ResourceLocation> textureConsumer,
-                                            ResourceLocation outsideTextureLocation, ResourceLocation insideTextureLocation) {
-        ResourceLocation outLoc = getTexturePath(OUTSIDE_FACE).orElse(outsideTextureLocation);
-        ResourceLocation inLoc = getTexturePath(INSIDE_FACE).orElse(insideTextureLocation);
+    public void addCapCenterAgeZeroTextures(BiConsumer<String, Identifier> textureConsumer,
+                                            Identifier outsideTextureLocation, Identifier insideTextureLocation) {
+        Identifier outLoc = getTexturePath(OUTSIDE_FACE).orElse(outsideTextureLocation);
+        Identifier inLoc = getTexturePath(INSIDE_FACE).orElse(insideTextureLocation);
         textureConsumer.accept("top", outLoc);
         textureConsumer.accept("bottom", inLoc);
         textureConsumer.accept("side", outLoc);
     }
 
-    public void addCapFaceTextures(BiConsumer<String, ResourceLocation> textureConsumer,
-                                            ResourceLocation textureLocation, boolean isInside) {
-        ResourceLocation faceLoc = getTexturePath(isInside?INSIDE_FACE:OUTSIDE_FACE).orElse(textureLocation);
+    public void addCapFaceTextures(BiConsumer<String, Identifier> textureConsumer,
+                                            Identifier textureLocation, boolean isInside) {
+        Identifier faceLoc = getTexturePath(isInside?INSIDE_FACE:OUTSIDE_FACE).orElse(textureLocation);
         textureConsumer.accept("texture", faceLoc);
     }
 
-    protected HashMap<String, ResourceLocation> textureOverrides = new HashMap<>();
-    protected HashMap<String, ResourceLocation> modelOverrides = new HashMap<>();
+    protected HashMap<String, Identifier> textureOverrides = new HashMap<>();
+    protected HashMap<String, Identifier> modelOverrides = new HashMap<>();
     public static final String OUTSIDE_FACE = "outside_face";
     public static final String INSIDE_FACE = "inside_face";
     public static final String FACE = "face";
     public static final String CAP_CENTER_AGE_0_PARENT = "cap_center_age_0_parent";
 
-    public void setTextureOverrides(Map<String, ResourceLocation> textureOverrides) {
+    public void setTextureOverrides(Map<String, Identifier> textureOverrides) {
         this.textureOverrides.putAll(textureOverrides);
     }
-    public void setModelOverrides(Map<String, ResourceLocation> modelOverrides) {
+    public void setModelOverrides(Map<String, Identifier> modelOverrides) {
         this.modelOverrides.putAll(modelOverrides);
     }
-    public Optional<ResourceLocation> getTexturePath(String key) {
+    public Optional<Identifier> getTexturePath(String key) {
         return Optional.ofNullable(textureOverrides.getOrDefault(key, null));
     }
-    public Optional<ResourceLocation> getModelPath(String key) {
+    public Optional<Identifier> getModelPath(String key) {
         return Optional.ofNullable(modelOverrides.getOrDefault(key, null));
     }
 

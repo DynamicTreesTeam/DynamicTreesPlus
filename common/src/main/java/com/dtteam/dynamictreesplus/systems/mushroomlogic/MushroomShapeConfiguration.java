@@ -50,4 +50,8 @@ public final class MushroomShapeConfiguration extends Configuration<MushroomShap
         return this.configurable.getShapeCluster(this, context);
     }
 
+    @Override
+    public Class<MushroomShapeConfiguration> getRegistryType() {
+        return MushroomShapeConfiguration.class;
+    }
 }

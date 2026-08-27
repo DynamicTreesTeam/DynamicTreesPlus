@@ -28,7 +28,7 @@ import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.utility.Optionals;
-import com.dtteam.dynamictrees.utility.ResourceLocationUtils;
+import com.dtteam.dynamictrees.utility.IdentifierUtils;
 import com.dtteam.dynamictrees.worldgen.DynamicTreeGenerationContext;
 import com.dtteam.dynamictrees.worldgen.JoCode;
 import com.dtteam.dynamictreesplus.block.mushroom.CapProperties;
@@ -45,7 +45,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
@@ -66,14 +66,14 @@ public class HugeMushroomSpecies extends Species {
 
     public static final TypedRegistry.EntryType<Species> TYPE = createDefaultMushroomType(HugeMushroomSpecies::new);
 
-    public static TypedRegistry.EntryType<Species> createDefaultMushroomType(final Function3<ResourceLocation, Family, CapProperties, Species> constructor) {
+    public static TypedRegistry.EntryType<Species> createDefaultMushroomType(final Function3<Identifier, Family, CapProperties, Species> constructor) {
         return TypedRegistry.newType(createDefaultMushroomCodec(constructor));
     }
 
-    public static Codec<Species> createDefaultMushroomCodec(final Function3<ResourceLocation, Family, CapProperties, Species> constructor) {
+    public static Codec<Species> createDefaultMushroomCodec(final Function3<Identifier, Family, CapProperties, Species> constructor) {
         return RecordCodecBuilder.create(instance -> instance
                 .group(
-                        ResourceLocation.CODEC.fieldOf(TypedRegistry.RESOURCE_LOCATION.toString())
+                        Identifier.CODEC.fieldOf(TypedRegistry.RESOURCE_LOCATION.toString())
                                 .forGetter(Species::getRegistryName),
                         Family.REGISTRY.getGetterCodec().fieldOf("family")
                                 .forGetter(Species::getFamily),
@@ -89,11 +89,11 @@ public class HugeMushroomSpecies extends Species {
 
     protected int maxLightForPlanting = 12;
 
-    public HugeMushroomSpecies(ResourceLocation name, Family family, CapProperties capProperties) {
+    public HugeMushroomSpecies(Identifier name, Family family, CapProperties capProperties) {
         this(name, family, MushroomShapeConfiguration.getDefault(), capProperties);
     }
 
-    public HugeMushroomSpecies(ResourceLocation name, Family family, final MushroomShapeConfiguration shapeKit, CapProperties capProperties) {
+    public HugeMushroomSpecies(Identifier name, Family family, final MushroomShapeConfiguration shapeKit, CapProperties capProperties) {
         super(name, family, LeavesProperties.NULL);
         this.setCapProperties(capProperties.isValid() ? capProperties : (family instanceof HugeMushroomFamily ? ((HugeMushroomFamily)family).getCommonCap() : CapProperties.NULL));
         this.mushroomShapeKit = shapeKit;
@@ -197,7 +197,7 @@ public class HugeMushroomSpecies extends Species {
     }
 
     @Override
-    public ResourceLocation getSaplingSmartModelLocation() {
+    public Identifier getSaplingSmartModelLocation() {
         return DynamicTrees.location("block/smartmodel/mushroom_" + (this.getSaplingShape() == CommonVoxelShapes.FLAT_MUSHROOM ? "flat" : "round"));
     }
 
@@ -238,9 +238,9 @@ public class HugeMushroomSpecies extends Species {
     }
 
     @Override
-    public void addSaplingTextures(BiConsumer<String, ResourceLocation> textureConsumer,
-                                   ResourceLocation leavesTextureLocation, ResourceLocation barkTextureLocation) {
-        final ResourceLocation capLocation = ResourceLocationUtils.surround(this.getRegistryName(), "block/", "_cap");
+    public void addSaplingTextures(BiConsumer<String, Identifier> textureConsumer,
+                                   Identifier leavesTextureLocation, Identifier barkTextureLocation) {
+        final Identifier capLocation = IdentifierUtils.surround(this.getRegistryName(), "block/", "_cap");
         textureConsumer.accept("stem", barkTextureLocation);
         textureConsumer.accept("cap", capLocation);
     }

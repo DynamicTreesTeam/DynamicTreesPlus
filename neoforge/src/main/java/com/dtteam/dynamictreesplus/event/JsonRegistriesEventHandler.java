@@ -5,7 +5,7 @@ import com.dtteam.dynamictrees.event.ApplierRegistryEvent;
 import com.dtteam.dynamictrees.event.JsonDeserializerRegistryEvent;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.utility.ResourceLocationUtils;
+import com.dtteam.dynamictrees.utility.IdentifierUtils;
 import com.dtteam.dynamictreesplus.DynamicTreesPlus;
 import com.dtteam.dynamictreesplus.block.mushroom.CapProperties;
 import com.dtteam.dynamictreesplus.resources.DTPJsonDeserializers;
@@ -15,7 +15,7 @@ import com.dtteam.dynamictreesplus.tree.CactusSpecies;
 import com.dtteam.dynamictreesplus.tree.HugeMushroomFamily;
 import com.dtteam.dynamictreesplus.tree.HugeMushroomSpecies;
 import com.google.gson.JsonElement;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import org.apache.logging.log4j.LogManager;
@@ -29,11 +29,11 @@ public final class JsonRegistriesEventHandler {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static void logError(ResourceLocation name, String error, String registryName) {
+    private static void logError(Identifier name, String error, String registryName) {
         LOGGER.error("Error whilst loading type \"{}\" with name \"{}\": {}", registryName, name, error);
     }
 
-    private static void logWarning(ResourceLocation name, String warning, String registryName) {
+    private static void logWarning(Identifier name, String warning, String registryName) {
         LOGGER.warn("Warning whilst loading type \"{}\" with name \"{}\": {}", registryName, name, warning);
     }
 
@@ -47,9 +47,9 @@ public final class JsonRegistriesEventHandler {
     }
 
     public static void registerMushroomCommonApplier(PropertyAppliers<Family, JsonElement> appliers) {
-        appliers.register("common_cap", HugeMushroomFamily.class, ResourceLocation.class,
+        appliers.register("common_cap", HugeMushroomFamily.class, Identifier.class,
                 (family, registryName) -> {
-                    final ResourceLocation processedRegName = ResourceLocationUtils.parseDTLocation(registryName);
+                    final Identifier processedRegName = IdentifierUtils.parseDTLocation(registryName);
                     CapProperties.REGISTRY.runOnNextLock(CapProperties.REGISTRY.generateIfValidRunnable(
                             processedRegName,
                             family::setCommonCap,

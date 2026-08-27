@@ -8,7 +8,7 @@ import com.dtteam.dynamictreesplus.block.CactusBranchBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 
 public final class MegaCactusLogic extends StraightLogic {
@@ -16,7 +16,7 @@ public final class MegaCactusLogic extends StraightLogic {
     private static final ConfigurationProperty<Integer> STOP_BRANCHING_HEIGHT = ConfigurationProperty.integer("stop_branching_height");
     private static final ConfigurationProperty<Integer> MAX_HEIGHT = ConfigurationProperty.integer("max_height");
 
-    public MegaCactusLogic(final ResourceLocation registryName) {
+    public MegaCactusLogic(final Identifier registryName) {
         super(registryName);
     }
 

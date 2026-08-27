@@ -37,8 +37,8 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-
 import org.jetbrains.annotations.Nullable;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -184,7 +184,7 @@ public class DynamicCapCenterBlock extends Block implements TreePart, UpdatesSur
         if (couldGrow) {
             Family family = species.getFamily();
 
-            BlockState capCenter = level.getBlockState(pos.offset(signal.dir.getNormal()));
+            BlockState capCenter = level.getBlockState(pos.offset(signal.dir.getUnitVec3i()));
             int thickness = family.getPrimaryThickness() + (capCenter.hasProperty(DynamicCapCenterBlock.AGE)
                     ? capCenter.getValue(DynamicCapCenterBlock.AGE)
                     : 0);
@@ -226,7 +226,7 @@ public class DynamicCapCenterBlock extends Block implements TreePart, UpdatesSur
         Family family = species.getFamily();
         int thickness = Math.min(species.getFamily().getPrimaryThickness() + currentAge, species.getMaxBranchRadius());
 
-        BlockPos branchPos = pos.offset(signal.dir.getOpposite().getNormal());
+        BlockPos branchPos = pos.offset(signal.dir.getOpposite().getUnitVec3i());
         family.getBranchForPlacement(level, signal.getSpecies(), branchPos).ifPresent(branch ->
                 branch.setRadius(level, branchPos, thickness, null)
         );
@@ -292,7 +292,7 @@ public class DynamicCapCenterBlock extends Block implements TreePart, UpdatesSur
         boolean[] dirs = {false, !topIsCap, true, true, true, true};
         if (yMoved || age == 1){
             for (Direction dir : Direction.Plane.HORIZONTAL){
-                float dot = dir.getNormal().getX() * centerDirection.x + dir.getNormal().getZ() * centerDirection.z;
+                float dot = dir.getUnitVec3i().getX() * centerDirection.x + dir.getUnitVec3i().getZ() * centerDirection.z;
                 if (dot >= 0)
                     dirs[negativeFactor ? dir.getOpposite().ordinal() : dir.ordinal()] = false;
             }
@@ -310,15 +310,15 @@ public class DynamicCapCenterBlock extends Block implements TreePart, UpdatesSur
 
     //Same behavior as beds
     @Override
-    public void fallOn(Level level, BlockState state, BlockPos pos, Entity entity, float fallDistance) {
+    public void fallOn(Level level, BlockState state, BlockPos pos, Entity entity, double fallDistance) {
         super.fallOn(level, state, pos, entity, fallDistance * 0.5F);
     }
 
     //Same behavior as beds
     @Override
-    public void updateEntityAfterFallOn(BlockGetter level, Entity entity) {
+    public void updateEntityMovementAfterFallOn(BlockGetter level, Entity entity) {
         if (entity.isSuppressingBounce()) {
-            super.updateEntityAfterFallOn(level, entity);
+            super.updateEntityMovementAfterFallOn(level, entity);
         } else {
             this.bounceUp(entity);
         }

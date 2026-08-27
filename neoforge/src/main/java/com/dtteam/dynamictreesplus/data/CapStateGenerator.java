@@ -6,7 +6,7 @@ import com.dtteam.dynamictrees.data.provider.DTBlockStateProvider;
 import com.dtteam.dynamictreesplus.block.mushroom.CapProperties;
 import com.dtteam.dynamictreesplus.block.mushroom.DynamicCapBlock;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.client.model.generators.BlockModelBuilder;
 import net.neoforged.neoforge.client.model.generators.ModelFile;
@@ -19,8 +19,8 @@ public class CapStateGenerator implements Generator<DTDataProvider.BlockState, C
     @Override
     public void generate(DTDataProvider.BlockState prov, CapProperties input, Dependencies dependencies) {
         if (prov instanceof DTBlockStateProvider provider){
-            ResourceLocation outLocation = provider.block(BuiltInRegistries.BLOCK.getKey(dependencies.get(PRIMITIVE_CAP)));
-            ResourceLocation inLocation = ResourceLocation.parse("block/mushroom_block_inside");
+            Identifier outLocation = provider.block(BuiltInRegistries.BLOCK.getKey(dependencies.get(PRIMITIVE_CAP)));
+            Identifier inLocation = Identifier.parse("block/mushroom_block_inside");
             ModelFile outFaceModel;
             ModelFile inFaceModel;
             if (input.shouldGenerateFaceModels()){

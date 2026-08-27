@@ -8,7 +8,7 @@ import com.dtteam.dynamictreesplus.systems.mushroomlogic.MushroomShapeConfigurat
 import com.dtteam.dynamictreesplus.systems.mushroomlogic.context.MushroomCapContext;
 import com.dtteam.dynamictreesplus.tree.HugeMushroomSpecies;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedList;
@@ -29,7 +29,7 @@ public class BellShape extends MushroomShapeKit {
     public static final ConfigurationProperty<Integer> POINTED_TIP_AGE =
             ConfigurationProperty.integer("pointed_tip_max_age");
 
-    public BellShape(ResourceLocation registryName) {
+    public BellShape(Identifier registryName) {
         super(registryName);
     }
 

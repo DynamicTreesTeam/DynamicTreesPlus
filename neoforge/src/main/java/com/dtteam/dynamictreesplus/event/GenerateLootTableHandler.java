@@ -5,7 +5,7 @@ import com.dtteam.dynamictreesplus.block.mushroom.CapProperties;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -27,7 +27,7 @@ public class GenerateLootTableHandler {
 
     private static void addCapBlockTable(CapProperties capProperties, ExistingFileHelper existingFileHelper, Map<ResourceKey<LootTable>, LootTable.Builder> map, HolderLookup.Provider registries) {
         if (capProperties.shouldGenerateBlockDrops()) {
-            final ResourceLocation capBlockTablePath = capProperties.getBlockLootTableName();
+            final Identifier capBlockTablePath = capProperties.getBlockLootTableName();
             if (!existingFileHelper.exists(capBlockTablePath, PackType.SERVER_DATA)) {
                 map.put(ResourceKey.create(Registries.LOOT_TABLE, capBlockTablePath), capProperties.createBlockDrops(registries));
             }
@@ -36,7 +36,7 @@ public class GenerateLootTableHandler {
 
     private static void addCapTable(CapProperties capProperties, ExistingFileHelper existingFileHelper, Map<ResourceKey<LootTable>, LootTable.Builder> map, HolderLookup.Provider registries) {
         if (capProperties.shouldGenerateDrops()) {
-            final ResourceLocation capTablePath = capProperties.getLootTableName();
+            final Identifier capTablePath = capProperties.getLootTableName();
             if (!existingFileHelper.exists(capTablePath, PackType.SERVER_DATA)) {
                 map.put(ResourceKey.create(Registries.LOOT_TABLE, capTablePath), capProperties.createDrops(registries));
             }

@@ -24,15 +24,15 @@ import com.google.common.base.Predicate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.InsideBlockEffectApplier;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -50,6 +50,7 @@ import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
@@ -91,7 +92,7 @@ public class CactusBranchBlock extends BranchBlock {
     /**
      * @param name name of branch, without a {@code _branch} suffix
      */
-    public CactusBranchBlock(ResourceLocation name, Properties properties) {
+    public CactusBranchBlock(Identifier name, Properties properties) {
         super(name, properties);
 
         this.registerDefaultState(this.getStateDefinition().any().setValue(TRUNK_TYPE, CactusThickness.TRUNK).setValue(ORIGIN, Direction.DOWN));
@@ -136,6 +137,16 @@ public class CactusBranchBlock extends BranchBlock {
         return false; // Do nothing. Cacti don't rot.
     }
 
+    @Override
+    public BranchBlock setFlammability(int flammability) {
+        return null;
+    }
+
+    @Override
+    public BranchBlock setFireSpreadSpeed(int fireSpreadSpeed) {
+        return null;
+    }
+
     ///////////////////////////////////////////
     // INTERACTION
     ///////////////////////////////////////////
@@ -143,12 +154,12 @@ public class CactusBranchBlock extends BranchBlock {
     private static final double hurtMovementDelta = 0.003;
 
     @Override
-    public void entityInside(BlockState state, Level worldIn, BlockPos pos, Entity entity) {
+    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier effectApplier, boolean isPrecise) {
         boolean damage = false;
         if (DTPConfigs.CACTUS_PRICKLE_ON_MOVE_ONLY.get() && entity instanceof LivingEntity) {
             boolean falling = entity.getDeltaMovement().y < 0;
             entity.setDeltaMovement(entity.getDeltaMovement().x * 0.25, entity.getDeltaMovement().y * (falling ? 0.5 : 1), entity.getDeltaMovement().z * 0.25);
-            if (!worldIn.isClientSide && (entity.xOld != entity.getX() || entity.yOld != entity.getY() || entity.zOld != entity.getZ())) {
+            if (!level.isClientSide() && (entity.xOld != entity.getX() || entity.yOld != entity.getY() || entity.zOld != entity.getZ())) {
                 double xMovement = Math.abs(entity.getX() - entity.xOld);
                 double yMovement = Math.abs(entity.getY() - entity.yOld);
                 double zMovement = Math.abs(entity.getZ() - entity.zOld);
@@ -160,9 +171,8 @@ public class CactusBranchBlock extends BranchBlock {
             damage = true;
         }
 
-        if (damage) entity.hurt(worldIn.damageSources().cactus(), 1.0F);
+        if (damage) entity.hurt(level.damageSources().cactus(), 1.0F);
     }
-
 
     @Nullable
     @Override
@@ -282,11 +292,11 @@ public class CactusBranchBlock extends BranchBlock {
 
 
     @Override
-    public Connections getConnectionData(BlockAndTintGetter world, BlockPos pos, BlockState state) {
+    public Connections getConnectionData(@NotNull BlockGetter level, @NotNull BlockPos pos, @NotNull BlockState state) {
         Connections connections = new Connections();
 
         for (Direction dir : Direction.values()) {
-            connections.setRadius(dir, this.getSideConnectionRadius(world, pos, dir));
+            connections.setRadius(dir, this.getSideConnectionRadius(level, pos, dir));
         }
 
         return connections;

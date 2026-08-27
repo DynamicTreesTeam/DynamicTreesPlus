@@ -3,16 +3,16 @@ package com.dtteam.dynamictreesplus.resources;
 import com.dtteam.dynamictrees.api.configuration.ConfigurationTemplateResourceLoader;
 import com.dtteam.dynamictrees.api.resource.loading.preparation.JsonRegistryResourceLoader;
 import com.dtteam.dynamictrees.deserialization.JsonHelper;
-import com.dtteam.dynamictrees.deserialization.deserializer.ResourceLocationDeserializer;
+import com.dtteam.dynamictrees.deserialization.deserializer.IdentifierDeserializer;
 import com.dtteam.dynamictrees.deserialization.result.JsonResult;
 import com.dtteam.dynamictrees.tree.family.Family;
-import com.dtteam.dynamictrees.utility.ResourceLocationUtils;
+import com.dtteam.dynamictrees.utility.IdentifierUtils;
 import com.dtteam.dynamictreesplus.block.mushroom.CapProperties;
 import com.dtteam.dynamictreesplus.systems.mushroomlogic.MushroomShapeConfiguration;
 import com.dtteam.dynamictreesplus.systems.mushroomlogic.shapekits.MushroomShapeKit;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -41,14 +41,14 @@ public class CapPropertiesResourceLoader extends JsonRegistryResourceLoader<CapP
         this.gatherDataAppliers
                 .register("primitive_cap", Block.class, CapProperties::setPrimitiveCap)
                 .register("generate_face_models", Boolean.class, CapProperties::setGenerateFaceModels)
-                .registerMapApplier("texture_overrides", ResourceLocation.class, CapProperties::setTextureOverrides)
-                .registerMapApplier("model_overrides", ResourceLocation.class, CapProperties::setModelOverrides)
+                .registerMapApplier("texture_overrides", Identifier.class, CapProperties::setTextureOverrides)
+                .registerMapApplier("model_overrides", Identifier.class, CapProperties::setModelOverrides)
                 .register("mushroom_item", Item.class, CapProperties::setMushroomItem);
 
         // Primitive leaves are needed both client and server (so cannot be done on load).
         this.setupAppliers.register("primitive_cap", Block.class, CapProperties::setPrimitiveCap)
-                .register("family", ResourceLocation.class, (capProperties, registryName) -> {
-                    final ResourceLocation processedRegName = ResourceLocationUtils.parseDTLocation(registryName);
+                .register("family", Identifier.class, (capProperties, registryName) -> {
+                    final Identifier processedRegName = IdentifierUtils.parseDTLocation(registryName);
                     Family.REGISTRY.runOnNextLock(Family.REGISTRY.generateIfValidRunnable(
                             processedRegName,
                             capProperties::setFamily,
@@ -80,14 +80,14 @@ public class CapPropertiesResourceLoader extends JsonRegistryResourceLoader<CapP
     private void readCustomBlockRegistryName(CapProperties capProperties, JsonObject json) {
         JsonResult.forInput(json)
                 .mapIfContains("block_registry_name", JsonElement.class, input ->
-                        ResourceLocationDeserializer.create(capProperties.getRegistryName().getNamespace())
+                        IdentifierDeserializer.create(capProperties.getRegistryName().getNamespace())
                                 .deserialize(input).orElseThrow(), capProperties.getBlockRegistryName()
                 ).ifSuccessOrElse(
                         capProperties::setBlockRegistryName,
                         error -> this.logError(capProperties.getRegistryName(), error),
                         warning -> this.logWarning(capProperties.getRegistryName(), warning)
                 ).mapIfContains("center_block_registry_name", JsonElement.class, input ->
-                        ResourceLocationDeserializer.create(capProperties.getRegistryName().getNamespace())
+                        IdentifierDeserializer.create(capProperties.getRegistryName().getNamespace())
                                 .deserialize(input).orElseThrow(), capProperties.getCenterBlockRegistryName()
                 ).ifSuccessOrElse(
                         capProperties::setCenterBlockRegistryName,

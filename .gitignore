@@ -11,7 +11,8 @@ out
 *.ipr
 *.iws
 *.iml
-.idea
+.idea/*
+!.idea/scopes
 
 # gradle
 build
@@ -21,8 +22,5 @@ build
 eclipse
 run
 runs
-run-data
-
-repo
-/libs
-/mcmodsrepo
+/neoforge/mcmodsrepo
+/buildSrc/src/main/groovy/.idea

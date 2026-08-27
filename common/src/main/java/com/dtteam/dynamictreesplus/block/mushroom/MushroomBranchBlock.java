@@ -22,7 +22,7 @@ import com.dtteam.dynamictreesplus.tree.HugeMushroomSpecies;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
 
 public class MushroomBranchBlock extends ThickBranchBlock {
 
-    public MushroomBranchBlock(ResourceLocation name, Properties properties) {
+    public MushroomBranchBlock(Identifier name, Properties properties) {
         super(name, properties);
         setFlammability(0); //by default mushrooms don't burn
         setFireSpreadSpeed(0);
@@ -111,7 +111,7 @@ public class MushroomBranchBlock extends ThickBranchBlock {
             cutDir = Direction.DOWN;
         }
 
-        Pair<ResourceLocation, Integer> soilState = getCachedSoilState(level, cutPos.offset(cutDir.getNormal()), true);
+        BlockState soilState = getCachedSoilState(level, cutPos.offset(cutDir.getUnitVec3i()), true);
         return new BranchDestructionData(species, stateMapper.getBranchConnectionMap(), destroyedLeaves, leavesDropsList, endPoints, volumeSum.getVolume(), cutPos, cutPos, cutDir, toolDir, trunkHeight, soilState);
     }
 
@@ -120,7 +120,7 @@ public class MushroomBranchBlock extends ThickBranchBlock {
         if (!(species instanceof final HugeMushroomSpecies mushSpecies)) return;
         if (!(species.getFamily() instanceof final HugeMushroomFamily family)) return;
 
-        if (level.isClientSide || endPoints.isEmpty()) {
+        if (level.isClientSide() || endPoints.isEmpty()) {
             return;
         }
 

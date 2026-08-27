@@ -8,7 +8,7 @@ import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelState;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.client.model.geometry.IGeometryBakingContext;
@@ -21,7 +21,7 @@ import java.util.function.Function;
 @OnlyIn(Dist.CLIENT)
 public class CactusBranchBlockModelGeometry extends BranchBlockModelGeometry {
 
-    public CactusBranchBlockModelGeometry(ResourceLocation barkTextureLocation, ResourceLocation ringsTextureLocation) {
+    public CactusBranchBlockModelGeometry(Identifier barkTextureLocation, Identifier ringsTextureLocation) {
         super(barkTextureLocation, ringsTextureLocation, null, false);
     }
 

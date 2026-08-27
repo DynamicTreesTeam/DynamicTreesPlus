@@ -4,20 +4,19 @@ import com.dtteam.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.dtteam.dynamictrees.api.worldgen.FeatureCanceller;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.CactusBlock;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.configurations.BlockColumnConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
-import net.minecraft.world.level.levelgen.feature.configurations.RandomPatchConfiguration;
-import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
+import net.minecraft.world.level.levelgen.feature.configurations.VegetationPatchConfiguration;
 import net.minecraft.world.level.levelgen.feature.stateproviders.SimpleStateProvider;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 
 /**
- * This class cancels any features that have a config that extends {@link RandomPatchConfiguration} and that
+ * This class cancels any features that have a config that extends {@link VegetationPatchConfiguration} and that
  * has a block set within that class that extends the cactus block class given (by default {@link CactusBlock}).
  *
  * @author Harley O'Connor
@@ -28,21 +27,21 @@ public class CactusFeatureCanceller<T extends Block> extends FeatureCanceller {
 
     private final Class<T> cactusBlockClass;
 
-    public CactusFeatureCanceller(final ResourceLocation registryName, Class<T> cactusBlockClass) {
+    public CactusFeatureCanceller(final Identifier registryName, Class<T> cactusBlockClass) {
         super(registryName);
         this.cactusBlockClass = cactusBlockClass;
     }
 
     @Override
     public boolean shouldCancel(ConfiguredFeature<?, ?> configuredFeature, BiomePropertySelectors.NormalFeatureCancellation featureCancellations) {
-        ResourceLocation featureResLoc = BuiltInRegistries.FEATURE.getKey(configuredFeature.feature());
+        Identifier featureResLoc = BuiltInRegistries.FEATURE.getKey(configuredFeature.feature());
         if (featureResLoc == null)
             return false;
 
         FeatureConfiguration featureConfig = configuredFeature.config();
 
-        if (featureConfig instanceof RandomPatchConfiguration randomPatchConfiguration) {
-            PlacedFeature placedFeature = randomPatchConfiguration.feature().value();
+        if (featureConfig instanceof VegetationPatchConfiguration randomPatchConfiguration) {
+            PlacedFeature placedFeature = randomPatchConfiguration.vegetationFeature.value();
             featureConfig = placedFeature.feature().value().config();
         }
 
@@ -51,13 +50,9 @@ public class CactusFeatureCanceller<T extends Block> extends FeatureCanceller {
         }
 
         for (BlockColumnConfiguration.Layer layer : blockColumnConfiguration.layers()) {
-            final BlockStateProvider stateProvider = layer.state();
-            if (!(stateProvider instanceof SimpleStateProvider)) {
-                continue;
-            }
 
-            // SimpleStateProvider does not use Random or BlockPos in getState, but we still provide non-null values just to be safe
-            if (this.cactusBlockClass.isInstance(stateProvider.getState(PLACEHOLDER_RANDOM, BlockPos.ZERO).getBlock())) {
+            if (layer.state() instanceof SimpleStateProvider ssp &&
+                    this.cactusBlockClass.isInstance(ssp.getState(null, PLACEHOLDER_RANDOM, BlockPos.ZERO).getBlock())) {
                 return true;
             }
         }

@@ -10,7 +10,7 @@ import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictreesplus.block.mushroom.CapProperties;
 import com.dtteam.dynamictreesplus.block.mushroom.MushroomBranchBlock;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
@@ -26,7 +26,7 @@ public class HugeMushroomFamily extends Family {
 
     protected CapProperties commonCap = CapProperties.NULL;
 
-    public HugeMushroomFamily(ResourceLocation name) {
+    public HugeMushroomFamily(Identifier name) {
         super(name);
     }
 
@@ -75,7 +75,7 @@ public class HugeMushroomFamily extends Family {
     }
 
     @Override
-    protected BranchBlock createBranchBlock(ResourceLocation name) {
+    protected BranchBlock createBranchBlock(Identifier name) {
         final BasicBranchBlock branch = new MushroomBranchBlock(name, this.getProperties());
         if (this.isFireProof()) {
             branch.setFireSpreadSpeed(0).setFlammability(0);

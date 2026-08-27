@@ -19,7 +19,7 @@ public interface UpdatesSurroundNeighbors {
             BlockPos offPos = pos.offset(corner);
             Block offBlock = level.getBlockState(offPos).getBlock();
             if (blockClass.isInstance(offBlock))
-                level.neighborChanged(offPos, offBlock, pos);
+                level.neighborChanged(offPos, offBlock, null);
         }
     }
 

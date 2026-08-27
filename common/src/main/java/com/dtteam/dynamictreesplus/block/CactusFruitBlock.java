@@ -3,6 +3,7 @@ package com.dtteam.dynamictreesplus.block;
 import com.dtteam.dynamictrees.block.fruit.Fruit;
 import com.dtteam.dynamictrees.block.fruit.FruitBlock;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
@@ -17,8 +18,8 @@ public class CactusFruitBlock extends FruitBlock {
 
     public static final BooleanProperty OFFSET = BooleanProperty.create("is_offset");
 
-    public CactusFruitBlock(Properties properties, Fruit fruit) {
-        super(properties, fruit);
+    public CactusFruitBlock(Identifier id, Properties properties, Fruit fruit) {
+        super(id, properties, fruit);
         registerDefaultState(defaultBlockState().setValue(OFFSET, false));
     }
 
